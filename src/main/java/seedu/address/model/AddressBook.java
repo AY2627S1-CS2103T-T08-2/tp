@@ -8,6 +8,8 @@ import javafx.collections.ObservableList;
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.UniquePersonList;
+import seedu.address.model.project.Project;
+import seedu.address.model.project.UniqueProjectList;
 
 /**
  * Wraps all data at the address-book level.
@@ -16,8 +18,10 @@ import seedu.address.model.person.UniquePersonList;
 public class AddressBook implements ReadOnlyAddressBook {
 
     private final UniquePersonList persons = new UniquePersonList();
+    private final UniqueProjectList projects = new UniqueProjectList();
 
-    public AddressBook() {}
+    public AddressBook() {
+    }
 
     /**
      * Creates an AddressBook using the Persons in the {@code toBeCopied}
@@ -83,7 +87,15 @@ public class AddressBook implements ReadOnlyAddressBook {
         persons.remove(key);
     }
 
-    //// util methods
+    /**
+     * Adds a project to the address book.
+     * The project must not already exist in the address book.
+     */
+    public void addProject(Project p) {
+        projects.add(p);
+    }
+
+    /// / util methods
 
     @Override
     public String toString() {

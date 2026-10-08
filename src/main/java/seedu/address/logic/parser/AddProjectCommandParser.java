@@ -9,7 +9,6 @@ import java.util.stream.Stream;
 
 import seedu.address.logic.commands.AddProjectCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
-import seedu.address.model.person.Person;
 import seedu.address.model.project.Deadline;
 import seedu.address.model.project.Description;
 import seedu.address.model.project.Project;
@@ -26,7 +25,17 @@ public class AddProjectCommandParser implements Parser<AddProjectCommand> {
      *
      * @throws ParseException if the user input does not conform to the expected format
      */
+    @Override
     public AddProjectCommand parse(String args) throws ParseException {
+        if (args.codePoints().anyMatch(codePoint -> codePoint == '\r'
+                || codePoint == '\n'
+                || codePoint == '\u0085'
+                || codePoint == '\u2028'
+                || codePoint == '\u2029')) {
+            throw new ParseException(String.format(
+                    MESSAGE_INVALID_COMMAND_FORMAT, AddProjectCommand.MESSAGE_USAGE));
+        }
+
         ArgumentMultimap argMultimap =
                 ArgumentTokenizer.tokenize(args, PREFIX_NAME, PREFIX_DEADLINE, PREFIX_DESCRIPTION);
 

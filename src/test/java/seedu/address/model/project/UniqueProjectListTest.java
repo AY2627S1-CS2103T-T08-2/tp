@@ -162,8 +162,7 @@ public class UniqueProjectListTest {
                 new Description("Updated"));
         uniqueProjectList.add(original);
 
-        assertThrows(DuplicateProjectException.class,
-                () -> uniqueProjectList.add(duplicate));
+        assertThrows(DuplicateProjectException.class, () -> uniqueProjectList.add(duplicate));
         assertEquals(List.of(original), uniqueProjectList.asUnmodifiableObservableList());
     }
 
@@ -176,8 +175,7 @@ public class UniqueProjectListTest {
                 new ProjectName("  cs2103t   team  "), deadline, Description.EMPTY);
         uniqueProjectList.add(original);
 
-        assertThrows(DuplicateProjectException.class,
-                () -> uniqueProjectList.add(duplicate));
+        assertThrows(DuplicateProjectException.class, () -> uniqueProjectList.add(duplicate));
         assertEquals(List.of(original), uniqueProjectList.asUnmodifiableObservableList());
     }
 

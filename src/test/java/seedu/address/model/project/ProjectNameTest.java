@@ -1,12 +1,11 @@
 package seedu.address.model.project;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
 
 import org.junit.jupiter.api.Test;
-
-import seedu.address.model.person.Name;
 
 public class ProjectNameTest {
 
@@ -22,6 +21,22 @@ public class ProjectNameTest {
     }
 
     @Test
+    public void constructor_normalisesWhitespace_preservesCapitalisation() {
+        ProjectName name = new ProjectName("  CS2103T   Team   Project  ");
+        assertEquals("CS2103T Team Project", name.toString());
+    }
+
+    @Test
+    public void equals_differentCaseAndSpacing_returnsTrue() {
+        ProjectName name = new ProjectName("CS2103T Team Project");
+        ProjectName equivalent = new ProjectName("  cs2103t   team project  ");
+
+        assertEquals(name, equivalent);
+        assertEquals(equivalent, name);
+        assertEquals(name.hashCode(), equivalent.hashCode());
+    }
+
+    @Test
     public void isValidName() {
         // null name
         assertThrows(NullPointerException.class, () -> ProjectName.isValidName(null));
@@ -31,6 +46,8 @@ public class ProjectNameTest {
         assertFalse(ProjectName.isValidName(" ")); // spaces only
         assertFalse(ProjectName.isValidName("^")); // only non-alphanumeric characters
         assertFalse(ProjectName.isValidName("peter*")); // contains non-alphanumeric characters
+        assertFalse(ProjectName.isValidName("a".repeat(51)));
+        assertFalse(ProjectName.isValidName("-'&()"));
 
         // valid name
         assertTrue(ProjectName.isValidName("peter jack")); // alphabets only
@@ -38,6 +55,8 @@ public class ProjectNameTest {
         assertTrue(ProjectName.isValidName("peter the 2nd")); // alphanumeric characters
         assertTrue(ProjectName.isValidName("Capital Tan")); // with capital letters
         assertTrue(ProjectName.isValidName("David Roger Jackson Ray Jr 2nd")); // long names
+        assertTrue(ProjectName.isValidName("a".repeat(50)));
+        assertTrue(ProjectName.isValidName("Team-A's Project & Research (2026)")); // allowed punctuation
     }
 
     @Test
@@ -57,6 +76,6 @@ public class ProjectNameTest {
         assertFalse(name.equals(5.0f));
 
         // different values -> returns false
-        assertFalse(name.equals(new Name("Other Valid Project Name")));
+        assertFalse(name.equals(new ProjectName("Other Valid Project Name")));
     }
 }

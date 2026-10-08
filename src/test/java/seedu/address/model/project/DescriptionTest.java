@@ -16,9 +16,11 @@ public class DescriptionTest {
     }
 
     @Test
-    public void constructor_invalidName_throwsIllegalArgumentException() {
+    public void constructor_invalidDescription_throwsIllegalArgumentException() {
         String invalidDescription = "\n";
         assertThrows(IllegalArgumentException.class, () -> new Name(invalidDescription));
+        assertThrows(IllegalArgumentException.class,
+                () -> new Description("a".repeat(201)));
     }
 
     @Test
@@ -32,14 +34,7 @@ public class DescriptionTest {
         assertFalse(Description.isValidDescription("\u0085"));
         assertFalse(Description.isValidDescription("\u2028"));
         assertFalse(Description.isValidDescription("\u2029"));
-        assertFalse(Description.isValidDescription(
-                        """
-                        tttttttttttttttttttttttttttttttttttttttttttttttttt
-                        tttttttttttttttttttttttttttttttttttttttttttttttttt
-                        tttttttttttttttttttttttttttttttttttttttttttttttttt
-                        tttttttttttttttttttttttttttttttttttttttttttttttttt
-                        t"""
-        )); // too long at 201 characters
+        assertFalse(Description.isValidDescription("a".repeat(201))); // too long
 
         // valid description
         assertTrue(Description.isValidDescription("peter jack")); // alphabets only
@@ -47,6 +42,9 @@ public class DescriptionTest {
         assertTrue(Description.isValidDescription("peter the 2nd")); // alphanumeric characters
         assertTrue(Description.isValidDescription("Capital Tan")); // with capital letters
         assertTrue(Description.isValidDescription("David Roger Jackson Ray Jr 2nd")); // long names
+        assertTrue(Description.isValidDescription(""));
+        assertTrue(Description.isValidDescription("Build UniTeam! (Version 1.0)"));
+        assertTrue(Description.isValidDescription("😀".repeat(200)));
     }
 
     @Test

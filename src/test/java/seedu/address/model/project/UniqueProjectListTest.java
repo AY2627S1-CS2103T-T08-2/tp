@@ -29,12 +29,12 @@ public class UniqueProjectListTest {
     }
 
     @Test
-    public void contains_personNotInList_returnsFalse() {
+    public void contains_projectNotInList_returnsFalse() {
         assertFalse(uniqueProjectList.contains(PROJ0));
     }
 
     @Test
-    public void contains_personInList_returnsTrue() {
+    public void contains_projectInList_returnsTrue() {
         uniqueProjectList.add(PROJ0);
         assertTrue(uniqueProjectList.contains(PROJ0));
     }
@@ -96,7 +96,7 @@ public class UniqueProjectListTest {
     }
 
     @Test
-    public void remove_personDoesNotExist_throwsProjectNotFoundException() {
+    public void remove_projectDoesNotExist_throwsProjectNotFoundException() {
         assertThrows(ProjectNotFoundException.class, () -> uniqueProjectList.remove(PROJ0));
     }
 
@@ -130,8 +130,8 @@ public class UniqueProjectListTest {
     @Test
     public void setProjects_list_replacesOwnListWithProvidedList() {
         uniqueProjectList.add(PROJ0);
-        List<Project> personList = List.of(PROJ1);
-        uniqueProjectList.setProjects(personList);
+        List<Project> projectList = List.of(PROJ1);
+        uniqueProjectList.setProjects(projectList);
         UniqueProjectList expectedUniqueProjectList = new UniqueProjectList();
         expectedUniqueProjectList.add(PROJ1);
         assertEquals(expectedUniqueProjectList, uniqueProjectList);

@@ -9,6 +9,7 @@ import static seedu.address.testutil.TypicalPersons.ALICE;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,8 @@ import seedu.address.model.Model;
 import seedu.address.model.ReadOnlyAddressBook;
 import seedu.address.model.ReadOnlyUserPrefs;
 import seedu.address.model.person.Person;
+import seedu.address.model.project.Project;
+import seedu.address.model.project.ProjectName;
 import seedu.address.testutil.PersonBuilder;
 
 public class AddCommandTest {
@@ -139,6 +142,36 @@ public class AddCommandTest {
 
         @Override
         public void updateFilteredPersonList(Predicate<Person> predicate) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public boolean hasProject(Project project) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void addProject(Project project) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void setProject(Project target, Project editedProject) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public void deleteProject(Project target) {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public ObservableList<Project> getProjectList() {
+            throw new AssertionError("This method should not be called.");
+        }
+
+        @Override
+        public Optional<Project> findProject(ProjectName name) {
             throw new AssertionError("This method should not be called.");
         }
     }

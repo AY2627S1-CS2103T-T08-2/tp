@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.commons.util.JsonUtil;
 import seedu.address.model.AddressBook;
+import seedu.address.model.project.Project;
+import seedu.address.model.project.ProjectContact;
 import seedu.address.testutil.TypicalPersons;
 
 public class JsonSerializableAddressBookTest {
@@ -42,6 +44,20 @@ public class JsonSerializableAddressBookTest {
                 JsonSerializableAddressBook.class).get();
         assertThrows(IllegalValueException.class, JsonSerializableAddressBook.MESSAGE_DUPLICATE_PERSON,
                 dataFromFile::toModelType);
+    }
+
+    @Test
+    public void toModelType_projectDataRoundTrips() throws Exception {
+        AddressBook original = TypicalPersons.getTypicalAddressBook();
+        original.setProjects(java.util.List.of(new Project(1, "UniTeam")));
+        original.setProjectContacts(java.util.List.of(new ProjectContact(1, "Alice Pauline")));
+
+        String json = JsonUtil.toJsonString(new JsonSerializableAddressBook(original));
+        JsonSerializableAddressBook decoded = JsonUtil.fromJsonString(json, JsonSerializableAddressBook.class);
+        AddressBook restored = decoded.toModelType();
+
+        assertEquals(original.getProjectList(), restored.getProjectList());
+        assertEquals(original.getProjectContacts(), restored.getProjectContacts());
     }
 
 }

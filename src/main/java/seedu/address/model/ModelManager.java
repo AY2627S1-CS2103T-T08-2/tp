@@ -3,6 +3,7 @@ package seedu.address.model;
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
@@ -11,6 +12,7 @@ import javafx.collections.transformation.FilteredList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.model.person.Person;
+import seedu.address.model.project.Project;
 
 /**
  * Represents the in-memory model of the address book data.
@@ -108,6 +110,22 @@ public class ModelManager implements Model {
     public void updateFilteredPersonList(Predicate<Person> predicate) {
         requireNonNull(predicate);
         filteredPersons.setPredicate(predicate);
+    }
+
+    @Override
+    public List<Project> getProjects() {
+        return addressBook.getProjectList();
+    }
+
+    @Override
+    public List<Person> getContactsForProject(int projectId) {
+        return addressBook.getProjectContacts(projectId);
+    }
+
+    @Override
+    public List<Project> getProjectsForContact(String contactName) {
+        requireNonNull(contactName);
+        return addressBook.getProjectsForContact(contactName);
     }
 
     @Override

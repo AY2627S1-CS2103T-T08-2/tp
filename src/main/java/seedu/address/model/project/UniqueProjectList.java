@@ -8,8 +8,6 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import seedu.address.model.person.Person;
-import seedu.address.model.person.UniquePersonList;
 import seedu.address.model.person.exceptions.DuplicatePersonException;
 import seedu.address.model.person.exceptions.PersonNotFoundException;
 import seedu.address.model.project.exceptions.DuplicateProjectException;
@@ -18,10 +16,10 @@ import seedu.address.model.project.exceptions.ProjectNotFoundException;
 /**
  * A list of projects that enforces uniqueness between its elements and does not allow nulls.
  * A project is considered unique by comparing using {@code Project#isSameProject(Project)}. As such, adding and updating of
- * projects uses Project#isSameProject(Project) for equality so as to ensure that the project being added or updated is
- * unique in terms of identity in the UniqueProjectList. However, the removal of a project uses Project#equals(Object) so
- * as to ensure that the project with exactly the same fields will be removed.
- *
+ * projects uses Project#isSameProject(Project) for equality to ensure that the project being added or updated is
+ * unique in terms of identity in the UniqueProjectList. However, the removal of a project uses Project#equals(Object)
+ * to ensure that the project with exactly the same fields will be removed.
+ * <p>
  * Supports a minimal set of list operations.
  *
  * @see Project#isSameProject(Project)

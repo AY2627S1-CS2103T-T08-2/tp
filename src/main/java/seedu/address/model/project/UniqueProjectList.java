@@ -8,8 +8,6 @@ import java.util.List;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import seedu.address.model.person.exceptions.DuplicatePersonException;
-import seedu.address.model.person.exceptions.PersonNotFoundException;
 import seedu.address.model.project.exceptions.DuplicateProjectException;
 import seedu.address.model.project.exceptions.ProjectNotFoundException;
 
@@ -60,11 +58,11 @@ public class UniqueProjectList implements Iterable<Project> {
 
         int index = internalList.indexOf(target);
         if (index == -1) {
-            throw new PersonNotFoundException();
+            throw new ProjectNotFoundException();
         }
 
         if (!target.isSameProject(editedProject) && contains(editedProject)) {
-            throw new DuplicatePersonException();
+            throw new DuplicateProjectException();
         }
 
         internalList.set(index, editedProject);
@@ -90,10 +88,10 @@ public class UniqueProjectList implements Iterable<Project> {
      * Replaces the contents of this list with {@code projects}.
      * {@code projects} must not contain duplicate projects.
      */
-    public void setPersons(List<Project> projects) {
+    public void setProjects(List<Project> projects) {
         requireAllNonNull(projects);
         if (!projectsAreUnique(projects)) {
-            throw new DuplicatePersonException();
+            throw new DuplicateProjectException();
         }
 
         internalList.setAll(projects);

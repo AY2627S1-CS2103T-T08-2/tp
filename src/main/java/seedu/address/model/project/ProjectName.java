@@ -14,7 +14,7 @@ public class ProjectName {
                     + "and contain only letters, digits, spaces, hyphens, apostrophes, "
                     + "ampersands and parentheses";
 
-    public static final String VALIDATION_REGEX = "[\\\\p{L}\\\\p{N} '&()\\\\-]+";
+    public static final String VALIDATION_REGEX = "[\\p{L}\\p{N} '&()\\-]+";
 
     public final String projectName;
 
@@ -57,15 +57,19 @@ public class ProjectName {
             return false;
         }
 
-        return projectName.equals(otherName.projectName);
+        return comparisonKey().equals(otherName.projectName);
     }
 
     @Override
     public int hashCode() {
-        return projectName.hashCode();
+        return comparisonKey().hashCode();
     }
 
     private static String normalise(String name) {
         return name.strip().replaceAll("\\s+", " ");
+    }
+
+    private String comparisonKey() {
+        return projectName.toLowerCase();
     }
 }

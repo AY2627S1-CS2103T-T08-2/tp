@@ -12,15 +12,11 @@ public class Description {
     public static final Description EMPTY = new Description("");
 
     public static final String MESSAGE_CONSTRAINTS =
-            "Description should only contain alphanumeric characters and spaces, and should not be blank";
+            "Descriptions must be at most 200 characters long and must not contain line breaks";
 
-    /*
-     * The first character of the description must not be a whitespace,
-     * otherwise " " (a blank string) becomes a valid input.
-     */
-    public static final String VALIDATION_REGEX = "[\\p{Alnum}][\\p{Alnum} ]*";
+    public static final String VALIDATION_REGEX = "[^\\r\\n\\u0085\\u2028\\u2029]*";
 
-    public final String fullDescription;
+    public final String description;
 
     /**
      * Constructs a {@code Description}.
@@ -30,19 +26,20 @@ public class Description {
     public Description(String description) {
         requireNonNull(description);
         checkArgument(isValidDescription(description), MESSAGE_CONSTRAINTS);
-        fullDescription = description;
+        this.description = description;
     }
 
     /**
      * Returns true if a given string is a valid description.
      */
     public static boolean isValidDescription(String test) {
-        return test.matches(VALIDATION_REGEX);
+        return test.codePointCount(0, test.length()) <= 200
+                && test.matches(VALIDATION_REGEX);
     }
 
     @Override
     public String toString() {
-        return fullDescription;
+        return description;
     }
 
     @Override
@@ -52,15 +49,15 @@ public class Description {
         }
 
         // instanceof handles nulls
-        if (!(other instanceof Description otherName)) {
+        if (!(other instanceof Description otherDescription)) {
             return false;
         }
 
-        return fullDescription.equals(otherName.fullDescription);
+        return description.equals(otherDescription.description);
     }
 
     @Override
     public int hashCode() {
-        return fullDescription.hashCode();
+        return description.hashCode();
     }
 }

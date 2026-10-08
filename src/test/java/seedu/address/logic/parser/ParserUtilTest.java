@@ -6,6 +6,7 @@ import static seedu.address.logic.parser.ParserUtil.MESSAGE_INVALID_INDEX;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -16,6 +17,9 @@ import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
 import seedu.address.model.person.Phone;
+import seedu.address.model.project.Deadline;
+import seedu.address.model.project.Description;
+import seedu.address.model.project.ProjectName;
 import seedu.address.model.tag.Tag;
 
 public class ParserUtilTest {
@@ -190,5 +194,130 @@ public class ParserUtilTest {
         Set<Tag> expectedTagSet = Set.of(new Tag(VALID_TAG_1), new Tag(VALID_TAG_2));
 
         assertEquals(expectedTagSet, actualTagSet);
+    }
+
+    @Test
+    public void parseProjectName_null_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> ParserUtil.parseProjectName(null));
+    }
+
+    @Test
+    public void parseProjectName_invalidValue_throwsParseException() {
+        String[] invalidNames = {"", "   ", "---", "Project@", "a".repeat(51)};
+
+        for (String name : invalidNames) {
+            assertThrows(ParseException.class, () -> ParserUtil.parseProjectName(name));
+        }
+    }
+
+    @Test
+    public void parseProjectName_validValue_returnsNormalisedName() throws Exception {
+        ProjectName result = ParserUtil.parseProjectName("  CS2103T   Team Project  ");
+
+        // Check the display value because equals() ignores case and spacing.
+        assertEquals("CS2103T Team Project", result.toString());
+    }
+
+    @Test
+    public void parseProjectName_maximumLength_success() throws Exception {
+        String name = "a".repeat(50);
+
+        assertEquals(new ProjectName(name), ParserUtil.parseProjectName(name));
+    }
+
+    @Test
+    public void parseDeadline_null_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> ParserUtil.parseDeadline(null));
+    }
+
+    @Test
+    public void parseDeadline_invalidValue_throwsParseException() {
+        String[] invalidDeadlines = {
+                "",
+                "   ",
+                "2026-02-29",
+                "2026-04-31",
+                "2026-13-01",
+                "2026-11-00",
+                "13/11/2026",
+                "2026-1-01",
+                "2026-11-13T12:00",
+                "tomorrow"
+        };
+
+        for (String deadline : invalidDeadlines) {
+            assertThrows(ParseException.class, () -> ParserUtil.parseDeadline(deadline));
+        }
+    }
+
+    @Test
+    public void parseDeadline_validValue_returnsDeadline() throws Exception {
+        assertEquals(
+                new Deadline(LocalDate.of(2026, 11, 13)),
+                ParserUtil.parseDeadline("  2026-11-13  "));
+    }
+
+    @Test
+    public void parseDeadline_validLeapDay_returnsDeadline() throws Exception {
+        assertEquals(
+                new Deadline(LocalDate.of(2028, 2, 29)),
+                ParserUtil.parseDeadline("2028-02-29"));
+    }
+
+    @Test
+    public void parseDeadline_pastDate_returnsDeadline() throws Exception {
+        assertEquals(
+                new Deadline(LocalDate.of(2000, 1, 1)),
+                ParserUtil.parseDeadline("2000-01-01"));
+    }
+
+    @Test
+    public void parseDescription_null_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> ParserUtil.parseDescription(null));
+    }
+
+    @Test
+    public void parseDescription_blank_throwsParseException() {
+        assertThrows(ParseException.class, () -> ParserUtil.parseDescription(""));
+        assertThrows(ParseException.class, () -> ParserUtil.parseDescription("   "));
+    }
+
+    @Test
+    public void parseDescription_tooLong_throwsParseException() {
+        assertThrows(ParseException.class,
+                () -> ParserUtil.parseDescription("a".repeat(201)));
+    }
+
+    @Test
+    public void parseDescription_lineBreaks_throwsParseException() {
+        String[] lineBreaks = {"\r", "\n", "\u0085", "\u2028", "\u2029"};
+
+        for (String lineBreak : lineBreaks) {
+            assertThrows(ParseException.class,
+                    () -> ParserUtil.parseDescription("First" + lineBreak + "Second"));
+
+            assertThrows(ParseException.class,
+                    () -> ParserUtil.parseDescription(lineBreak + "Description"));
+
+            assertThrows(ParseException.class,
+                    () -> ParserUtil.parseDescription("Description" + lineBreak));
+        }
+    }
+
+    @Test
+    public void parseDescription_validValue_preservesInternalSpacingAndCase() throws Exception {
+        assertEquals(
+                new Description("Build  a Contact Manager!"),
+                ParserUtil.parseDescription("  Build  a Contact Manager!  "));
+    }
+
+    @Test
+    public void parseDescription_lengthBoundaries_success() throws Exception {
+        assertEquals(new Description("a"), ParserUtil.parseDescription("a"));
+
+        String description = "a".repeat(200);
+        assertEquals(
+                new Description(description),
+                ParserUtil.parseDescription("  " + description + "  "));
     }
 }

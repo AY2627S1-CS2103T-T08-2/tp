@@ -14,7 +14,7 @@ import seedu.address.model.project.UniqueProjectList;
 
 /**
  * Wraps all data at the address-book level.
- * Duplicates are not allowed (by .isSamePerson comparison).
+ * Duplicates are not allowed (by .isSamePerson and .isSameProject comparison).
  */
 public class AddressBook implements ReadOnlyAddressBook {
 
@@ -25,7 +25,7 @@ public class AddressBook implements ReadOnlyAddressBook {
     }
 
     /**
-     * Creates an AddressBook using the Persons in the {@code toBeCopied}
+     * Creates an AddressBook using the Persons and Projects in the {@code toBeCopied}
      */
     public AddressBook(ReadOnlyAddressBook toBeCopied) {
         this();
@@ -133,7 +133,7 @@ public class AddressBook implements ReadOnlyAddressBook {
         projects.remove(key);
     }
 
-    /// / util methods
+    //// util methods
 
     @Override
     public String toString() {

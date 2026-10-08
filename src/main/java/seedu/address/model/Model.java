@@ -15,7 +15,6 @@ import seedu.address.model.project.ProjectName;
 public interface Model {
     /** {@code Predicate} that always evaluates to true */
     Predicate<Person> PREDICATE_SHOW_ALL_PERSONS = unused -> true;
-    Predicate<Project> PREDICATE_SHOW_ALL_PROJECTS = unused -> true;
 
     /**
      * Returns the user prefs.
@@ -91,7 +90,7 @@ public interface Model {
     void addProject(Project project);
 
     /**
-     * Replaces the given person {@code target} with {@code editedProject}.
+     * Replaces the given project {@code target} with {@code editedProject}.
      * {@code target} must exist in the address book.
      * The project identity of {@code editedProject} must not be the same as another existing project in the address
      * book.

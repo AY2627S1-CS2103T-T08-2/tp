@@ -6,8 +6,6 @@ import static seedu.address.testutil.Assert.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-import seedu.address.model.person.Name;
-
 public class DescriptionTest {
 
     @Test
@@ -18,7 +16,7 @@ public class DescriptionTest {
     @Test
     public void constructor_invalidDescription_throwsIllegalArgumentException() {
         String invalidDescription = "\n";
-        assertThrows(IllegalArgumentException.class, () -> new Name(invalidDescription));
+        assertThrows(IllegalArgumentException.class, () -> new Description(invalidDescription));
         assertThrows(IllegalArgumentException.class, () -> new Description("a".repeat(201)));
     }
 

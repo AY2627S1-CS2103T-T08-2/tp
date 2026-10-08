@@ -20,7 +20,8 @@ public class AddressBook implements ReadOnlyAddressBook {
     private final UniquePersonList persons = new UniquePersonList();
     private final UniqueProjectList projects = new UniqueProjectList();
 
-    public AddressBook() {}
+    public AddressBook() {
+    }
 
     /**
      * Creates an AddressBook using the Persons in the {@code toBeCopied}
@@ -94,7 +95,7 @@ public class AddressBook implements ReadOnlyAddressBook {
         projects.add(p);
     }
 
-    //// util methods
+    /// / util methods
 
     @Override
     public String toString() {

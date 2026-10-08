@@ -12,6 +12,15 @@ import seedu.address.testutil.ProjectBuilder;
 public class ProjectTest {
 
     @Test
+    public void isSameProject() {
+        // same object -> returns true
+        assertTrue(PROJ0.isSameProject(PROJ0));
+
+        // null -> returns false
+        assertFalse(PROJ0.isSameProject(null));
+    }
+
+    @Test
     public void equals() {
         // same values -> returns true
         Project proj0Copy = new ProjectBuilder(PROJ0).build();

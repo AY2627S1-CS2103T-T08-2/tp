@@ -20,7 +20,7 @@ public class DeadlineTest {
         Deadline deadline = new Deadline(LocalDate.of(2020, 1, 1));
 
         // same values -> returns true
-        assertTrue(deadline.equals(LocalDate.of(2020, 1, 1)));
+        assertTrue(deadline.equals(new Deadline(LocalDate.of(2020, 1, 1))));
 
         // same object -> returns true
         assertTrue(deadline.equals(deadline));

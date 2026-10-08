@@ -1,21 +1,32 @@
 package seedu.address.model.person;
 
+import static java.util.Objects.requireNonNull;
+
 import java.util.UUID;
 
 /**
  * Represents a PersonId for a Person.
- * Guarantees: Immutable ID.
+ * Guarantees: ID is present, not null, and immutable.
  */
 public class PersonId {
-    
+
     private final UUID id;
 
+    /**
+     * Constructs a person identifier from an existing UUID.
+     *
+     * @param id A non-null UUID.
+     * @throws NullPointerException if {@code id} is null.
+     */
     public PersonId(UUID id) {
-        this.id = id;
+        this.id = requireNonNull(id);
     }
 
-    public UUID generateId() {
-        return id;
+    /**
+     * Returns a new randomly generated person identifier.
+     */
+    public static PersonId generate() {
+        return new PersonId(UUID.randomUUID());
     }
 
     public UUID getId() {

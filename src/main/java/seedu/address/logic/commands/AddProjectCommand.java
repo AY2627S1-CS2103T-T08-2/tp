@@ -23,7 +23,7 @@ public class AddProjectCommand extends Command {
             + " desc/Build a contact management application";
 
     public static final String MESSAGE_SUCCESS = "New project added:\n%1$s\nDeadline: %2$s\nDescription: %3$s";
-    public static final String MESSAGE_DUPLICATE_PROJECT = "This project already exists in the address book.";
+    public static final String MESSAGE_DUPLICATE_PROJECT = "A project with the name \"%1$s\" already exists.";
 
     private final Project toAdd;
 
@@ -40,7 +40,7 @@ public class AddProjectCommand extends Command {
         requireNonNull(model);
 
         if (model.hasProject(toAdd)) {
-            throw new CommandException(MESSAGE_DUPLICATE_PROJECT);
+            throw new CommandException(String.format(MESSAGE_DUPLICATE_PROJECT, toAdd.getName()));
         }
 
         model.addProject(toAdd);

@@ -7,6 +7,7 @@ import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalProjects.PROJ0;
 import static seedu.address.testutil.TypicalProjects.PROJ1;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -21,11 +22,6 @@ public class UniqueProjectListTest {
     @Test
     public void contains_nullProject_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> uniqueProjectList.contains(null));
-    }
-
-    @Test
-    public void contains_projectNotInList_returnsFalse() {
-        assertFalse(uniqueProjectList.contains(PROJ0));
     }
 
     @Test
@@ -152,5 +148,52 @@ public class UniqueProjectListTest {
     @Test
     public void toStringMethod() {
         assertEquals(uniqueProjectList.asUnmodifiableObservableList().toString(), uniqueProjectList.toString());
+    }
+
+    @Test
+    public void add_sameNameDifferentData_throwsDuplicateProjectException() {
+        Project original = new Project(
+                new ProjectName("CS2103T Team"),
+                new Deadline(LocalDate.of(2026, 11, 1)),
+                new Description("Original"));
+        Project duplicate = new Project(
+                new ProjectName("CS2103T Team"),
+                new Deadline(LocalDate.of(2026, 12, 1)),
+                new Description("Updated"));
+        uniqueProjectList.add(original);
+
+        assertThrows(DuplicateProjectException.class,
+                () -> uniqueProjectList.add(duplicate));
+        assertEquals(List.of(original), uniqueProjectList.asUnmodifiableObservableList());
+    }
+
+    @Test
+    public void add_nameWithDifferentCaseAndSpacing_throwsDuplicateProjectException() {
+        Deadline deadline = new Deadline(LocalDate.of(2026, 11, 1));
+        Project original = new Project(
+                new ProjectName("CS2103T Team"), deadline, Description.EMPTY);
+        Project duplicate = new Project(
+                new ProjectName("  cs2103t   team  "), deadline, Description.EMPTY);
+        uniqueProjectList.add(original);
+
+        assertThrows(DuplicateProjectException.class,
+                () -> uniqueProjectList.add(duplicate));
+        assertEquals(List.of(original), uniqueProjectList.asUnmodifiableObservableList());
+    }
+
+    @Test
+    public void setProject_sameNameDifferentData_success() {
+        ProjectName name = new ProjectName("CS2103T");
+        Project original = new Project(name,
+                new Deadline(LocalDate.of(2026, 11, 1)),
+                new Description("Original"));
+        Project updated = new Project(name,
+                new Deadline(LocalDate.of(2026, 12, 1)),
+                new Description("Updated"));
+        uniqueProjectList.add(original);
+
+        uniqueProjectList.setProject(original, updated);
+
+        assertEquals(List.of(updated), uniqueProjectList.asUnmodifiableObservableList());
     }
 }

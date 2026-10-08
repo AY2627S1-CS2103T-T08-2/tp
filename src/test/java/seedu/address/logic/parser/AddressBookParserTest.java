@@ -7,12 +7,14 @@ import static seedu.address.logic.Messages.MESSAGE_UNKNOWN_COMMAND;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalIndexes.INDEX_FIRST_PERSON;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.commands.AddCommand;
+import seedu.address.logic.commands.AddProjectCommand;
 import seedu.address.logic.commands.ClearCommand;
 import seedu.address.logic.commands.DeleteCommand;
 import seedu.address.logic.commands.EditCommand;
@@ -24,6 +26,10 @@ import seedu.address.logic.commands.ListCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
 import seedu.address.model.person.Person;
+import seedu.address.model.project.Deadline;
+import seedu.address.model.project.Description;
+import seedu.address.model.project.Project;
+import seedu.address.model.project.ProjectName;
 import seedu.address.testutil.EditPersonDescriptorBuilder;
 import seedu.address.testutil.PersonBuilder;
 import seedu.address.testutil.PersonUtil;
@@ -96,5 +102,18 @@ public class AddressBookParserTest {
     @Test
     public void parseCommand_unknownCommand_throwsParseException() {
         assertThrows(ParseException.class, MESSAGE_UNKNOWN_COMMAND, () -> parser.parseCommand("unknownCommand"));
+    }
+
+    @Test
+    public void parseCommand_addProject() throws Exception {
+        Project project = new Project(
+                new ProjectName("CS2103T"),
+                new Deadline(LocalDate.of(2026, 11, 13)),
+                new Description("Build a contact manager"));
+
+        assertEquals(
+                new AddProjectCommand(project),
+                parser.parseCommand(
+                        "addproject n/CS2103T d/2026-11-13 desc/Build a contact manager"));
     }
 }

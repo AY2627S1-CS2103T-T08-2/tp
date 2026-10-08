@@ -42,12 +42,21 @@ public class AddressBook implements ReadOnlyAddressBook {
     }
 
     /**
+     * Replaces the contents of the project list with {@code projects}.
+     * {@code projects} must not contain duplicate projects.
+     */
+    public void setProjects(List<Project> projects) {
+        this.projects.setProjects(projects);
+    }
+
+    /**
      * Resets the existing data of this {@code AddressBook} with {@code newData}.
      */
     public void resetData(ReadOnlyAddressBook newData) {
         requireNonNull(newData);
 
         setPersons(newData.getPersonList());
+        setProjects(newData.getProjectList());
     }
 
     //// person-level operations
@@ -75,7 +84,6 @@ public class AddressBook implements ReadOnlyAddressBook {
      */
     public void setPerson(Person target, Person editedPerson) {
         requireNonNull(editedPerson);
-
         persons.setPerson(target, editedPerson);
     }
 
@@ -87,12 +95,41 @@ public class AddressBook implements ReadOnlyAddressBook {
         persons.remove(key);
     }
 
+    //// project-level operations
+
+    /**
+     * Returns true if a project with the same identity as {@code project} exists in the address book.
+     */
+    public boolean hasProject(Project project) {
+        requireNonNull(project);
+        return projects.contains(project);
+    }
+
     /**
      * Adds a project to the address book.
      * The project must not already exist in the address book.
      */
     public void addProject(Project p) {
         projects.add(p);
+    }
+
+    /**
+     * Replaces the given project {@code target} in the list with {@code editedProject}.
+     * {@code target} must exist in the address book.
+     * The project identity of {@code editedProject} must not be the same as another existing project in the address
+     * book.
+     */
+    public void setProject(Project target, Project editedProject) {
+        requireNonNull(editedProject);
+        projects.setProject(target, editedProject);
+    }
+
+    /**
+     * Removes {@code key} from this {@code AddressBook}.
+     * {@code key} must exist in the address book.
+     */
+    public void removeProject(Project key) {
+        projects.remove(key);
     }
 
     /// / util methods
@@ -107,6 +144,11 @@ public class AddressBook implements ReadOnlyAddressBook {
     @Override
     public ObservableList<Person> getPersonList() {
         return persons.asUnmodifiableObservableList();
+    }
+
+    @Override
+    public ObservableList<Project> getProjectList() {
+        return projects.asUnmodifiableObservableList();
     }
 
     @Override

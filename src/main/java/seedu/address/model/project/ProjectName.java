@@ -41,7 +41,6 @@ public class ProjectName {
                 && normalised.codePoints().anyMatch(Character::isLetterOrDigit);
     }
 
-
     @Override
     public String toString() {
         return projectName;

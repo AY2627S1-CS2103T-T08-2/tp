@@ -16,8 +16,8 @@ public class DescriptionTest {
     }
 
     @Test
-    public void constructor_invalidDescription_throwsIllegalArgumentException() {
-        String invalidDescription = "";
+    public void constructor_invalidName_throwsIllegalArgumentException() {
+        String invalidDescription = "\n";
         assertThrows(IllegalArgumentException.class, () -> new Name(invalidDescription));
     }
 
@@ -27,10 +27,19 @@ public class DescriptionTest {
         assertThrows(NullPointerException.class, () -> Description.isValidDescription(null));
 
         // invalid description
-        assertFalse(Description.isValidDescription("")); // empty string
-        assertFalse(Description.isValidDescription(" ")); // spaces only
-        assertFalse(Description.isValidDescription("^")); // only non-alphanumeric characters
-        assertFalse(Description.isValidDescription("peter*")); // contains non-alphanumeric characters
+        assertFalse(Description.isValidDescription("\n"));
+        assertFalse(Description.isValidDescription("\r"));
+        assertFalse(Description.isValidDescription("\u0085"));
+        assertFalse(Description.isValidDescription("\u2028"));
+        assertFalse(Description.isValidDescription("\u2029"));
+        assertFalse(Description.isValidDescription(
+                        """
+                        tttttttttttttttttttttttttttttttttttttttttttttttttt
+                        tttttttttttttttttttttttttttttttttttttttttttttttttt
+                        tttttttttttttttttttttttttttttttttttttttttttttttttt
+                        tttttttttttttttttttttttttttttttttttttttttttttttttt
+                        t"""
+        )); // too long at 201 characters
 
         // valid description
         assertTrue(Description.isValidDescription("peter jack")); // alphabets only
@@ -57,6 +66,6 @@ public class DescriptionTest {
         assertFalse(description.equals(5.0f));
 
         // different values -> returns false
-        assertFalse(description.equals(new Name("This is another valid description")));
+        assertFalse(description.equals(new Description("This is another valid description")));
     }
 }

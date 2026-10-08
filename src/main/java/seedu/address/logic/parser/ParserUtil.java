@@ -22,6 +22,12 @@ public class ParserUtil {
 
     public static final String MESSAGE_INVALID_INDEX = "Index must be a positive integer.";
 
+    public static final String MESSAGE_INVALID_DEADLINE =
+            "Deadline must be a valid date in YYYY-MM-DD format.";
+
+    public static final String MESSAGE_EMPTY_DESCRIPTION =
+            "DESCRIPTION cannot be empty when desc/ is specified.";
+
     /**
      * Parses {@code oneBasedIndex} into an {@code Index} and returns it. Leading and trailing whitespaces will be
      * trimmed.

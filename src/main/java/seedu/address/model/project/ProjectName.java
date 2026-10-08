@@ -38,7 +38,7 @@ public class ProjectName {
         int length = normalised.codePointCount(0, normalised.length());
         return length >= 1 && length <= 50
                 && normalised.matches(VALIDATION_REGEX)
-                && normalised.codePoints().anyMatch(Character::isLetterOrDigit);r
+                && normalised.codePoints().anyMatch(Character::isLetterOrDigit);
     }
 
 

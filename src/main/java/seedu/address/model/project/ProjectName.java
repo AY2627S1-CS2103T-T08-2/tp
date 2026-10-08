@@ -3,6 +3,8 @@ package seedu.address.model.project;
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.AppUtil.checkArgument;
 
+import java.util.Locale;
+
 /**
  * Represents a Project's name in the address book.
  * Guarantees: immutable; is valid as declared in {@link #isValidName(String)}
@@ -57,7 +59,7 @@ public class ProjectName {
             return false;
         }
 
-        return comparisonKey().equals(otherName.projectName);
+        return comparisonKey().equals(otherName.comparisonKey());
     }
 
     @Override
@@ -70,6 +72,6 @@ public class ProjectName {
     }
 
     private String comparisonKey() {
-        return projectName.toLowerCase();
+        return projectName.toLowerCase(Locale.ROOT);
     }
 }

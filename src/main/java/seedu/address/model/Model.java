@@ -1,11 +1,13 @@
 package seedu.address.model;
 
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.model.person.Person;
 import seedu.address.model.project.Project;
+import seedu.address.model.project.ProjectName;
 
 /**
  * The API of the Model component.
@@ -96,12 +98,13 @@ public interface Model {
      */
     void setProject(Project target, Project editedProject);
 
-    /** Returns an unmodifiable view of the filtered project list */
-    ObservableList<Project> getFilteredProjectList();
+    /**
+     * Returns an unmodifiable view of the project list.
+     */
+    ObservableList<Project> getProjectList();
 
     /**
-     * Updates the filter of the filtered project list to filter by the given {@code predicate}.
-     * @throws NullPointerException if {@code predicate} is null.
+     * Returns the project with the given name, or an empty Optional if none exists.
      */
-    void updateFilteredProjectList(Predicate<Project> predicate);
+    Optional<Project> findProject(ProjectName name);
 }

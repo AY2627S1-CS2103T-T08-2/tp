@@ -3,6 +3,7 @@ package seedu.address.model;
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
@@ -11,6 +12,8 @@ import javafx.collections.transformation.FilteredList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.model.person.Person;
+import seedu.address.model.project.Project;
+import seedu.address.model.project.ProjectName;
 
 /**
  * Represents the in-memory model of the address book data.
@@ -89,8 +92,39 @@ public class ModelManager implements Model {
     @Override
     public void setPerson(Person target, Person editedPerson) {
         requireAllNonNull(target, editedPerson);
-
         addressBook.setPerson(target, editedPerson);
+    }
+
+    @Override
+    public boolean hasProject(Project project) {
+        requireNonNull(project);
+        return addressBook.hasProject(project);
+    }
+
+    @Override
+    public void deleteProject(Project target) {
+        requireNonNull(target);
+        addressBook.removeProject(target);
+    }
+
+    @Override
+    public void addProject(Project project) {
+        requireNonNull(project);
+        addressBook.addProject(project);
+    }
+
+    @Override
+    public void setProject(Project target, Project editedProject) {
+        requireAllNonNull(target, editedProject);
+        addressBook.setProject(target, editedProject);
+    }
+
+    @Override
+    public Optional<Project> findProject(ProjectName name) {
+        requireNonNull(name);
+        return addressBook.getProjectList().stream()
+                .filter(project -> project.getName().equals(name))
+                .findFirst();
     }
 
     //=========== Filtered Person List Accessors =============================================================
@@ -111,6 +145,11 @@ public class ModelManager implements Model {
     }
 
     @Override
+    public ObservableList<Project> getProjectList() {
+        return addressBook.getProjectList();
+    }
+
+    @Override
     public boolean equals(Object other) {
         if (other == this) {
             return true;
@@ -125,5 +164,4 @@ public class ModelManager implements Model {
                 && userPrefs.equals(otherModelManager.userPrefs)
                 && filteredPersons.equals(otherModelManager.filteredPersons);
     }
-
 }

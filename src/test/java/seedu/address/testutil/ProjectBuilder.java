@@ -49,7 +49,7 @@ public class ProjectBuilder {
     /**
      * Sets the {@code Deadline} of the {@code Project} that we are building.
      */
-    public ProjectBuilder withAddress(LocalDate deadline) {
+    public ProjectBuilder withDeadline(LocalDate deadline) {
         this.deadline = new Deadline(deadline);
         return this;
     }

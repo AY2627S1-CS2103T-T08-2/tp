@@ -1,5 +1,4 @@
 package seedu.address.model.project;
 
 public class ProjectTest {
-
 }

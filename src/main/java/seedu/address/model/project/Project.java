@@ -20,7 +20,7 @@ public class Project {
      * Every field must be present and not null.
      */
     public Project(ProjectName name, Deadline deadline, Description description) {
-        requireAllNonNull(name, deadline);
+        requireAllNonNull(name, deadline, description);
         this.name = name;
         this.deadline = deadline;
         this.description = description;

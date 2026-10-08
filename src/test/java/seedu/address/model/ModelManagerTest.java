@@ -8,12 +8,19 @@ import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 import static seedu.address.testutil.TypicalPersons.BENSON;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
+import seedu.address.model.project.Deadline;
+import seedu.address.model.project.Description;
+import seedu.address.model.project.Project;
+import seedu.address.model.project.ProjectName;
+import seedu.address.model.project.exceptions.DuplicateProjectException;
 import seedu.address.testutil.AddressBookBuilder;
 
 public class ModelManagerTest {
@@ -74,6 +81,93 @@ public class ModelManagerTest {
     }
 
     @Test
+    public void addProject_newProject_updatesAddressBookAndList() {
+        ModelManager model = new ModelManager();
+        Project project = createProject("CS2103T");
+
+        // Obtain the view before adding to verify that it stays up to date.
+        var projectList = model.getProjectList();
+
+        assertFalse(model.hasProject(project));
+
+        model.addProject(project);
+
+        assertTrue(model.hasProject(project));
+        assertEquals(List.of(project), projectList);
+        assertEquals(List.of(project), model.getAddressBook().getProjectList());
+    }
+
+    @Test
+    public void addProject_duplicateName_throwsDuplicateProjectException() {
+        ModelManager model = new ModelManager();
+        Project original = createProject("CS2103T Team");
+        Project duplicate = createProject("  cs2103t   team  ");
+        model.addProject(original);
+
+        assertThrows(DuplicateProjectException.class, () -> model.addProject(duplicate));
+
+        assertEquals(List.of(original), model.getProjectList());
+    }
+
+    @Test
+    public void findProject_matchingName_returnsProject() {
+        ModelManager model = new ModelManager();
+        Project project = createProject("CS2103T Team");
+        model.addProject(project);
+
+        assertEquals(Optional.of(project),
+                model.findProject(new ProjectName("  cs2103t   team  ")));
+    }
+
+    @Test
+    public void findProject_missingOrPartialName_returnsEmpty() {
+        ModelManager model = new ModelManager();
+        model.addProject(createProject("CS2103T Team"));
+
+        assertEquals(Optional.empty(),
+                model.findProject(new ProjectName("Orbital")));
+        assertEquals(Optional.empty(),
+                model.findProject(new ProjectName("CS2103T")));
+    }
+
+    @Test
+    public void findProject_nullName_throwsNullPointerException() {
+        ModelManager model = new ModelManager();
+
+        assertThrows(NullPointerException.class, () -> model.findProject(null));
+    }
+
+    @Test
+    public void constructor_withProjects_preservesProjects() {
+        AddressBook addressBook = new AddressBook();
+        Project project = createProject("CS2103T");
+        addressBook.addProject(project);
+
+        ModelManager model = new ModelManager(addressBook, new UserPrefs());
+
+        assertEquals(List.of(project), model.getProjectList());
+        assertEquals(Optional.of(project), model.findProject(project.getName()));
+    }
+
+    @Test
+    public void setAddressBook_withProjects_replacesProjects() {
+        ModelManager model = new ModelManager();
+        model.addProject(createProject("Old Project"));
+        var projectList = model.getProjectList();
+
+        AddressBook replacement = new AddressBook();
+        Project project = createProject("New Project");
+        replacement.addProject(project);
+
+        model.setAddressBook(replacement);
+
+        assertEquals(List.of(project), projectList);
+        assertEquals(Optional.of(project), model.findProject(project.getName()));
+        assertEquals(Optional.empty(),
+                model.findProject(new ProjectName("Old Project")));
+    }
+
+    @Test
     public void equals() {
         AddressBook addressBook = new AddressBookBuilder().withPerson(ALICE).withPerson(BENSON).build();
         AddressBook differentAddressBook = new AddressBook();
@@ -108,5 +202,12 @@ public class ModelManagerTest {
         UserPrefs differentUserPrefs = new UserPrefs();
         differentUserPrefs.setGuiSettings(new GuiSettings(1, 2, 3, 4));
         assertFalse(modelManager.equals(new ModelManager(addressBook, differentUserPrefs)));
+    }
+
+    private Project createProject(String name) {
+        return new Project(
+                new ProjectName(name),
+                new Deadline(LocalDate.of(2026, 11, 1)),
+                Description.EMPTY);
     }
 }

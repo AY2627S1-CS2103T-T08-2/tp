@@ -3,6 +3,7 @@ package seedu.address.model;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
+import java.util.Objects;
 
 import javafx.collections.ObservableList;
 import seedu.address.commons.util.ToStringBuilder;
@@ -13,7 +14,7 @@ import seedu.address.model.project.UniqueProjectList;
 
 /**
  * Wraps all data at the address-book level.
- * Duplicates are not allowed (by .isSamePerson comparison).
+ * Duplicates are not allowed (by .isSamePerson and .isSameProject comparison).
  */
 public class AddressBook implements ReadOnlyAddressBook {
 
@@ -24,7 +25,7 @@ public class AddressBook implements ReadOnlyAddressBook {
     }
 
     /**
-     * Creates an AddressBook using the Persons in the {@code toBeCopied}
+     * Creates an AddressBook using the Persons and Projects in the {@code toBeCopied}
      */
     public AddressBook(ReadOnlyAddressBook toBeCopied) {
         this();
@@ -42,12 +43,21 @@ public class AddressBook implements ReadOnlyAddressBook {
     }
 
     /**
+     * Replaces the contents of the project list with {@code projects}.
+     * {@code projects} must not contain duplicate projects.
+     */
+    public void setProjects(List<Project> projects) {
+        this.projects.setProjects(projects);
+    }
+
+    /**
      * Resets the existing data of this {@code AddressBook} with {@code newData}.
      */
     public void resetData(ReadOnlyAddressBook newData) {
         requireNonNull(newData);
 
         setPersons(newData.getPersonList());
+        setProjects(newData.getProjectList());
     }
 
     //// person-level operations
@@ -75,7 +85,6 @@ public class AddressBook implements ReadOnlyAddressBook {
      */
     public void setPerson(Person target, Person editedPerson) {
         requireNonNull(editedPerson);
-
         persons.setPerson(target, editedPerson);
     }
 
@@ -87,6 +96,16 @@ public class AddressBook implements ReadOnlyAddressBook {
         persons.remove(key);
     }
 
+    //// project-level operations
+
+    /**
+     * Returns true if a project with the same identity as {@code project} exists in the address book.
+     */
+    public boolean hasProject(Project project) {
+        requireNonNull(project);
+        return projects.contains(project);
+    }
+
     /**
      * Adds a project to the address book.
      * The project must not already exist in the address book.
@@ -95,18 +114,43 @@ public class AddressBook implements ReadOnlyAddressBook {
         projects.add(p);
     }
 
-    /// / util methods
+    /**
+     * Replaces the given project {@code target} in the list with {@code editedProject}.
+     * {@code target} must exist in the address book.
+     * The project identity of {@code editedProject} must not be the same as another existing project in the address
+     * book.
+     */
+    public void setProject(Project target, Project editedProject) {
+        requireNonNull(editedProject);
+        projects.setProject(target, editedProject);
+    }
+
+    /**
+     * Removes {@code key} from this {@code AddressBook}.
+     * {@code key} must exist in the address book.
+     */
+    public void removeProject(Project key) {
+        projects.remove(key);
+    }
+
+    //// util methods
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .add("persons", persons)
+                .add("projects", projects)
                 .toString();
     }
 
     @Override
     public ObservableList<Person> getPersonList() {
         return persons.asUnmodifiableObservableList();
+    }
+
+    @Override
+    public ObservableList<Project> getProjectList() {
+        return projects.asUnmodifiableObservableList();
     }
 
     @Override
@@ -120,11 +164,11 @@ public class AddressBook implements ReadOnlyAddressBook {
             return false;
         }
 
-        return persons.equals(otherAddressBook.persons);
+        return persons.equals(otherAddressBook.persons) && projects.equals(otherAddressBook.projects);
     }
 
     @Override
     public int hashCode() {
-        return persons.hashCode();
+        return Objects.hash(persons, projects);
     }
 }

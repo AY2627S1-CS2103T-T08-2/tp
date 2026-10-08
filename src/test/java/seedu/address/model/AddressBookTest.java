@@ -9,6 +9,7 @@ import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
@@ -18,6 +19,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.exceptions.DuplicatePersonException;
+import seedu.address.model.project.Deadline;
+import seedu.address.model.project.Description;
+import seedu.address.model.project.Project;
+import seedu.address.model.project.ProjectName;
+import seedu.address.model.project.exceptions.DuplicateProjectException;
 import seedu.address.testutil.PersonBuilder;
 
 public class AddressBookTest {
@@ -47,7 +53,7 @@ public class AddressBookTest {
         Person editedAlice = new PersonBuilder(ALICE).withAddress(VALID_ADDRESS_BOB).withTags(VALID_TAG_HUSBAND)
                 .build();
         List<Person> newPersons = List.of(ALICE, editedAlice);
-        AddressBookStub newData = new AddressBookStub(newPersons);
+        AddressBookStub newData = new AddressBookStub(newPersons, List.of());
 
         assertThrows(DuplicatePersonException.class, () -> addressBook.resetData(newData));
     }
@@ -83,8 +89,101 @@ public class AddressBookTest {
 
     @Test
     public void toStringMethod() {
-        String expected = AddressBook.class.getCanonicalName() + "{persons=" + addressBook.getPersonList() + "}";
+        String expected =
+                AddressBook.class.getCanonicalName() + String.format(
+                        "{persons=%s, projects=%s}",
+                        addressBook.getPersonList(),
+                        addressBook.getProjectList()
+                );
         assertEquals(expected, addressBook.toString());
+    }
+
+    @Test
+    public void addProject_newProject_success() {
+        AddressBook addressBook = new AddressBook();
+        Project project = createProject("CS2103T");
+
+        assertFalse(addressBook.hasProject(project));
+
+        addressBook.addProject(project);
+
+        assertTrue(addressBook.hasProject(project));
+        assertEquals(List.of(project), addressBook.getProjectList());
+    }
+
+    @Test
+    public void addProject_duplicateName_throwsDuplicateProjectException() {
+        AddressBook addressBook = new AddressBook();
+        Project original = createProject("CS2103T Team");
+        Project duplicate = new Project(
+                new ProjectName("  cs2103t   team  "),
+                new Deadline(LocalDate.of(2026, 12, 1)),
+                new Description("Different details"));
+        addressBook.addProject(original);
+
+        assertThrows(DuplicateProjectException.class, () -> addressBook.addProject(duplicate));
+
+        assertEquals(List.of(original), addressBook.getProjectList());
+    }
+
+    @Test
+    public void constructor_withProjects_copiesProjectsIndependently() {
+        AddressBook original = new AddressBook();
+        Project project = createProject("CS2103T");
+        original.addProject(project);
+
+        AddressBook copy = new AddressBook(original);
+
+        assertEquals(List.of(project), copy.getProjectList());
+        assertEquals(original, copy);
+        assertEquals(original.hashCode(), copy.hashCode());
+
+        // Changing the original collection must not change the copy.
+        original.addProject(createProject("Orbital"));
+
+        assertEquals(List.of(project), copy.getProjectList());
+    }
+
+    @Test
+    public void resetData_withProjects_replacesExistingProjects() {
+        AddressBook addressBook = new AddressBook();
+        addressBook.addProject(createProject("Old Project"));
+
+        AddressBook replacement = new AddressBook();
+        Project project = createProject("New Project");
+        replacement.addProject(project);
+
+        addressBook.resetData(replacement);
+
+        assertEquals(List.of(project), addressBook.getProjectList());
+    }
+
+    @Test
+    public void resetData_emptyAddressBook_clearsProjects() {
+        AddressBook addressBook = new AddressBook();
+        addressBook.addProject(createProject("CS2103T"));
+
+        addressBook.resetData(new AddressBook());
+
+        assertTrue(addressBook.getProjectList().isEmpty());
+    }
+
+    @Test
+    public void equals_differentProjects_returnsFalse() {
+        AddressBook first = new AddressBook();
+        AddressBook second = new AddressBook();
+        first.addProject(createProject("CS2103T"));
+        second.addProject(createProject("Orbital"));
+
+        assertFalse(first.equals(second));
+    }
+
+    @Test
+    public void getProjectList_modifyList_throwsUnsupportedOperationException() {
+        AddressBook addressBook = new AddressBook();
+        addressBook.addProject(createProject("CS2103T"));
+
+        assertThrows(UnsupportedOperationException.class, () -> addressBook.getProjectList().clear());
     }
 
     /**
@@ -92,15 +191,28 @@ public class AddressBookTest {
      */
     private static class AddressBookStub implements ReadOnlyAddressBook {
         private final ObservableList<Person> persons = FXCollections.observableArrayList();
+        private final ObservableList<Project> projects = FXCollections.observableArrayList();
 
-        AddressBookStub(Collection<Person> persons) {
+        AddressBookStub(Collection<Person> persons, Collection<Project> projects) {
             this.persons.setAll(persons);
+            this.projects.setAll(projects);
         }
 
         @Override
         public ObservableList<Person> getPersonList() {
             return persons;
         }
+
+        @Override
+        public ObservableList<Project> getProjectList() {
+            return projects;
+        }
     }
 
+    private Project createProject(String name) {
+        return new Project(
+                new ProjectName(name),
+                new Deadline(LocalDate.of(2026, 11, 1)),
+                Description.EMPTY);
+    }
 }

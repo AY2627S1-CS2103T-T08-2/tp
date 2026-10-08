@@ -1,10 +1,13 @@
 package seedu.address.model;
 
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import javafx.collections.ObservableList;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.model.person.Person;
+import seedu.address.model.project.Project;
+import seedu.address.model.project.ProjectName;
 
 /**
  * The API of the Model component.
@@ -68,4 +71,39 @@ public interface Model {
      * @throws NullPointerException if {@code predicate} is null.
      */
     void updateFilteredPersonList(Predicate<Person> predicate);
+
+    /**
+     * Returns true if a project with the same identity as {@code project} exists in the address book.
+     */
+    boolean hasProject(Project project);
+
+    /**
+     * Deletes the given project.
+     * The project must exist in the address book.
+     */
+    void deleteProject(Project target);
+
+    /**
+     * Adds the given project.
+     * {@code project} must not already exist in the address book.
+     */
+    void addProject(Project project);
+
+    /**
+     * Replaces the given project {@code target} with {@code editedProject}.
+     * {@code target} must exist in the address book.
+     * The project identity of {@code editedProject} must not be the same as another existing project in the address
+     * book.
+     */
+    void setProject(Project target, Project editedProject);
+
+    /**
+     * Returns an unmodifiable view of the project list.
+     */
+    ObservableList<Project> getProjectList();
+
+    /**
+     * Returns the project with the given name, or an empty Optional if none exists.
+     */
+    Optional<Project> findProject(ProjectName name);
 }

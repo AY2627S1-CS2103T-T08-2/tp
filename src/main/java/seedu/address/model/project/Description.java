@@ -9,6 +9,8 @@ import static seedu.address.commons.util.AppUtil.checkArgument;
  */
 public class Description {
 
+    public static final Description EMPTY = new Description("");
+
     public static final String MESSAGE_CONSTRAINTS =
             "Description should only contain alphanumeric characters and spaces, and should not be blank";
 

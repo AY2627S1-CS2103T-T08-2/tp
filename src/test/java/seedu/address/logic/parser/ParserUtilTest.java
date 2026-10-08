@@ -233,16 +233,16 @@ public class ParserUtilTest {
     @Test
     public void parseDeadline_invalidValue_throwsParseException() {
         String[] invalidDeadlines = {
-                "",
-                "   ",
-                "2026-02-29",
-                "2026-04-31",
-                "2026-13-01",
-                "2026-11-00",
-                "13/11/2026",
-                "2026-1-01",
-                "2026-11-13T12:00",
-                "tomorrow"
+            "",
+            "   ",
+            "2026-02-29",
+            "2026-04-31",
+            "2026-13-01",
+            "2026-11-00",
+            "13/11/2026",
+            "2026-1-01",
+            "2026-11-13T12:00",
+            "tomorrow"
         };
 
         for (String deadline : invalidDeadlines) {
@@ -284,8 +284,7 @@ public class ParserUtilTest {
 
     @Test
     public void parseDescription_tooLong_throwsParseException() {
-        assertThrows(ParseException.class,
-                () -> ParserUtil.parseDescription("a".repeat(201)));
+        assertThrows(ParseException.class, () -> ParserUtil.parseDescription("a".repeat(201)));
     }
 
     @Test
@@ -293,14 +292,11 @@ public class ParserUtilTest {
         String[] lineBreaks = {"\r", "\n", "\u0085", "\u2028", "\u2029"};
 
         for (String lineBreak : lineBreaks) {
-            assertThrows(ParseException.class,
-                    () -> ParserUtil.parseDescription("First" + lineBreak + "Second"));
+            assertThrows(ParseException.class, () -> ParserUtil.parseDescription("First" + lineBreak + "Second"));
 
-            assertThrows(ParseException.class,
-                    () -> ParserUtil.parseDescription(lineBreak + "Description"));
+            assertThrows(ParseException.class, () -> ParserUtil.parseDescription(lineBreak + "Description"));
 
-            assertThrows(ParseException.class,
-                    () -> ParserUtil.parseDescription("Description" + lineBreak));
+            assertThrows(ParseException.class, () -> ParserUtil.parseDescription("Description" + lineBreak));
         }
     }
 

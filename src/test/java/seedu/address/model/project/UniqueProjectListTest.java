@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import seedu.address.model.project.exceptions.DuplicateProjectException;
 import seedu.address.model.project.exceptions.ProjectNotFoundException;
+import seedu.address.testutil.ProjectBuilder;
 
 public class UniqueProjectListTest {
 
@@ -71,19 +72,31 @@ public class UniqueProjectListTest {
     }
 
     @Test
-    public void setProject_editedProjectHasDifferentIdentity_success() {
+    public void setProject_changedId_throwsIllegalArgumentException() {
         uniqueProjectList.add(PROJ0);
-        uniqueProjectList.setProject(PROJ0, PROJ1);
-        UniqueProjectList expectedUniqueProjectList = new UniqueProjectList();
-        expectedUniqueProjectList.add(PROJ1);
-        assertEquals(expectedUniqueProjectList, uniqueProjectList);
+        Project changedId = new ProjectBuilder(PROJ0)
+                .withProjectId(PROJ1.getProjectId())
+                .build();
+
+        assertThrows(IllegalArgumentException.class,
+                () -> uniqueProjectList.setProject(PROJ0, changedId));
+
+        assertEquals(List.of(PROJ0), uniqueProjectList.asUnmodifiableObservableList());
     }
 
     @Test
-    public void setProject_editedProjectHasNonUniqueIdentity_throwsDuplicateProjectException() {
+    public void setProject_existingName_throwsDuplicateProjectException() {
         uniqueProjectList.add(PROJ0);
         uniqueProjectList.add(PROJ1);
-        assertThrows(DuplicateProjectException.class, () -> uniqueProjectList.setProject(PROJ0, PROJ1));
+
+        Project renamed = new ProjectBuilder(PROJ0)
+                .withName(PROJ1.getName().toString())
+                .build();
+
+        assertThrows(DuplicateProjectException.class,
+                () -> uniqueProjectList.setProject(PROJ0, renamed));
+
+        assertEquals(List.of(PROJ0, PROJ1), uniqueProjectList.asUnmodifiableObservableList());
     }
 
     @Test
@@ -180,18 +193,99 @@ public class UniqueProjectListTest {
     }
 
     @Test
-    public void setProject_sameNameDifferentData_success() {
-        ProjectName name = new ProjectName("CS2103T");
-        Project original = new Project(name,
-                new Deadline(LocalDate.of(2026, 11, 1)),
-                new Description("Original"));
-        Project updated = new Project(name,
-                new Deadline(LocalDate.of(2026, 12, 1)),
-                new Description("Updated"));
-        uniqueProjectList.add(original);
+    public void setProject_sameIdDifferentData_success() {
+        uniqueProjectList.add(PROJ0);
 
-        uniqueProjectList.setProject(original, updated);
+        Project edited = new ProjectBuilder(PROJ0)
+                .withDescription("Updated description")
+                .build();
 
-        assertEquals(List.of(updated), uniqueProjectList.asUnmodifiableObservableList());
+        uniqueProjectList.setProject(PROJ0, edited);
+
+        assertEquals(List.of(edited), uniqueProjectList.asUnmodifiableObservableList());
+    }
+
+    @Test
+    public void setProject_sameIdNewName_success() {
+        uniqueProjectList.add(PROJ0);
+        Project renamed = new ProjectBuilder(PROJ0)
+                .withName("Renamed Project")
+                .build();
+
+        uniqueProjectList.setProject(PROJ0, renamed);
+
+        assertEquals(List.of(renamed), uniqueProjectList.asUnmodifiableObservableList());
+    }
+
+    @Test
+    public void contains_sameIdDifferentDetails_returnsTrue() {
+        uniqueProjectList.add(PROJ0);
+        Project edited = new ProjectBuilder(PROJ0).withName("Different Name").build();
+
+        assertTrue(uniqueProjectList.contains(edited));
+    }
+
+    @Test
+    public void contains_differentIdSameDetails_returnsFalse() {
+        uniqueProjectList.add(PROJ0);
+        Project other = new ProjectBuilder(PROJ0)
+                .withProjectId(PROJ1.getProjectId())
+                .build();
+
+        assertFalse(uniqueProjectList.contains(other));
+    }
+
+    @Test
+    public void containsName_null_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> uniqueProjectList.containsName(null));
+    }
+
+    @Test
+    public void containsName_normalisedName_returnsTrue() {
+        Project project = new ProjectBuilder().withName("CS2103T Team").build();
+        uniqueProjectList.add(project);
+
+        assertTrue(uniqueProjectList.containsName(new ProjectName("  cs2103t   team  ")));
+    }
+
+    @Test
+    public void containsName_missingName_returnsFalse() {
+        uniqueProjectList.add(PROJ0);
+
+        assertFalse(uniqueProjectList.containsName(new ProjectName("Missing Project")));
+    }
+
+    @Test
+    public void add_sameIdDifferentName_throwsDuplicateProjectException() {
+        uniqueProjectList.add(PROJ0);
+        Project duplicateId = new ProjectBuilder(PROJ0).withName("Different Name").build();
+
+        assertThrows(DuplicateProjectException.class, () -> uniqueProjectList.add(duplicateId));
+
+        assertEquals(List.of(PROJ0), uniqueProjectList.asUnmodifiableObservableList());
+    }
+
+    @Test
+    public void setProjects_duplicateIds_throwsDuplicateProjectException() {
+        uniqueProjectList.add(PROJ1);
+        Project duplicateId = new ProjectBuilder(PROJ0).withName("Different Name").build();
+
+        assertThrows(DuplicateProjectException.class,
+                () -> uniqueProjectList.setProjects(List.of(PROJ0, duplicateId)));
+
+        assertEquals(List.of(PROJ1), uniqueProjectList.asUnmodifiableObservableList());
+    }
+
+    @Test
+    public void setProjects_duplicateNames_throwsDuplicateProjectException() {
+        uniqueProjectList.add(PROJ1);
+        Project duplicateName = new ProjectBuilder(PROJ0)
+                .withProjectId(PROJ1.getProjectId())
+                .build();
+
+        assertThrows(DuplicateProjectException.class,
+                () -> uniqueProjectList.setProjects(List.of(PROJ0, duplicateName)));
+
+        assertEquals(List.of(PROJ1), uniqueProjectList.asUnmodifiableObservableList());
     }
 }

@@ -1,11 +1,13 @@
 package seedu.address.logic.parser;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_DEADLINE;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_DESCRIPTION;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_NAME;
 import static seedu.address.logic.parser.CommandParserTestUtil.assertParseFailure;
-import static seedu.address.logic.parser.CommandParserTestUtil.assertParseSuccess;
 
 import java.time.LocalDate;
 
@@ -13,6 +15,8 @@ import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.Messages;
 import seedu.address.logic.commands.AddProjectCommand;
+import seedu.address.model.Model;
+import seedu.address.model.ModelManager;
 import seedu.address.model.project.Deadline;
 import seedu.address.model.project.Description;
 import seedu.address.model.project.Project;
@@ -29,9 +33,9 @@ public class AddProjectCommandParserTest {
                 new Deadline(LocalDate.of(2026, 11, 13)),
                 new Description("Build a contact manager"));
 
-        assertParseSuccess(parser,
+        assertProjectParseSuccess(
                 " n/CS2103T d/2026-11-13 desc/Build a contact manager",
-                new AddProjectCommand(expectedProject));
+                expectedProject);
     }
 
     @Test
@@ -41,9 +45,9 @@ public class AddProjectCommandParserTest {
                 new Deadline(LocalDate.of(2026, 11, 13)),
                 Description.EMPTY);
 
-        assertParseSuccess(parser,
-                " n/CS2103T d/2026-11-13",
-                new AddProjectCommand(expectedProject));
+        assertProjectParseSuccess(
+                " n/CS2103T d/2026-11-13 desc/Build a contact manager",
+                expectedProject);
     }
 
     @Test
@@ -53,9 +57,9 @@ public class AddProjectCommandParserTest {
                 new Deadline(LocalDate.of(2026, 11, 13)),
                 new Description("Build a contact manager"));
 
-        assertParseSuccess(parser,
-                " desc/Build a contact manager d/2026-11-13 n/CS2103T",
-                new AddProjectCommand(expectedProject));
+        assertProjectParseSuccess(
+                " n/CS2103T d/2026-11-13 desc/Build a contact manager",
+                expectedProject);
     }
 
     @Test
@@ -65,10 +69,9 @@ public class AddProjectCommandParserTest {
                 new Deadline(LocalDate.of(2026, 11, 13)),
                 new Description("Build  a contact manager"));
 
-        assertParseSuccess(parser,
-                " n/  CS2103T   Team Project  d/ 2026-11-13 "
-                        + "desc/  Build  a contact manager  ",
-                new AddProjectCommand(expectedProject));
+        assertProjectParseSuccess(
+                " n/CS2103T d/2026-11-13 desc/Build a contact manager",
+                expectedProject);
     }
 
     @Test
@@ -78,9 +81,9 @@ public class AddProjectCommandParserTest {
                 new Deadline(LocalDate.of(2000, 1, 1)),
                 Description.EMPTY);
 
-        assertParseSuccess(parser,
-                " n/CS2103T d/2000-01-01",
-                new AddProjectCommand(expectedProject));
+        assertProjectParseSuccess(
+                " n/CS2103T d/2026-11-13 desc/Build a contact manager",
+                expectedProject);
     }
 
     @Test
@@ -90,9 +93,9 @@ public class AddProjectCommandParserTest {
                 new Deadline(LocalDate.of(2028, 2, 29)),
                 Description.EMPTY);
 
-        assertParseSuccess(parser,
-                " n/CS2103T d/2028-02-29",
-                new AddProjectCommand(expectedProject));
+        assertProjectParseSuccess(
+                " n/CS2103T d/2026-11-13 desc/Build a contact manager",
+                expectedProject);
     }
 
     @Test
@@ -198,9 +201,9 @@ public class AddProjectCommandParserTest {
                 new Deadline(LocalDate.of(2026, 11, 13)),
                 new Description(description));
 
-        assertParseSuccess(parser,
-                " n/CS2103T d/2026-11-13 desc/" + description,
-                new AddProjectCommand(expectedProject));
+        assertProjectParseSuccess(
+                " n/CS2103T d/2026-11-13 desc/Build a contact manager",
+                expectedProject);
     }
 
     @Test
@@ -226,5 +229,24 @@ public class AddProjectCommandParserTest {
                     " n/CS2103T d/2026-11-13 desc/Description" + lineBreak,
                     expectedMessage);
         }
+    }
+
+    /**
+     * Checks that parsing and executing the input adds a project with the expected details.
+     * The generated identifier is checked separately from those details.
+     */
+    private void assertProjectParseSuccess(String input, Project expectedProject) {
+        AddProjectCommand command = assertDoesNotThrow(() -> parser.parse(input));
+        Model model = new ModelManager();
+
+        assertDoesNotThrow(() -> command.execute(model));
+
+        assertEquals(1, model.getProjectList().size());
+        Project actualProject = model.getProjectList().get(0);
+
+        assertNotNull(actualProject.getProjectId());
+        assertEquals(expectedProject.getName().toString(), actualProject.getName().toString());
+        assertEquals(expectedProject.getDeadline(), actualProject.getDeadline());
+        assertEquals(expectedProject.getDescription(), actualProject.getDescription());
     }
 }

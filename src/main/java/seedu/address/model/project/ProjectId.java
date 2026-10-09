@@ -49,6 +49,7 @@ public class ProjectId {
             return true;
         }
 
+        // instanceof handles nulls
         if (!(other instanceof ProjectId otherProjectId)) {
             return false;
         }

@@ -79,6 +79,6 @@ public class ProjectBuilder {
     }
 
     public Project build() {
-        return new Project(name, deadline, description);
+        return new Project(projectId, name, deadline, description);
     }
 }

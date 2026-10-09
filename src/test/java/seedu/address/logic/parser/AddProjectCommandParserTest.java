@@ -58,7 +58,7 @@ public class AddProjectCommandParserTest {
                 new Description("Build a contact manager"));
 
         assertProjectParseSuccess(
-                " n/CS2103T d/2026-11-13 desc/Build a contact manager",
+                " desc/Build a contact manager d/2026-11-13 n/CS2103T",
                 expectedProject);
     }
 

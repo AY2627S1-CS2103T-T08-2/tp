@@ -39,8 +39,10 @@ public class AddProjectCommand extends Command {
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
 
-        if (model.hasProject(toAdd)) {
-            throw new CommandException(String.format(MESSAGE_DUPLICATE_PROJECT, toAdd.getName()));
+        if (model.hasProject(toAdd)
+                || model.findProject(toAdd.getName()).isPresent()) {
+            throw new CommandException(
+                    String.format(MESSAGE_DUPLICATE_PROJECT, toAdd.getName()));
         }
 
         model.addProject(toAdd);

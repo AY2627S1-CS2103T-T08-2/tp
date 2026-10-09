@@ -78,8 +78,7 @@ public class UniqueProjectListTest {
                 .withProjectId(PROJ1.getProjectId())
                 .build();
 
-        assertThrows(IllegalArgumentException.class,
-                () -> uniqueProjectList.setProject(PROJ0, changedId));
+        assertThrows(IllegalArgumentException.class, () -> uniqueProjectList.setProject(PROJ0, changedId));
 
         assertEquals(List.of(PROJ0), uniqueProjectList.asUnmodifiableObservableList());
     }
@@ -93,8 +92,7 @@ public class UniqueProjectListTest {
                 .withName(PROJ1.getName().toString())
                 .build();
 
-        assertThrows(DuplicateProjectException.class,
-                () -> uniqueProjectList.setProject(PROJ0, renamed));
+        assertThrows(DuplicateProjectException.class, () -> uniqueProjectList.setProject(PROJ0, renamed));
 
         assertEquals(List.of(PROJ0, PROJ1), uniqueProjectList.asUnmodifiableObservableList());
     }
@@ -270,8 +268,7 @@ public class UniqueProjectListTest {
         uniqueProjectList.add(PROJ1);
         Project duplicateId = new ProjectBuilder(PROJ0).withName("Different Name").build();
 
-        assertThrows(DuplicateProjectException.class,
-                () -> uniqueProjectList.setProjects(List.of(PROJ0, duplicateId)));
+        assertThrows(DuplicateProjectException.class, () -> uniqueProjectList.setProjects(List.of(PROJ0, duplicateId)));
 
         assertEquals(List.of(PROJ1), uniqueProjectList.asUnmodifiableObservableList());
     }
@@ -283,8 +280,8 @@ public class UniqueProjectListTest {
                 .withProjectId(PROJ1.getProjectId())
                 .build();
 
-        assertThrows(DuplicateProjectException.class,
-                () -> uniqueProjectList.setProjects(List.of(PROJ0, duplicateName)));
+        assertThrows(DuplicateProjectException.class, ()
+                -> uniqueProjectList.setProjects(List.of(PROJ0, duplicateName)));
 
         assertEquals(List.of(PROJ1), uniqueProjectList.asUnmodifiableObservableList());
     }

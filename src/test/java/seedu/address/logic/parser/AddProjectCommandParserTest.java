@@ -46,7 +46,7 @@ public class AddProjectCommandParserTest {
                 Description.EMPTY);
 
         assertProjectParseSuccess(
-                " n/CS2103T d/2026-11-13 desc/Build a contact manager",
+                " n/CS2103T d/2026-11-13",
                 expectedProject);
     }
 
@@ -70,7 +70,8 @@ public class AddProjectCommandParserTest {
                 new Description("Build  a contact manager"));
 
         assertProjectParseSuccess(
-                " n/CS2103T d/2026-11-13 desc/Build a contact manager",
+                " n/  CS2103T   Team Project  d/ 2026-11-13 "
+                        + "desc/  Build  a contact manager  ",
                 expectedProject);
     }
 
@@ -82,7 +83,7 @@ public class AddProjectCommandParserTest {
                 Description.EMPTY);
 
         assertProjectParseSuccess(
-                " n/CS2103T d/2026-11-13 desc/Build a contact manager",
+                " n/CS2103T d/2000-01-01",
                 expectedProject);
     }
 
@@ -94,7 +95,7 @@ public class AddProjectCommandParserTest {
                 Description.EMPTY);
 
         assertProjectParseSuccess(
-                " n/CS2103T d/2026-11-13 desc/Build a contact manager",
+                " n/CS2103T d/2028-02-29",
                 expectedProject);
     }
 
@@ -202,7 +203,7 @@ public class AddProjectCommandParserTest {
                 new Description(description));
 
         assertProjectParseSuccess(
-                " n/CS2103T d/2026-11-13 desc/Build a contact manager",
+                " n/CS2103T d/2026-11-13 desc/" + description,
                 expectedProject);
     }
 

@@ -2,6 +2,8 @@ package seedu.address.storage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 import static seedu.address.testutil.TypicalPersons.HOON;
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.io.TempDir;
 import seedu.address.commons.exceptions.DataLoadingException;
 import seedu.address.model.AddressBook;
 import seedu.address.model.ReadOnlyAddressBook;
+import seedu.address.model.person.Person;
 
 public class JsonAddressBookStorageTest {
     private static final Path TEST_DATA_FOLDER = Paths.get("src", "test", "data", "JsonAddressBookStorageTest");
@@ -61,6 +64,30 @@ public class JsonAddressBookStorageTest {
     }
 
     @Test
+    public void readAddressBook_invalidPersonId_throwDataLoadingException() {
+        assertThrows(DataLoadingException.class, () -> readAddressBook("invalidPersonIdAddressBook.json"));
+    }
+
+    @Test
+    public void readAndSaveAddressBook_legacyIds_preservesGeneratedIds() throws Exception {
+        ReadOnlyAddressBook original = readAddressBook("legacyPersonIdsAddressBook.json").get();
+        assertEquals(2, original.getPersonList().size());
+        for (Person person : original.getPersonList()) {
+            assertNotNull(person.getPersonId());
+        }
+        assertNotEquals(original.getPersonList().get(0).getPersonId(), original.getPersonList().get(1).getPersonId());
+
+        Path filePath = testFolder.resolve("LegacyAddressBook.json");
+        JsonAddressBookStorage jsonAddressBookStorage = new JsonAddressBookStorage(filePath);
+        jsonAddressBookStorage.saveAddressBook(original);
+        ReadOnlyAddressBook readBack = jsonAddressBookStorage.readAddressBook().get();
+
+        assertEquals(original, new AddressBook(readBack));
+        assertEquals(original.getPersonList().stream().map(Person::getPersonId).toList(),
+                readBack.getPersonList().stream().map(Person::getPersonId).toList());
+    }
+
+    @Test
     public void readAndSaveAddressBook_allInOrder_success() throws Exception {
         Path filePath = testFolder.resolve("TempAddressBook.json");
         AddressBook original = getTypicalAddressBook();
@@ -70,6 +97,8 @@ public class JsonAddressBookStorageTest {
         jsonAddressBookStorage.saveAddressBook(original, filePath);
         ReadOnlyAddressBook readBack = jsonAddressBookStorage.readAddressBook(filePath).get();
         assertEquals(original, new AddressBook(readBack));
+        assertEquals(original.getPersonList().stream().map(Person::getPersonId).toList(),
+                readBack.getPersonList().stream().map(Person::getPersonId).toList());
 
         // Modify data, overwrite existing file, and read back
         original.addPerson(HOON);
@@ -77,12 +106,16 @@ public class JsonAddressBookStorageTest {
         jsonAddressBookStorage.saveAddressBook(original, filePath);
         readBack = jsonAddressBookStorage.readAddressBook(filePath).get();
         assertEquals(original, new AddressBook(readBack));
+        assertEquals(original.getPersonList().stream().map(Person::getPersonId).toList(),
+                readBack.getPersonList().stream().map(Person::getPersonId).toList());
 
         // Save and read without specifying file path
         original.addPerson(IDA);
         jsonAddressBookStorage.saveAddressBook(original); // file path not specified
         readBack = jsonAddressBookStorage.readAddressBook().get(); // file path not specified
         assertEquals(original, new AddressBook(readBack));
+        assertEquals(original.getPersonList().stream().map(Person::getPersonId).toList(),
+                readBack.getPersonList().stream().map(Person::getPersonId).toList());
 
     }
 

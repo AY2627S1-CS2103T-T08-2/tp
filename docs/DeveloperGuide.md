@@ -125,6 +125,7 @@ How the parsing works:
 The `Model` component,
 
 * stores the address book data i.e., all `Person` objects (which are contained in a `UniquePersonList` object).
+* gives each `Person` an immutable internal `PersonId`, represented by a UUID. New contacts generate an ID; editing and storage reconstruction preserve an existing ID. `Person#equals`, `Person#hashCode`, and the name-based `Person#isSamePerson` comparison continue to use their existing contact fields.
 * stores the `Person` objects selected by the current filter, such as search results, in a separate _filtered_ list. It exposes this list as an unmodifiable `ObservableList<Person>` that the UI can observe and bind to, so the UI updates when the list changes.
 * stores a `UserPrefs` object that represents the user’s preferences (currently, just the GUI settings). This is exposed to the outside as a `ReadOnlyUserPrefs` object.
 * does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components)
@@ -148,6 +149,8 @@ The `Storage` component,
 * can save both address book data and user preference data in JSON format, and read them back into corresponding objects.
 * is implemented by `StorageManager`, which delegates the actual JSON file access to `JsonAddressBookStorage` and `JsonUserPrefsStorage` (one class per data file).
 * depends on some classes in the `Model` component (because the `Storage` component's job is to save/retrieve objects that belong to the `Model`)
+
+`JsonAdaptedPerson` saves each contact's `PersonId` as an `id` string in the address book JSON file and restores it when loading. A missing or null `id` is supported for legacy data and generates a new ID, which is persisted on the next save. A present ID must use the standard UUID format, with either uppercase or lowercase hexadecimal digits. Malformed IDs cause an `IllegalValueException`, which `JsonAddressBookStorage` reports as a `DataLoadingException`.
 
 ### Common classes
 
@@ -543,6 +546,30 @@ testers are expected to do more *exploratory* testing.
 1. _{ more test cases … }_
 
 ### Saving data
+
+1. Preserving contact IDs across saves and restarts
+
+   1. Prerequisites: Use a disposable copy of the app with at least one contact. Its data file is `data/addressbook.json` by default.
+
+   1. Edit a contact's phone number using `edit 1 p/91234567`, then inspect the saved JSON and record that contact's `id` value.
+
+   1. Close and restart the app. Edit the same contact's phone number using `edit 1 p/92345678`, then inspect the saved JSON.<br>
+      Expected: The contact's details load successfully and its `id` remains the same.
+
+1. Loading legacy contacts without IDs
+
+   1. In the disposable copy, close the app and remove the `id` property from one contact in the JSON file. For another contact, set `"id": null`.
+
+   1. Restart the app and edit a contact to trigger a save, then inspect the JSON.<br>
+      Expected: Both legacy contacts load with their original details. Each now has a distinct UUID in its `id` property. Existing non-null IDs are preserved. Generated IDs are written on saving, rather than immediately on loading.
+
+1. Rejecting malformed stored IDs
+
+   1. In the disposable copy, close the app and replace one contact's `id` with `"not-a-uuid"`, then restart.<br>
+      Expected: The data file is rejected, a loading warning is logged, and the app starts with an empty address book.
+
+   1. Repeat with an empty ID string or `"1-1-1-1-1"`.<br>
+      Expected: The same invalid-data behavior occurs. No replacement ID is generated for a malformed value.
 
 1. Dealing with missing/corrupted data files
 

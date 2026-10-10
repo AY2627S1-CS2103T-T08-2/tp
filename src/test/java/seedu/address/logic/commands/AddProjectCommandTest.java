@@ -17,8 +17,29 @@ import seedu.address.model.project.Deadline;
 import seedu.address.model.project.Description;
 import seedu.address.model.project.Project;
 import seedu.address.model.project.ProjectName;
+import seedu.address.testutil.ProjectBuilder;
 
 public class AddProjectCommandTest {
+
+    @Test
+    public void equals() {
+        Project project = createProject("CS2103T", Description.EMPTY);
+        Project copy = new ProjectBuilder(project).build();
+        Project otherProject = createProject("Orbital", Description.EMPTY);
+        Project editedProject = new ProjectBuilder(project)
+                .withDescription("Different description")
+                .build();
+
+        AddProjectCommand command = new AddProjectCommand(project);
+
+        assertTrue(command.equals(command));
+        assertTrue(command.equals(new AddProjectCommand(copy)));
+
+        assertFalse(command.equals(null));
+        assertFalse(command.equals(1));
+        assertFalse(command.equals(new AddProjectCommand(otherProject)));
+        assertFalse(command.equals(new AddProjectCommand(editedProject)));
+    }
 
     @Test
     public void constructor_nullProject_throwsNullPointerException() {
@@ -133,32 +154,6 @@ public class AddProjectCommandTest {
         );
 
         assertEquals(List.of(existingProject), model.getProjectList());
-    }
-
-    @Test
-    public void equals() {
-        Project project = createProject("CS2103T", Description.EMPTY);
-        Project otherProject = createProject("Orbital", Description.EMPTY);
-        Project editedProject = createProject(
-                "CS2103T", new Description("Different description"));
-        AddProjectCommand command = new AddProjectCommand(project);
-
-        // Same object.
-        assertTrue(command.equals(command));
-
-        // Different command object with equal project data.
-        assertTrue(command.equals(new AddProjectCommand(
-                createProject("CS2103T", Description.EMPTY))));
-
-        // Different types and null.
-        assertFalse(command.equals(1));
-        assertFalse(command.equals(null));
-
-        // Different project name.
-        assertFalse(command.equals(new AddProjectCommand(otherProject)));
-
-        // Same identity, but different project details.
-        assertFalse(command.equals(new AddProjectCommand(editedProject)));
     }
 
     private static Project createProject(String name, Description description) {

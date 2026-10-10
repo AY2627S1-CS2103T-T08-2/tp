@@ -13,20 +13,36 @@ import seedu.address.commons.util.ToStringBuilder;
 public class Project {
 
     // Identity fields
-    private final ProjectName name;
+    private final ProjectId projectId;
+
 
     // Data fields
+    private final ProjectName name;
     private final Deadline deadline;
     private final Description description;
 
     /**
-     * Every field must be present and not null.
+     * Creates a new project with a generated identifier.
      */
     public Project(ProjectName name, Deadline deadline, Description description) {
-        requireAllNonNull(name, deadline, description);
+        this(ProjectId.generate(), name, deadline, description);
+    }
+
+    /**
+     * Constructs a project with an existing identifier.
+     * Used when restoring or editing a project.
+     */
+    public Project(ProjectId projectId, ProjectName name,
+                   Deadline deadline, Description description) {
+        requireAllNonNull(projectId, name, deadline, description);
+        this.projectId = projectId;
         this.name = name;
         this.deadline = deadline;
         this.description = description;
+    }
+
+    public ProjectId getProjectId() {
+        return projectId;
     }
 
     public ProjectName getName() {
@@ -42,7 +58,7 @@ public class Project {
     }
 
     /**
-     * Returns true if both projects have the same name.
+     * Returns true if both projects have the same identifier.
      * This defines a weaker notion of equality between two projects.
      */
     public boolean isSameProject(Project otherProject) {
@@ -51,7 +67,7 @@ public class Project {
         }
 
         return otherProject != null
-                && otherProject.getName().equals(getName());
+                && projectId.equals(otherProject.projectId);
     }
 
     /**
@@ -69,7 +85,8 @@ public class Project {
             return false;
         }
 
-        return name.equals(otherProject.name)
+        return projectId.equals(otherProject.projectId)
+                && name.equals(otherProject.name)
                 && deadline.equals(otherProject.deadline)
                 && description.equals(otherProject.description);
     }
@@ -77,12 +94,13 @@ public class Project {
     @Override
     public int hashCode() {
         // use this method for custom fields hashing instead of implementing your own
-        return Objects.hash(name, deadline, description);
+        return Objects.hash(projectId, name, deadline, description);
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
+                .add("projectId", projectId)
                 .add("name", name)
                 .add("deadline", deadline)
                 .add("description", description)

@@ -37,12 +37,21 @@ public class UniqueProjectList implements Iterable<Project> {
     }
 
     /**
+     * Returns true if a project with the given normalised name exists.
+     */
+    public boolean containsName(ProjectName name) {
+        requireNonNull(name);
+        return internalList.stream()
+                .anyMatch(project -> project.getName().equals(name));
+    }
+
+    /**
      * Adds a project to the list.
      * The project must not already exist in the list.
      */
     public void add(Project toAdd) {
         requireNonNull(toAdd);
-        if (contains(toAdd)) {
+        if (contains(toAdd) || containsName(toAdd.getName())) {
             throw new DuplicateProjectException();
         }
         internalList.add(toAdd);
@@ -61,8 +70,15 @@ public class UniqueProjectList implements Iterable<Project> {
             throw new ProjectNotFoundException();
         }
 
-        if (!target.isSameProject(editedProject) && contains(editedProject)) {
-            throw new DuplicateProjectException();
+        if (!target.isSameProject(editedProject)) {
+            throw new IllegalArgumentException("A project's identifier cannot be changed.");
+        }
+
+        for (int i = 0; i < internalList.size(); i++) {
+            if (i != index
+                    && internalList.get(i).getName().equals(editedProject.getName())) {
+                throw new DuplicateProjectException();
+            }
         }
 
         internalList.set(index, editedProject);
@@ -134,12 +150,16 @@ public class UniqueProjectList implements Iterable<Project> {
     }
 
     /**
-     * Returns true if {@code projects} contains only unique projects.
+     * Returns true if every project has a unique identifier and normalised name.
      */
     private boolean projectsAreUnique(List<Project> projects) {
         for (int i = 0; i < projects.size() - 1; i++) {
             for (int j = i + 1; j < projects.size(); j++) {
-                if (projects.get(i).isSameProject(projects.get(j))) {
+                Project first = projects.get(i);
+                Project second = projects.get(j);
+
+                if (first.isSameProject(second)
+                        || first.getName().equals(second.getName())) {
                     return false;
                 }
             }

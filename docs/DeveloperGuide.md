@@ -334,7 +334,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 **Extensions**
 
 * 2a. The command format is invalid
-    
+
     * 2a1. UniTeam shows an error message with the correct command format.
 
     Use case resumes at step 1.
@@ -342,7 +342,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 * 2b. A required field is missing.
 
     * 2b1. UniTeam shows an error message
-  
+
       Use case resumes at step 1.
 
 * 3a. A given detail is invalid.
@@ -354,12 +354,12 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 * 4a. A contact with the same identity already exists.
 
     * 4a1. UniTeam shows an error message
-    
+
       Use case resumes at step 1.
 
 
 * 5a. UniTeam is unable to save the data.
-    
+
     * 4a1. UniTeam shows an error message
 
       Use case ends.
@@ -373,7 +373,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 2. UniTeam checks that no existing project has the same name
 3. UniTeam adds the project to the project list
 4. UniTeam saves the updated data
-5. UniTeam shows a confirmation message with new project's details and the project list is updated 
+5. UniTeam shows a confirmation message with new project's details and the project list is updated
 
    Use case ends.
 
@@ -382,13 +382,13 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 * 1a. The command format is invalid.
 
     * 1a1. UniTeam shows an error message
-      
+
       Use case resumes at step 1.
-    
+
 * 1b. The project name is missing.
 
     * 1b1. UniTeam shows an error message
-  
+
       Use case resumes at step 1.
 
 * 2a. A project with the same name already exists.
@@ -398,7 +398,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
       Use case resumes at step 1.
 
 * 4a. UniTeam is unable to save the data.
-    
+
     * 4a1. UniTeam shows an error message
 
       Use case ends.

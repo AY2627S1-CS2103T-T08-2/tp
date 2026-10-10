@@ -152,6 +152,8 @@ The `Storage` component,
 
 `JsonAdaptedPerson` saves each contact's `PersonId` as an `id` string in the address book JSON file and restores it when loading. A missing or null `id` is supported for legacy data and generates a new ID, which is persisted on the next save. A present ID must use the standard UUID format, with either uppercase or lowercase hexadecimal digits. Malformed IDs cause an `IllegalValueException`, which `JsonAddressBookStorage` reports as a `DataLoadingException`.
 
+`JsonSerializableAddressBook#toModelType()` also tracks restored IDs in a `Set<PersonId>` and rejects duplicate IDs with a dedicated error message. UUIDs that differ only in capitalization represent the same ID. The existing name-based duplicate-person check runs first, and a contact is added only after both checks pass. Duplicate IDs are reported as invalid data through the same storage-loading exception path as malformed IDs.
+
 ### Common classes
 
 Classes used by multiple components are in the `seedu.address.commons` package.
@@ -570,6 +572,16 @@ testers are expected to do more *exploratory* testing.
 
    1. Repeat with an empty ID string or `"1-1-1-1-1"`.<br>
       Expected: The same invalid-data behavior occurs. No replacement ID is generated for a malformed value.
+
+1. Rejecting duplicate stored IDs
+
+   1. Prerequisites: Use a disposable copy of the app with at least two contacts with different names. Close the app and copy the first contact's `id` value into the second contact's `id` property in the JSON file.
+
+   1. Restart the app.<br>
+      Expected: The data file is rejected, a loading warning is logged, and the app starts with an empty address book. The log identifies duplicate person IDs.
+
+   1. Repeat with one copy of the UUID written in uppercase and the other in lowercase.<br>
+      Expected: The same duplicate-ID rejection occurs.
 
 1. Dealing with missing/corrupted data files
 

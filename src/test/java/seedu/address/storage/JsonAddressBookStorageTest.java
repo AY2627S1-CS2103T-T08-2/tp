@@ -69,6 +69,15 @@ public class JsonAddressBookStorageTest {
     }
 
     @Test
+    public void readAddressBook_duplicatePersonIds_throwDataLoadingException() {
+        Path filePath = Paths.get("src", "test", "data", "JsonSerializableAddressBookTest",
+                "duplicatePersonIdsAddressBook.json");
+        JsonAddressBookStorage jsonAddressBookStorage = new JsonAddressBookStorage(filePath);
+
+        assertThrows(DataLoadingException.class, jsonAddressBookStorage::readAddressBook);
+    }
+
+    @Test
     public void readAndSaveAddressBook_legacyIds_preservesGeneratedIds() throws Exception {
         ReadOnlyAddressBook original = readAddressBook("legacyPersonIdsAddressBook.json").get();
         assertEquals(2, original.getPersonList().size());

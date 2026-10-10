@@ -2,6 +2,8 @@ package seedu.address.model.person;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_ADDRESS_BOB;
 import static seedu.address.logic.commands.CommandTestUtil.VALID_EMAIL_BOB;
@@ -17,6 +19,36 @@ import org.junit.jupiter.api.Test;
 import seedu.address.testutil.PersonBuilder;
 
 public class PersonTest {
+
+    private static final PersonId PERSON_ID = PersonId.fromString("550e8400-e29b-41d4-a716-446655440000");
+    private static final PersonId OTHER_PERSON_ID = PersonId.fromString("550e8400-e29b-41d4-a716-446655440001");
+
+    @Test
+    public void constructor_withoutId_generatesDistinctNonNullIds() {
+        Person person = new Person(ALICE.getName(), ALICE.getPhone(), ALICE.getEmail(),
+                ALICE.getAddress(), ALICE.getTags());
+        Person otherPerson = new Person(ALICE.getName(), ALICE.getPhone(), ALICE.getEmail(),
+                ALICE.getAddress(), ALICE.getTags());
+
+        assertNotNull(person.getPersonId());
+        assertNotNull(otherPerson.getPersonId());
+        assertNotEquals(person.getPersonId(), otherPerson.getPersonId());
+    }
+
+    @Test
+    public void constructor_withId_preservesSuppliedId() {
+        Person person = new Person(PERSON_ID, ALICE.getName(), ALICE.getPhone(), ALICE.getEmail(),
+                ALICE.getAddress(), ALICE.getTags());
+
+        assertEquals(PERSON_ID, person.getPersonId());
+        assertEquals(ALICE, person);
+    }
+
+    @Test
+    public void constructor_nullId_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> new Person(null, ALICE.getName(), ALICE.getPhone(),
+                ALICE.getEmail(), ALICE.getAddress(), ALICE.getTags()));
+    }
 
     @Test
     public void asObservableList_modifyList_throwsUnsupportedOperationException() {
@@ -49,6 +81,20 @@ public class PersonTest {
         String nameWithTrailingSpaces = VALID_NAME_BOB + " ";
         editedBob = new PersonBuilder(BOB).withName(nameWithTrailingSpaces).build();
         assertFalse(BOB.isSamePerson(editedBob));
+    }
+
+    @Test
+    public void isSamePerson_ignoresIds_comparesNames() {
+        Person person = new PersonBuilder(ALICE).withPersonId(PERSON_ID).build();
+        Person editedAlice = new PersonBuilder(person).withPersonId(OTHER_PERSON_ID)
+                .withPhone(VALID_PHONE_BOB).withEmail(VALID_EMAIL_BOB).withAddress(VALID_ADDRESS_BOB)
+                .withTags(VALID_TAG_HUSBAND).build();
+        Person renamedAlice = new PersonBuilder(person).withName(VALID_NAME_BOB).build();
+
+        assertNotEquals(person.getPersonId(), editedAlice.getPersonId());
+        assertTrue(person.isSamePerson(editedAlice));
+        assertEquals(person.getPersonId(), renamedAlice.getPersonId());
+        assertFalse(person.isSamePerson(renamedAlice));
     }
 
     @Test
@@ -91,9 +137,22 @@ public class PersonTest {
     }
 
     @Test
+    public void equals_differentIdsWithSameDetails_returnsTrueWithMatchingHashCodes() {
+        Person person = new PersonBuilder(ALICE).withPersonId(PERSON_ID).build();
+        Person aliceCopy = new PersonBuilder(person).withPersonId(OTHER_PERSON_ID).build();
+
+        assertNotEquals(person.getPersonId(), aliceCopy.getPersonId());
+        assertEquals(person, aliceCopy);
+        assertEquals(aliceCopy, person);
+        assertEquals(person.hashCode(), aliceCopy.hashCode());
+    }
+
+    @Test
     public void toStringMethod() {
         String expected = Person.class.getCanonicalName() + "{name=" + ALICE.getName() + ", phone=" + ALICE.getPhone()
                 + ", email=" + ALICE.getEmail() + ", address=" + ALICE.getAddress() + ", tags=" + ALICE.getTags() + "}";
         assertEquals(expected, ALICE.toString());
+        Person aliceCopy = new PersonBuilder(ALICE).withPersonId(OTHER_PERSON_ID).build();
+        assertEquals(expected, aliceCopy.toString());
     }
 }

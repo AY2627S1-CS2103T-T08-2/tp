@@ -50,8 +50,31 @@ public class JsonAdaptedPersonTest {
     public void toModelType_validId_preservesId() throws Exception {
         JsonAdaptedPerson person =
                 new JsonAdaptedPerson(VALID_ID, VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS, VALID_TAGS);
+        Person modelPerson = person.toModelType();
 
-        assertEquals(BENSON.getPersonId(), person.toModelType().getPersonId());
+        assertEquals(BENSON.getPersonId(), modelPerson.getPersonId());
+        assertEquals(VALID_ID, modelPerson.getPersonId().toString());
+    }
+
+    @Test
+    public void fromJson_missingId_generatesNonNullId() throws Exception {
+        String json = """
+                {
+                  "name": "%s",
+                  "phone": "%s",
+                  "email": "%s",
+                  "address": "%s",
+                  "tags": []
+                }
+                """.formatted(VALID_NAME, VALID_PHONE, VALID_EMAIL, VALID_ADDRESS);
+        JsonAdaptedPerson person = JsonUtil.fromJsonString(json, JsonAdaptedPerson.class);
+        Person modelPerson = person.toModelType();
+
+        assertNotNull(modelPerson.getPersonId());
+        assertEquals(BENSON.getName(), modelPerson.getName());
+        assertEquals(BENSON.getPhone(), modelPerson.getPhone());
+        assertEquals(BENSON.getEmail(), modelPerson.getEmail());
+        assertEquals(BENSON.getAddress(), modelPerson.getAddress());
     }
 
     @Test

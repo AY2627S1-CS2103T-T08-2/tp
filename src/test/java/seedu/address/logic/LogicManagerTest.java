@@ -12,7 +12,10 @@ import static seedu.address.testutil.TypicalPersons.AMY;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +31,7 @@ import seedu.address.model.ModelManager;
 import seedu.address.model.ReadOnlyAddressBook;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.PersonId;
 import seedu.address.storage.JsonAddressBookStorage;
 import seedu.address.storage.JsonUserPrefsStorage;
 import seedu.address.storage.StorageManager;
@@ -68,6 +72,30 @@ public class LogicManagerTest {
     public void execute_validCommand_success() throws Exception {
         String listCommand = ListCommand.COMMAND_WORD;
         assertCommandSuccess(listCommand, ListCommand.MESSAGE_SUCCESS, model);
+    }
+
+    @Test
+    public void execute_listCommand_persistsGeneratedLegacyIds() throws Exception {
+        Path filePath = temporaryFolder.resolve("LegacyAddressBook.json");
+        Files.copy(Paths.get("src", "test", "data", "JsonAddressBookStorageTest", "legacyPersonIdsAddressBook.json"),
+                filePath);
+        String json = Files.readString(filePath);
+        JsonAddressBookStorage addressBookStorage = new JsonAddressBookStorage(filePath);
+        ReadOnlyAddressBook original = addressBookStorage.readAddressBook().get();
+        List<PersonId> personIds = original.getPersonList().stream().map(Person::getPersonId).toList();
+        model = new ModelManager(original, new UserPrefs());
+        JsonUserPrefsStorage userPrefsStorage =
+                new JsonUserPrefsStorage(temporaryFolder.resolve("LegacyUserPrefs.json"));
+        StorageManager storage = new StorageManager(addressBookStorage, userPrefsStorage);
+        logic = new LogicManager(model, storage);
+
+        assertEquals(json, Files.readString(filePath));
+        String listCommand = ListCommand.COMMAND_WORD;
+        assertCommandSuccess(listCommand, ListCommand.MESSAGE_SUCCESS, model);
+
+        ReadOnlyAddressBook readBack = new JsonAddressBookStorage(filePath).readAddressBook().get();
+        assertEquals(personIds, readBack.getPersonList().stream().map(Person::getPersonId).toList());
+        assertEquals(original, readBack);
     }
 
     @Test

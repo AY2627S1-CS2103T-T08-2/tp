@@ -1,0 +1,20 @@
+{
+  "persons": [
+    {
+      "id": "550e8400-e29b-41d4-a716-446655440001",
+      "name": "Alice Pauline",
+      "phone": "94351253",
+      "email": "alice@example.com",
+      "address": "123, Jurong West Ave 6, #08-111",
+      "tags": ["friends"]
+    },
+    {
+      "id": "550E8400-E29B-41D4-A716-446655440001",
+      "name": "Benson Meier",
+      "phone": "98765432",
+      "email": "johnd@example.com",
+      "address": "311, Clementi Ave 2, #02-25",
+      "tags": ["owesMoney", "friends"]
+    }
+  ]
+}

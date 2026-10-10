@@ -14,33 +14,57 @@ import static seedu.address.logic.commands.CommandTestUtil.VALID_TAG_HUSBAND;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import seedu.address.model.AddressBook;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.PersonId;
 
 /**
  * A utility class containing a list of {@code Person} objects to be used in tests.
  */
 public class TypicalPersons {
 
-    public static final Person ALICE = new PersonBuilder().withName("Alice Pauline")
+    public static final PersonId ALICE_ID =
+            new PersonId(UUID.fromString("550e8400-e29b-41d4-a716-446655440001"));
+
+    public static final PersonId BENSON_ID =
+            new PersonId(UUID.fromString("550e8400-e29b-41d4-a716-446655440002"));
+
+    public static final PersonId CARL_ID =
+            new PersonId(UUID.fromString("550e8400-e29b-41d4-a716-446655440003"));
+
+    public static final PersonId DANIEL_ID =
+            new PersonId(UUID.fromString("550e8400-e29b-41d4-a716-446655440004"));
+
+    public static final PersonId ELLE_ID =
+            new PersonId(UUID.fromString("550e8400-e29b-41d4-a716-446655440005"));
+
+    public static final PersonId FIONA_ID =
+            new PersonId(UUID.fromString("550e8400-e29b-41d4-a716-446655440006"));
+
+    public static final PersonId GEORGE_ID =
+            new PersonId(UUID.fromString("550e8400-e29b-41d4-a716-446655440007"));
+
+    public static final Person ALICE = new PersonBuilder().withPersonId(ALICE_ID).withName("Alice Pauline")
             .withAddress("123, Jurong West Ave 6, #08-111").withEmail("alice@example.com")
             .withPhone("94351253")
             .withTags("friends").build();
-    public static final Person BENSON = new PersonBuilder().withName("Benson Meier")
+    public static final Person BENSON = new PersonBuilder().withPersonId(BENSON_ID).withName("Benson Meier")
             .withAddress("311, Clementi Ave 2, #02-25")
             .withEmail("johnd@example.com").withPhone("98765432")
             .withTags("owesMoney", "friends").build();
-    public static final Person CARL = new PersonBuilder().withName("Carl Kurz").withPhone("95352563")
-            .withEmail("heinz@example.com").withAddress("wall street").build();
-    public static final Person DANIEL = new PersonBuilder().withName("Daniel Meier").withPhone("87652533")
-            .withEmail("cornelia@example.com").withAddress("10th street").withTags("friends").build();
-    public static final Person ELLE = new PersonBuilder().withName("Elle Meyer").withPhone("9482224")
-            .withEmail("werner@example.com").withAddress("michegan ave").build();
-    public static final Person FIONA = new PersonBuilder().withName("Fiona Kunz").withPhone("9482427")
-            .withEmail("lydia@example.com").withAddress("little tokyo").build();
-    public static final Person GEORGE = new PersonBuilder().withName("George Best").withPhone("9482442")
-            .withEmail("anna@example.com").withAddress("4th street").build();
+    public static final Person CARL = new PersonBuilder().withPersonId(CARL_ID).withName("Carl Kurz")
+            .withPhone("95352563").withEmail("heinz@example.com").withAddress("wall street").build();
+    public static final Person DANIEL = new PersonBuilder().withPersonId(DANIEL_ID).withName("Daniel Meier")
+            .withPhone("87652533").withEmail("cornelia@example.com").withAddress("10th street")
+            .withTags("friends").build();
+    public static final Person ELLE = new PersonBuilder().withPersonId(ELLE_ID).withName("Elle Meyer")
+            .withPhone("9482224").withEmail("werner@example.com").withAddress("michegan ave").build();
+    public static final Person FIONA = new PersonBuilder().withPersonId(FIONA_ID).withName("Fiona Kunz")
+            .withPhone("9482427").withEmail("lydia@example.com").withAddress("little tokyo").build();
+    public static final Person GEORGE = new PersonBuilder().withPersonId(GEORGE_ID).withName("George Best")
+            .withPhone("9482442").withEmail("anna@example.com").withAddress("4th street").build();
 
     // Manually added
     public static final Person HOON = new PersonBuilder().withName("Hoon Meier").withPhone("8482424")

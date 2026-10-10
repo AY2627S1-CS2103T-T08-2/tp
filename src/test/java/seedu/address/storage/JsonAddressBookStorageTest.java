@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 import static seedu.address.testutil.TypicalPersons.HOON;
@@ -13,17 +14,25 @@ import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import seedu.address.commons.exceptions.DataLoadingException;
+import seedu.address.commons.exceptions.IllegalValueException;
+import seedu.address.commons.util.JsonUtil;
 import seedu.address.model.AddressBook;
 import seedu.address.model.ReadOnlyAddressBook;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.PersonId;
 
 public class JsonAddressBookStorageTest {
     private static final Path TEST_DATA_FOLDER = Paths.get("src", "test", "data", "JsonAddressBookStorageTest");
+    private static final Path SERIALIZABLE_TEST_DATA_FOLDER =
+            Paths.get("src", "test", "data", "JsonSerializableAddressBookTest");
 
     @TempDir
     public Path testFolder;
@@ -65,16 +74,79 @@ public class JsonAddressBookStorageTest {
 
     @Test
     public void readAddressBook_invalidPersonId_throwDataLoadingException() {
-        assertThrows(DataLoadingException.class, () -> readAddressBook("invalidPersonIdAddressBook.json"));
+        String expectedMessage = IllegalValueException.class.getName() + ": " + PersonId.MESSAGE_CONSTRAINTS;
+        assertThrows(DataLoadingException.class, expectedMessage, () -> {
+            readAddressBook("invalidPersonIdAddressBook.json");
+        });
     }
 
     @Test
     public void readAddressBook_duplicatePersonIds_throwDataLoadingException() {
-        Path filePath = Paths.get("src", "test", "data", "JsonSerializableAddressBookTest",
-                "duplicatePersonIdsAddressBook.json");
+        Path filePath = SERIALIZABLE_TEST_DATA_FOLDER.resolve("duplicatePersonIdsAddressBook.json");
         JsonAddressBookStorage jsonAddressBookStorage = new JsonAddressBookStorage(filePath);
 
-        assertThrows(DataLoadingException.class, jsonAddressBookStorage::readAddressBook);
+        assertThrows(DataLoadingException.class,
+                IllegalValueException.class.getName() + ": " + JsonSerializableAddressBook.MESSAGE_DUPLICATE_PERSON_ID,
+                jsonAddressBookStorage::readAddressBook);
+    }
+
+    @Test
+    public void readAddressBook_duplicateNames_throwDataLoadingException() {
+        Path filePath = SERIALIZABLE_TEST_DATA_FOLDER.resolve("duplicatePersonAddressBook.json");
+        JsonAddressBookStorage jsonAddressBookStorage = new JsonAddressBookStorage(filePath);
+
+        assertThrows(DataLoadingException.class,
+                IllegalValueException.class.getName() + ": " + JsonSerializableAddressBook.MESSAGE_DUPLICATE_PERSON,
+                jsonAddressBookStorage::readAddressBook);
+    }
+
+    @Test
+    public void readAddressBook_missingIds_generatesDistinctNonNullIds() throws Exception {
+        ReadOnlyAddressBook original = readAddressBook("legacyAddressBookWithoutIds.json").get();
+
+        assertEquals(2, original.getPersonList().size());
+        for (Person person : original.getPersonList()) {
+            assertNotNull(person.getPersonId());
+        }
+        assertNotEquals(original.getPersonList().get(0).getPersonId(), original.getPersonList().get(1).getPersonId());
+    }
+
+    @Test
+    public void readAndSaveAddressBook_validStoredIds_preservesEveryId() throws Exception {
+        ReadOnlyAddressBook original = new JsonAddressBookStorage(
+                SERIALIZABLE_TEST_DATA_FOLDER.resolve("validPersonIdsAddressBook.json")).readAddressBook().get();
+        List<PersonId> personIds = List.of(
+                PersonId.fromString("550e8400-e29b-41d4-a716-446655440001"),
+                PersonId.fromString("550e8400-e29b-41d4-a716-446655440002"));
+        assertEquals(personIds, original.getPersonList().stream().map(Person::getPersonId).toList());
+
+        Path filePath = testFolder.resolve("AddressBookWithIds.json");
+        JsonAddressBookStorage jsonAddressBookStorage = new JsonAddressBookStorage(filePath);
+        jsonAddressBookStorage.saveAddressBook(original);
+        ReadOnlyAddressBook readBack = jsonAddressBookStorage.readAddressBook().get();
+
+        assertEquals(original, new AddressBook(readBack));
+        assertEquals(personIds, readBack.getPersonList().stream().map(Person::getPersonId).toList());
+    }
+
+    @Test
+    public void saveAddressBook_validPersons_writesEveryIdProperty() throws Exception {
+        AddressBook original = getTypicalAddressBook();
+        Path filePath = testFolder.resolve("SavedAddressBookWithIds.json");
+        JsonAddressBookStorage jsonAddressBookStorage = new JsonAddressBookStorage(filePath);
+        jsonAddressBookStorage.saveAddressBook(original);
+
+        JsonNode json = JsonUtil.readJsonFile(filePath, JsonNode.class).get();
+        JsonNode persons = json.get("persons");
+        assertNotNull(persons);
+        assertTrue(persons.isArray());
+        assertEquals(original.getPersonList().size(), persons.size());
+        for (int i = 0; i < persons.size(); i++) {
+            JsonNode person = persons.get(i);
+            assertTrue(person.hasNonNull("id"));
+            assertTrue(person.get("id").isTextual());
+            assertEquals(original.getPersonList().get(i).getPersonId().toString(), person.get("id").textValue());
+        }
     }
 
     @Test

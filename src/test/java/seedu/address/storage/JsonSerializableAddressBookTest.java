@@ -9,9 +9,12 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.commons.util.JsonUtil;
 import seedu.address.model.AddressBook;
+import seedu.address.model.person.Person;
 import seedu.address.model.person.PersonId;
 import seedu.address.testutil.TypicalPersons;
 
@@ -34,6 +37,21 @@ public class JsonSerializableAddressBookTest {
         AddressBook addressBookFromFile = dataFromFile.toModelType();
         AddressBook typicalPersonsAddressBook = TypicalPersons.getTypicalAddressBook();
         assertEquals(addressBookFromFile, typicalPersonsAddressBook);
+        assertEquals(typicalPersonsAddressBook.getPersonList().stream().map(Person::getPersonId).toList(),
+                addressBookFromFile.getPersonList().stream().map(Person::getPersonId).toList());
+    }
+
+    @Test
+    public void toJsonString_typicalPersons_matchesFixtureIds() throws Exception {
+        AddressBook typicalPersonsAddressBook = TypicalPersons.getTypicalAddressBook();
+        String json = JsonUtil.toJsonString(new JsonSerializableAddressBook(typicalPersonsAddressBook));
+        JsonNode persons = JsonUtil.fromJsonString(json, JsonNode.class).get("persons");
+        JsonNode expectedPersons = JsonUtil.readJsonFile(TYPICAL_PERSONS_FILE, JsonNode.class).get().get("persons");
+
+        assertEquals(expectedPersons.size(), persons.size());
+        for (int i = 0; i < persons.size(); i++) {
+            assertEquals(expectedPersons.get(i).get("id"), persons.get(i).get("id"));
+        }
     }
 
     @Test

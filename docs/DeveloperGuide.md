@@ -125,10 +125,14 @@ How the parsing works:
 The `Model` component,
 
 * stores the address book data i.e., all `Person` objects (which are contained in a `UniquePersonList` object).
-* gives each `Person` an immutable internal `PersonId`, represented by a UUID. New contacts generate an ID; editing and storage reconstruction preserve an existing ID. `Person#equals`, `Person#hashCode`, and the name-based `Person#isSamePerson` comparison continue to use their existing contact fields.
+* gives each `Person` a non-null, immutable internal `PersonId`, represented by a UUID, that is not displayed to users.
 * stores the `Person` objects selected by the current filter, such as search results, in a separate _filtered_ list. It exposes this list as an unmodifiable `ObservableList<Person>` that the UI can observe and bind to, so the UI updates when the list changes.
 * stores a `UserPrefs` object that represents the user’s preferences (currently, just the GUI settings). This is exposed to the outside as a `ReadOnlyUserPrefs` object.
 * does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components)
+
+Each `Person` owns exactly one `PersonId`, shown by the composition in the Model diagrams. The normal `Person` constructor generates a new ID, while the reconstruction constructor accepts an existing ID. Editing replaces the person's details but preserves its ID.
+
+IDs provide stable internal references and are separate from contact duplicate detection. `Person#isSamePerson` remains name-based, and `UniquePersonList` still uses it to reject duplicate contacts. `Person#equals` and `Person#hashCode` continue to compare the existing contact fields without including the ID; otherwise equal contacts with different IDs remain equal.
 
 
 <box type="info" seamless>
@@ -153,6 +157,14 @@ The `Storage` component,
 `JsonAdaptedPerson` saves each contact's `PersonId` as an `id` string in the address book JSON file and restores it when loading. A missing or null `id` is supported for legacy data and generates a new ID, which is persisted on the next save. A present ID must use the standard UUID format, with either uppercase or lowercase hexadecimal digits. Malformed IDs cause an `IllegalValueException`, which `JsonAddressBookStorage` reports as a `DataLoadingException`.
 
 `JsonSerializableAddressBook#toModelType()` also tracks restored IDs in a `Set<PersonId>` and rejects duplicate IDs with a dedicated error message. UUIDs that differ only in capitalization represent the same ID. The existing name-based duplicate-person check runs first, and a contact is added only after both checks pass. Duplicate IDs are reported as invalid data through the same storage-loading exception path as malformed IDs.
+
+#### Legacy migration
+
+Loading legacy data generates IDs in memory but does not rewrite the JSON file. `LogicManager#execute()` saves the address book after every successful command, including commands such as `list` that do not change contact details. That save writes the generated IDs, and subsequent loads restore them.
+
+`MainApp#stop()` saves user preferences only. Closing the window without executing a successful command leaves an ID-less legacy file unchanged, so its missing or null IDs are generated again on the next startup. Entering `exit` is different from closing the window: it is a successful command and follows the normal address-book save path.
+
+Immediate migration write-back is not implemented. If IDs must remain stable across startups even when no address-book save occurs, the team must explicitly choose to add a write-back after successful legacy loading, including handling possible write failures.
 
 ### Common classes
 
@@ -562,8 +574,14 @@ testers are expected to do more *exploratory* testing.
 
    1. In the disposable copy, close the app and remove the `id` property from one contact in the JSON file. For another contact, set `"id": null`.
 
-   1. Restart the app and edit a contact to trigger a save, then inspect the JSON.<br>
-      Expected: Both legacy contacts load with their original details. Each now has a distinct UUID in its `id` property. Existing non-null IDs are preserved. Generated IDs are written on saving, rather than immediately on loading.
+   1. Restart the app, then close its window without entering a command. Inspect the JSON.<br>
+      Expected: Both legacy contacts load with their original details, but the file still has the missing or null IDs. Loading and closing the window do not write back the generated IDs. Do not use the `exit` command for this step, because successful commands save the address book.
+
+   1. Restart the app and execute `list` to trigger a save, then inspect the JSON.<br>
+      Expected: Each legacy contact now has a distinct UUID in its `id` property. Existing non-null IDs are preserved. Generated IDs are written on saving, rather than immediately on loading.
+
+   1. Record the IDs, close the window, restart the app, and execute `list` again.<br>
+      Expected: All recorded IDs remain unchanged after loading and saving the migrated file.
 
 1. Rejecting malformed stored IDs
 

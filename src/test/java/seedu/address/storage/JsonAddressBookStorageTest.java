@@ -12,6 +12,7 @@ import static seedu.address.testutil.TypicalPersons.IDA;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -112,6 +113,29 @@ public class JsonAddressBookStorageTest {
     }
 
     @Test
+    public void readAddressBook_legacyIds_withoutSaveLeavesFileUnchanged() throws Exception {
+        Path filePath = testFolder.resolve("UnsavedLegacyAddressBook.json");
+        Files.copy(TEST_DATA_FOLDER.resolve("legacyPersonIdsAddressBook.json"), filePath);
+        String json = Files.readString(filePath);
+        JsonAddressBookStorage jsonAddressBookStorage = new JsonAddressBookStorage(filePath);
+        ReadOnlyAddressBook original = jsonAddressBookStorage.readAddressBook().get();
+
+        assertEquals(2, original.getPersonList().size());
+        for (Person person : original.getPersonList()) {
+            assertNotNull(person.getPersonId());
+        }
+        assertEquals(json, Files.readString(filePath));
+
+        ReadOnlyAddressBook readBack = new JsonAddressBookStorage(filePath).readAddressBook().get();
+        assertEquals(original, new AddressBook(readBack));
+        for (int i = 0; i < original.getPersonList().size(); i++) {
+            assertNotEquals(original.getPersonList().get(i).getPersonId(),
+                    readBack.getPersonList().get(i).getPersonId());
+        }
+        assertEquals(json, Files.readString(filePath));
+    }
+
+    @Test
     public void readAndSaveAddressBook_validStoredIds_preservesEveryId() throws Exception {
         ReadOnlyAddressBook original = new JsonAddressBookStorage(
                 SERIALIZABLE_TEST_DATA_FOLDER.resolve("validPersonIdsAddressBook.json")).readAddressBook().get();
@@ -161,7 +185,7 @@ public class JsonAddressBookStorageTest {
         Path filePath = testFolder.resolve("LegacyAddressBook.json");
         JsonAddressBookStorage jsonAddressBookStorage = new JsonAddressBookStorage(filePath);
         jsonAddressBookStorage.saveAddressBook(original);
-        ReadOnlyAddressBook readBack = jsonAddressBookStorage.readAddressBook().get();
+        ReadOnlyAddressBook readBack = new JsonAddressBookStorage(filePath).readAddressBook().get();
 
         assertEquals(original, new AddressBook(readBack));
         assertEquals(original.getPersonList().stream().map(Person::getPersonId).toList(),

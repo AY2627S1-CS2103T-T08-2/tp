@@ -21,6 +21,16 @@ Class Name
 Class Phone
 Class Tag
 
+Class UniqueProjectList
+Class Project
+Class ProjectId
+Class ProjectName
+Class Deadline
+Class Description
+
+Class UniqueProjectMembershipList
+Class ProjectMembership
+
 Class I #FFFFFF
 }
 
@@ -45,6 +55,18 @@ Person *--> Email
 Person *--> Address
 Person *--> "*" Tag
 
+AddressBook *--> "1" UniqueProjectList
+UniqueProjectList --> "~* all" Project
+Project *--> "1" ProjectId
+Project *--> ProjectName
+Project *--> Deadline
+Project *--> Description
+
+AddressBook *--> "1" UniqueProjectMembershipList
+UniqueProjectMembershipList --> "~* all" ProjectMembership
+ProjectMembership --> "1" PersonId
+ProjectMembership --> "1" ProjectId
+
 Person -[hidden]up--> I
 UniquePersonList -[hidden]right-> I
 
@@ -52,6 +74,13 @@ PersonId -[hidden]right-> Name
 Name -[hidden]right-> Phone
 Phone -[hidden]right-> Address
 Address -[hidden]right-> Email
+
+UniquePersonList -[hidden]down-> UniqueProjectList
+UniqueProjectList -[hidden]down-> UniqueProjectMembershipList
+
+ProjectId -[hidden]right-> ProjectName
+ProjectName -[hidden]right-> Deadline
+Deadline -[hidden]right-> Description
 
 ModelManager --> "~* filtered" Person
 @enduml

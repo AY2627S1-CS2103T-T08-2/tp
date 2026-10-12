@@ -64,6 +64,7 @@
         "appendix-instructions-for-manual-testing": "Appendix: Instructions for manual testing",
         "launch-and-shutdown": "Launch and shutdown",
         "deleting-a-person": "Deleting a person",
+        "listing-projects": "Listing projects",
         "associating-a-contact-with-a-project": "Associating a contact with a project",
         "saving-data": "Saving data"
       },
@@ -115,6 +116,7 @@
         "viewing-help-help": "Viewing help: help",
         "adding-a-person-add": "Adding a person: add",
         "listing-all-persons-list": "Listing all persons: list",
+        "listing-all-projects-listprojects": "Listing all projects: listprojects",
         "editing-a-person-edit": "Editing a person: edit",
         "locating-persons-by-name-find": "Locating persons by name: find",
         "deleting-a-person-delete": "Deleting a person: delete",

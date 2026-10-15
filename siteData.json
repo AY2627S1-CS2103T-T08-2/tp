@@ -66,6 +66,7 @@
         "deleting-a-person": "Deleting a person",
         "listing-projects": "Listing projects",
         "associating-a-contact-with-a-project": "Associating a contact with a project",
+        "dissociating-a-contact-from-a-project": "Dissociating a contact from a project",
         "listing-contacts-in-a-project": "Listing contacts in a project",
         "saving-data": "Saving data"
       },
@@ -123,6 +124,7 @@
         "locating-contacts-by-name-find": "Locating contacts by name: find",
         "deleting-a-contact-delete": "Deleting a contact: delete",
         "associating-a-contact-with-a-project-associate": "Associating a contact with a project: associate",
+        "dissociating-a-contact-from-a-project-dissociate": "Dissociating a contact from a project: dissociate",
         "listing-project-members-listmembers": "Listing project members: listmembers",
         "clearing-all-entries-clear": "Clearing all entries: clear",
         "exiting-the-program-exit": "Exiting the program: exit",

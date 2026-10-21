@@ -7,8 +7,6 @@ import static java.util.Objects.requireNonNull;
  * Guarantees: immutable; is valid as declared in {@link #isValidRemark(String)}
  */
 public class Remark {
-    
-
 
     public static final String MESSAGE_CONSTRAINTS = "Remarks can take any values, and should not be blank";
 

@@ -168,7 +168,7 @@ Format: `associate c/CONTACT_INDEX pr/PROJECT_INDEX`
 
 Projects are numbered in the Projects tab starting at 1, in the order they are added with `addproject`.
 Switching tabs does not change either list's indices or reset the contact search results.
-Projects and associations last only for the current application session.
+Projects and associations are saved with the address book.
 
 Example, in a new session with at least two contacts:
 
@@ -195,6 +195,17 @@ If the project exists but has no associated contacts, UniTeam reports that no co
 If no project has the specified name, UniTeam reports that the project does not exist. Project names are matched
 without regard to letter case and with whitespace normalised.
 
+### Setting a member's role: `setrole`
+
+Sets or updates a short description of a contact's task allotment in a project. The contact must already be associated
+with the project. A role can contain up to 200 characters and cannot contain line breaks.
+
+Format: `setrole c/CONTACT_INDEX pr/PROJECT_INDEX r/ROLE`
+
+Example: `setrole c/2 pr/1 r/Implement the parser`
+
+`listmembers` displays a non-empty role beside the contact's name. An empty role is shown as just the contact's name.
+
 ### Clearing all entries: `clear`
 
 Clears all entries from the address book.
@@ -209,8 +220,8 @@ Format: `exit`
 
 ### Saving the data
 
-AddressBook automatically saves contacts after every successful command. You do not need to save manually.
-Projects and contact-project associations are not yet saved and are lost when the application closes.
+AddressBook automatically saves contacts, projects, memberships and member roles after every successful command. You do
+not need to save manually.
 
 ### Editing the data file
 

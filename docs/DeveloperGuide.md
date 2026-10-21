@@ -210,7 +210,7 @@ This section describes some noteworthy details on how certain features are imple
 
 The project membership model represents the many-to-many relationship between contacts and projects: one contact can
 belong to multiple projects, and one project can contain multiple contacts. Each relationship is represented by a
-separate `ProjectMembership` value object containing a `PersonId` and a `ProjectId`.
+separate `ProjectMembership` value object containing a `PersonId`, a `ProjectId`, and a member-specific `Role`.
 
 Using stable IDs keeps memberships valid when descriptive fields such as a contact's phone number or a project's name
 change. It also avoids the stale or inconsistent data that could result from storing copies of `Person` or `Project` in
@@ -221,6 +221,11 @@ the displayed list is filtered or reordered.
 rejects duplicate ID pairs and memberships with unknown IDs, and removes related memberships when a person or project
 is deleted. During reset, persons and projects are installed before memberships so that membership references can be
 validated against the replacement data.
+
+`Role` is an immutable value object with a 200-character, single-line constraint. `setrole` replaces the matching
+membership while preserving its person and project IDs. The JSON adapter stores each role with its membership and
+defaults missing role fields to an empty role for compatibility with older data. `listmembers` appends each non-empty
+role to the displayed contact name.
 
 The `listmembers` command resolves a project name to its `Project`, then asks the model for that project's contacts.
 `AddressBook#getProjectMembers` matches membership IDs and returns contacts in address-book order; command logic does

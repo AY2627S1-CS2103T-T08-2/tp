@@ -26,9 +26,9 @@ public class PersonTest {
     @Test
     public void constructor_withoutId_generatesDistinctNonNullIds() {
         Person person = new Person(ALICE.getName(), ALICE.getPhone(), ALICE.getEmail(),
-                ALICE.getAddress(), ALICE.getTags());
+                ALICE.getAddress(), ALICE.getRemark(), ALICE.getTags());
         Person otherPerson = new Person(ALICE.getName(), ALICE.getPhone(), ALICE.getEmail(),
-                ALICE.getAddress(), ALICE.getTags());
+                ALICE.getAddress(), ALICE.getRemark(), ALICE.getTags());
 
         assertNotNull(person.getPersonId());
         assertNotNull(otherPerson.getPersonId());
@@ -38,7 +38,7 @@ public class PersonTest {
     @Test
     public void constructor_withId_preservesSuppliedId() {
         Person person = new Person(PERSON_ID, ALICE.getName(), ALICE.getPhone(), ALICE.getEmail(),
-                ALICE.getAddress(), ALICE.getTags());
+                ALICE.getAddress(), ALICE.getRemark(), ALICE.getTags());
 
         assertEquals(PERSON_ID, person.getPersonId());
         assertEquals(ALICE, person);
@@ -47,7 +47,7 @@ public class PersonTest {
     @Test
     public void constructor_nullId_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new Person(null, ALICE.getName(), ALICE.getPhone(),
-                ALICE.getEmail(), ALICE.getAddress(), ALICE.getTags()));
+                ALICE.getEmail(), ALICE.getAddress(), ALICE.getRemark(), ALICE.getTags()));
     }
 
     @Test

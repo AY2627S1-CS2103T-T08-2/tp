@@ -15,4 +15,5 @@ public class CliSyntax {
     public static final Prefix PREFIX_DESCRIPTION = new Prefix("desc/");
     public static final Prefix PREFIX_PROJECT = new Prefix("pr/");
     public static final Prefix PREFIX_CONTACT = new Prefix("c/");
+    public static final Prefix PREFIX_ROLE = new Prefix("r/");
 }

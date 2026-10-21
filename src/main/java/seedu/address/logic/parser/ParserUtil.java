@@ -11,6 +11,7 @@ import java.util.Set;
 import seedu.address.commons.core.index.Index;
 import seedu.address.commons.util.StringUtil;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.membership.Role;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
@@ -200,5 +201,21 @@ public class ParserUtil {
         }
 
         return new Description(trimmedDescription);
+    }
+
+    /** Parses a non-empty role description, removing surrounding whitespace. */
+    public static Role parseRole(String role) throws ParseException {
+        requireNonNull(role);
+        if (!role.matches(Role.VALIDATION_REGEX)) {
+            throw new ParseException(Role.MESSAGE_CONSTRAINTS);
+        }
+        String trimmedRole = role.strip();
+        if (trimmedRole.isEmpty()) {
+            throw new ParseException("ROLE cannot be empty when r/ is specified.");
+        }
+        if (!Role.isValidRole(trimmedRole)) {
+            throw new ParseException(Role.MESSAGE_CONSTRAINTS);
+        }
+        return new Role(trimmedRole);
     }
 }

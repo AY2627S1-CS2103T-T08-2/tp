@@ -15,13 +15,20 @@ public final class ProjectMembership {
 
     private final PersonId personId;
     private final ProjectId projectId;
+    private final Role role;
 
     /**
      * Creates a membership between the identified person and project.
      */
     public ProjectMembership(PersonId personId, ProjectId projectId) {
+        this(personId, projectId, Role.EMPTY);
+    }
+
+    /** Creates a membership with a role describing the person's task allotment. */
+    public ProjectMembership(PersonId personId, ProjectId projectId, Role role) {
         this.personId = requireNonNull(personId);
         this.projectId = requireNonNull(projectId);
+        this.role = requireNonNull(role);
     }
 
     public PersonId getPersonId() {
@@ -30,6 +37,16 @@ public final class ProjectMembership {
 
     public ProjectId getProjectId() {
         return projectId;
+    }
+
+    /** Returns the role for this person's membership. */
+    public Role getRole() {
+        return role;
+    }
+
+    /** Returns a copy of this membership with {@code newRole}. */
+    public ProjectMembership withRole(Role newRole) {
+        return new ProjectMembership(personId, projectId, newRole);
     }
 
     @Override
@@ -51,4 +68,3 @@ public final class ProjectMembership {
         return Objects.hash(personId, projectId);
     }
 }
-

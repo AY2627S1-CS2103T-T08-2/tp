@@ -125,4 +125,7 @@ public interface Model {
      * The referenced person and project must exist, and the membership must not already exist.
      */
     void addProjectMembership(ProjectMembership membership);
+
+    /** Replaces an existing membership with the same person and project identifiers. */
+    void setProjectMembership(ProjectMembership membership);
 }

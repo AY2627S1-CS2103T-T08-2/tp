@@ -178,6 +178,13 @@ public class AddressBook implements ReadOnlyAddressBook {
         memberships.add(membership);
     }
 
+    /** Replaces an existing membership while preserving its person and project identifiers. */
+    public void setProjectMembership(ProjectMembership membership) {
+        requireNonNull(membership);
+        ensureMembershipReferencesExist(membership);
+        memberships.set(membership);
+    }
+
     /**
      * Returns the contacts associated with {@code project}, preserving address-book order.
      *

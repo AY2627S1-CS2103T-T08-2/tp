@@ -10,6 +10,8 @@ import java.util.UUID;
  */
 public class ProjectId {
 
+    public static final String MESSAGE_CONSTRAINTS = "Project IDs must use the standard UUID format.";
+
     public final UUID value;
 
     /**

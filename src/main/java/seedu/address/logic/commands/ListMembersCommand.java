@@ -3,13 +3,17 @@ package seedu.address.logic.commands;
 import static java.util.Objects.requireNonNull;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import seedu.address.commons.util.ToStringBuilder;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
+import seedu.address.model.membership.ProjectMembership;
 import seedu.address.model.person.Person;
+import seedu.address.model.person.PersonId;
 import seedu.address.model.project.Project;
 import seedu.address.model.project.ProjectName;
 
@@ -44,10 +48,21 @@ public class ListMembersCommand extends Command {
             return new CommandResult(String.format(MESSAGE_NO_MEMBERS, projectName));
         }
 
+        Map<PersonId, ProjectMembership> membershipsByPersonId = model.getAddressBook()
+                .getProjectMembershipList().stream()
+                .filter(membership -> membership.getProjectId().equals(project.getProjectId()))
+                .collect(Collectors.toMap(ProjectMembership::getPersonId, Function.identity()));
         String memberNames = IntStream.range(0, members.size())
-                .mapToObj(index -> String.format("%1$d. %2$s", index + 1, members.get(index).getName()))
+                .mapToObj(index -> formatMember(index + 1, members.get(index),
+                        membershipsByPersonId.get(members.get(index).getPersonId())))
                 .collect(Collectors.joining("\n"));
         return new CommandResult(String.format(MESSAGE_SUCCESS, projectName, members.size(), memberNames));
+    }
+
+    private String formatMember(int index, Person person, ProjectMembership membership) {
+        String role = membership.getRole().toString();
+        return role.isEmpty() ? String.format("%1$d. %2$s", index, person.getName())
+                : String.format("%1$d. %2$s — %3$s", index, person.getName(), role);
     }
 
     @Override

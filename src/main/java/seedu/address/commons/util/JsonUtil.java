@@ -41,7 +41,7 @@ public class JsonUtil {
     }
 
     /**
-     * Returns the JSON object from the given file or {@code Optional.empty()} object if the file is not found.
+     * Returns the JSON object from the given file or {@code Optional.empty()} if the file is known to be missing.
      * If any values are missing from the file, default values will be used, as long as the file is a valid JSON file.
      *
      * @param filePath cannot be null.
@@ -52,10 +52,10 @@ public class JsonUtil {
             Path filePath, Class<T> classOfObjectToDeserialize) throws DataLoadingException {
         requireNonNull(filePath);
 
-        if (!Files.exists(filePath)) {
+        if (Files.notExists(filePath)) {
             return Optional.empty();
         }
-        logger.info("JSON file " + filePath + " found.");
+        logger.info("Attempting to read JSON file: " + filePath);
 
         T jsonFile;
 

@@ -2,6 +2,7 @@ package seedu.address.logic;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 
 import javafx.collections.ObservableList;
@@ -12,6 +13,7 @@ import seedu.address.logic.commands.CommandResult;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.AddressBookParser;
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
 import seedu.address.model.person.Person;
 import seedu.address.model.project.Project;
@@ -46,15 +48,38 @@ public class LogicManager implements Logic {
         logger.info("----------------[USER COMMAND][" + commandText + "]");
 
         CommandResult commandResult;
+        AddressBook beforeCommand = new AddressBook(model.getAddressBook());
+        Predicate<? super Person> previousFilter = model.getFilteredPersonListPredicate();
         Command command = addressBookParser.parseCommand(commandText);
         commandResult = command.execute(model);
 
+        if (storage.isAddressBookSavingBlocked()) {
+            return new CommandResult(
+                    commandResult.getFeedbackToUser()
+                            + "\nSaving is disabled because the data file could not be loaded."
+                            + " Changes in this session will be lost.",
+                    commandResult.isShowHelp(),
+                    commandResult.isExit());
+        }
+
         try {
             storage.saveAddressBook(model.getAddressBook());
-        } catch (AccessDeniedException e) {
-            throw new CommandException(String.format(FILE_OPS_PERMISSION_ERROR_FORMAT, e.getMessage()), e);
-        } catch (IOException ioe) {
-            throw new CommandException(String.format(FILE_OPS_ERROR_FORMAT, ioe.getMessage()), ioe);
+        } catch (IOException e) {
+            String errorMessage = String.format(
+                    e instanceof AccessDeniedException ? FILE_OPS_PERMISSION_ERROR_FORMAT : FILE_OPS_ERROR_FORMAT,
+                    e.getMessage());
+            logger.warning(errorMessage);
+
+            if (beforeCommand.equals(model.getAddressBook())) {
+                return new CommandResult(commandResult.getFeedbackToUser() + "\nWarning: " + errorMessage,
+                        commandResult.isShowHelp(), commandResult.isExit());
+            }
+
+            model.setAddressBook(beforeCommand);
+            model.updateFilteredPersonList(previousFilter == null
+                    ? Model.PREDICATE_SHOW_ALL_PERSONS : previousFilter::test);
+            throw new CommandException(errorMessage
+                    + "\nThe command was not applied. Fix the save problem and try again.", e);
         }
 
         return commandResult;

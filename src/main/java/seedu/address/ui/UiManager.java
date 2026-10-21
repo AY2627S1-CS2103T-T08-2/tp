@@ -25,15 +25,16 @@ public class UiManager implements Ui {
 
     private Logic logic;
     private Path dataFilePath;
+    private final boolean savingDisabled;
     private MainWindow mainWindow;
 
     /**
-     * Creates a {@code UiManager} with the given {@code Logic} and the data file path
-     * to show in the status bar.
+     * Creates a {@code UiManager} with the given logic, data file path, and session saving restriction.
      */
-    public UiManager(Logic logic, Path dataFilePath) {
+    public UiManager(Logic logic, Path dataFilePath, boolean savingDisabled) {
         this.logic = logic;
         this.dataFilePath = dataFilePath;
+        this.savingDisabled = savingDisabled;
     }
 
     @Override
@@ -44,9 +45,19 @@ public class UiManager implements Ui {
         primaryStage.getIcons().add(getImage(ICON_APPLICATION));
 
         try {
-            mainWindow = new MainWindow(primaryStage, logic, dataFilePath);
+            mainWindow = new MainWindow(primaryStage, logic, dataFilePath, savingDisabled);
             mainWindow.show(); //This should be called before creating other UI parts
             mainWindow.fillInnerParts();
+
+            if (savingDisabled) {
+                showAlertDialogAndWait(AlertType.ERROR, "Data loading failed",
+                        "Your saved data could not be loaded. Saving is disabled.",
+                        "Affected file: " + dataFilePath.toAbsolutePath().normalize()
+                                + "\n\nYour original file has been preserved."
+                                + " Close UniTeam, copy the file somewhere safe,"
+                                + " then repair it or restore a valid backup and restart."
+                                + "\n\nChanges in this session will be lost.");
+            }
 
         } catch (Throwable e) {
             logger.severe(StringUtil.getDetails(e));

@@ -19,6 +19,7 @@ public class StorageManager implements Storage {
     private static final Logger logger = LogsCenter.getLogger(StorageManager.class);
     private JsonAddressBookStorage addressBookStorage;
     private JsonUserPrefsStorage userPrefsStorage;
+    private boolean addressBookSavingBlocked;
 
     /**
      * Creates a {@code StorageManager} with the given address book and user prefs storage.
@@ -56,11 +57,26 @@ public class StorageManager implements Storage {
     @Override
     public Optional<ReadOnlyAddressBook> readAddressBook() throws DataLoadingException {
         logger.fine("Attempting to read data from file: " + addressBookStorage.getAddressBookFilePath());
-        return addressBookStorage.readAddressBook();
+        try {
+            return addressBookStorage.readAddressBook();
+        } catch (DataLoadingException e) {
+            addressBookSavingBlocked = true;
+            throw e;
+        }
+    }
+
+    @Override
+    public boolean isAddressBookSavingBlocked() {
+        return addressBookSavingBlocked;
     }
 
     @Override
     public void saveAddressBook(ReadOnlyAddressBook addressBook) throws IOException {
+        if (addressBookSavingBlocked) {
+            throw new IOException("Saving is disabled because the data file could not be loaded: "
+                    + getAddressBookFilePath());
+        }
+
         logger.fine("Attempting to write to data file: " + addressBookStorage.getAddressBookFilePath());
         addressBookStorage.saveAddressBook(addressBook);
     }

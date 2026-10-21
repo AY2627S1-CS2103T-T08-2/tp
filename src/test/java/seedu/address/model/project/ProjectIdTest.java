@@ -50,6 +50,12 @@ public class ProjectIdTest {
     }
 
     @Test
+    public void fromString_nonCanonicalUuid_throwsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class,
+                ProjectId.MESSAGE_CONSTRAINTS, () -> ProjectId.fromString("1-1-1-1-1"));
+    }
+
+    @Test
     public void fromString_validValue_returnsExpectedId() {
         assertEquals(
                 new ProjectId(UUID.fromString(VALID_ID)),

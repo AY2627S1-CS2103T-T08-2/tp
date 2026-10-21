@@ -126,6 +126,14 @@ public interface Model {
      */
     void addProjectMembership(ProjectMembership membership);
 
-    /** Replaces an existing membership with the same person and project identifiers. */
-    void setProjectMembership(ProjectMembership membership);
+    /**
+     * Removes the given project membership from the address book.
+     * The membership must exist in the address book.
+     */
+    void removeProjectMembership(ProjectMembership membership);
+
+    /**
+     * Returns the current contact filter, or null if no filter is set.
+     */
+    Predicate<? super Person> getFilteredPersonListPredicate();
 }

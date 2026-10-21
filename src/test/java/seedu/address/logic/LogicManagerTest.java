@@ -1,6 +1,7 @@
 package seedu.address.logic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static seedu.address.logic.Messages.MESSAGE_INVALID_COMMAND_FORMAT;
 import static seedu.address.logic.Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX;
 import static seedu.address.logic.Messages.MESSAGE_INVALID_PROJECT_DISPLAYED_INDEX;
@@ -11,6 +12,7 @@ import static seedu.address.logic.commands.CommandTestUtil.NAME_DESC_AMY;
 import static seedu.address.logic.commands.CommandTestUtil.PHONE_DESC_AMY;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.AMY;
+import static seedu.address.testutil.TypicalPersons.BENSON;
 
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
@@ -23,11 +25,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import seedu.address.commons.exceptions.DataLoadingException;
 import seedu.address.logic.commands.AddCommand;
 import seedu.address.logic.commands.AssociateCommand;
+import seedu.address.logic.commands.ClearCommand;
 import seedu.address.logic.commands.CommandResult;
+import seedu.address.logic.commands.DissociateCommand;
 import seedu.address.logic.commands.ListCommand;
 import seedu.address.logic.commands.exceptions.CommandException;
+import seedu.address.logic.parser.AddressBookParser;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
@@ -40,7 +46,6 @@ import seedu.address.model.project.Project;
 import seedu.address.storage.JsonAddressBookStorage;
 import seedu.address.storage.JsonUserPrefsStorage;
 import seedu.address.storage.StorageManager;
-import seedu.address.testutil.PersonBuilder;
 import seedu.address.testutil.ProjectBuilder;
 
 public class LogicManagerTest {
@@ -78,6 +83,28 @@ public class LogicManagerTest {
     public void execute_validCommand_success() throws Exception {
         String listCommand = ListCommand.COMMAND_WORD;
         assertCommandSuccess(listCommand, ListCommand.MESSAGE_SUCCESS, model);
+    }
+
+    @Test
+    public void execute_clearWithExtraArguments_preservesDataAndSavedFile() throws Exception {
+        Project project = new ProjectBuilder().build();
+        model.addPerson(AMY);
+        model.addProject(project);
+        model.addProjectMembership(new ProjectMembership(AMY.getPersonId(), project.getProjectId()));
+        logic.execute(ListCommand.COMMAND_WORD);
+        Path addressBookPath = temporaryFolder.resolve("addressBook.json");
+        String savedJson = Files.readString(addressBookPath);
+        Model expectedModel = new ModelManager(model.getAddressBook(), new UserPrefs());
+
+        String expectedMessage = String.format(MESSAGE_INVALID_COMMAND_FORMAT, ClearCommand.MESSAGE_USAGE);
+        assertThrows(ParseException.class, expectedMessage, () -> logic.execute("clear 3"));
+
+        assertEquals(expectedModel, model);
+        assertEquals(savedJson, Files.readString(addressBookPath));
+        assertEquals(List.of(AMY), model.getAddressBook().getPersonList());
+        assertEquals(List.of(project), model.getAddressBook().getProjectList());
+        assertEquals(List.of(new ProjectMembership(AMY.getPersonId(), project.getProjectId())),
+                model.getAddressBook().getProjectMembershipList());
     }
 
     @Test
@@ -149,6 +176,47 @@ public class LogicManagerTest {
     }
 
     @Test
+    public void execute_dissociateCommand_persistsRemovalAfterReload() throws Exception {
+        Project firstProject = new ProjectBuilder().withName("CS2103T Team Project").build();
+        Project secondProject = new ProjectBuilder().withName("Orbital").build();
+        model.addPerson(AMY);
+        model.addPerson(BENSON);
+        model.addProject(firstProject);
+        model.addProject(secondProject);
+        logic.execute("associate c/1 pr/1");
+        logic.execute("associate c/1 pr/2");
+        logic.execute("associate c/2 pr/1");
+        ProjectMembership selectedMembership = new ProjectMembership(AMY.getPersonId(), firstProject.getProjectId());
+        ProjectMembership sameContactMembership =
+                new ProjectMembership(AMY.getPersonId(), secondProject.getProjectId());
+        ProjectMembership sameProjectMembership =
+                new ProjectMembership(BENSON.getPersonId(), firstProject.getProjectId());
+        Path filePath = temporaryFolder.resolve("addressBook.json");
+        ReadOnlyAddressBook beforeRemoval = new JsonAddressBookStorage(filePath).readAddressBook().orElseThrow();
+        assertEquals(List.of(selectedMembership, sameContactMembership, sameProjectMembership),
+                beforeRemoval.getProjectMembershipList());
+
+        CommandResult result = logic.execute("dissociate c/1 pr/1");
+
+        ReadOnlyAddressBook restored = new JsonAddressBookStorage(filePath).readAddressBook().orElseThrow();
+        Model restartedModel = new ModelManager(restored, new UserPrefs());
+        assertEquals(String.format(DissociateCommand.MESSAGE_SUCCESS, AMY.getName(), firstProject.getName()),
+                result.getFeedbackToUser());
+        assertFalse(restartedModel.hasProjectMembership(selectedMembership));
+        assertEquals(List.of(sameContactMembership, sameProjectMembership),
+                restartedModel.getAddressBook().getProjectMembershipList());
+        assertEquals(List.of(AMY, BENSON), restartedModel.getAddressBook().getPersonList());
+        assertEquals(List.of(AMY.getPersonId(), BENSON.getPersonId()),
+                restartedModel.getAddressBook().getPersonList().stream().map(Person::getPersonId).toList());
+        assertEquals(List.of(firstProject, secondProject), restartedModel.getProjectList());
+        assertEquals(List.of(firstProject.getProjectId(), secondProject.getProjectId()),
+                restartedModel.getProjectList().stream().map(Project::getProjectId).toList());
+        assertEquals(List.of(BENSON), restartedModel.getProjectMembers(firstProject));
+        assertEquals(List.of(AMY), restartedModel.getProjectMembers(secondProject));
+        assertEquals(model, restartedModel);
+    }
+
+    @Test
     public void execute_listCommand_persistsGeneratedLegacyIds() throws Exception {
         Path filePath = temporaryFolder.resolve("LegacyAddressBook.json");
         Files.copy(Paths.get("src", "test", "data", "JsonAddressBookStorageTest", "legacyPersonIdsAddressBook.json"),
@@ -176,6 +244,32 @@ public class LogicManagerTest {
     public void execute_storageThrowsIoException_throwsCommandException() {
         assertCommandFailureForExceptionFromStorage(DUMMY_IO_EXCEPTION, String.format(
                 LogicManager.FILE_OPS_ERROR_FORMAT, DUMMY_IO_EXCEPTION.getMessage()));
+    }
+
+    @Test
+    public void execute_loadingFailure_preservesFileAndCommandResultFlags() throws Exception {
+        Path filePath = temporaryFolder.resolve("invalidAddressBook.json");
+        String invalidJson = "{ invalid JSON";
+        Files.writeString(filePath, invalidJson);
+        StorageManager storage = new StorageManager(new JsonAddressBookStorage(filePath),
+                new JsonUserPrefsStorage(temporaryFolder.resolve("userPrefs.json")));
+        assertThrows(DataLoadingException.class, () -> storage.readAddressBook());
+        logic = new LogicManager(model, storage);
+        Model expectedModel = new ModelManager();
+        String addCommand = AddCommand.COMMAND_WORD + NAME_DESC_AMY + PHONE_DESC_AMY
+                + EMAIL_DESC_AMY + ADDRESS_DESC_AMY;
+
+        for (String commandText : List.of("list", "listprojects", "help", addCommand, "exit")) {
+            CommandResult expectedResult = new AddressBookParser()
+                    .parseCommand(commandText).execute(expectedModel);
+            CommandResult actualResult = logic.execute(commandText);
+            assertEquals(new CommandResult(expectedResult.getFeedbackToUser()
+                    + "\nSaving is disabled because the data file could not be loaded."
+                    + " Changes in this session will be lost.",
+                    expectedResult.isShowHelp(), expectedResult.isExit()), actualResult);
+            assertEquals(expectedModel, model);
+            assertEquals(invalidJson, Files.readString(filePath));
+        }
     }
 
     @Test
@@ -281,9 +375,12 @@ public class LogicManagerTest {
         // Triggers the saveAddressBook method by executing an add command
         String addCommand = AddCommand.COMMAND_WORD + NAME_DESC_AMY + PHONE_DESC_AMY
                 + EMAIL_DESC_AMY + ADDRESS_DESC_AMY;
-        Person expectedPerson = new PersonBuilder(AMY).withTags().build();
-        ModelManager expectedModel = new ModelManager();
-        expectedModel.addPerson(expectedPerson);
-        assertCommandFailure(addCommand, CommandException.class, expectedMessage, expectedModel);
+        Model expectedModel = new ModelManager(model.getAddressBook(), model.getUserPrefs());
+        assertCommandFailure(
+                addCommand,
+                CommandException.class,
+                expectedMessage + "\nThe command was not applied. Fix the save problem and try again.",
+                expectedModel
+        );
     }
 }

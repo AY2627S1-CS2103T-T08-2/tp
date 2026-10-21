@@ -12,15 +12,11 @@ import seedu.address.model.project.exceptions.DuplicateProjectException;
 import seedu.address.model.project.exceptions.ProjectNotFoundException;
 
 /**
- * A list of projects that enforces uniqueness between its elements and does not allow nulls.
- * A project is considered unique by comparing using {@code Project#isSameProject(Project)}. As such, adding and
- * updating of projects uses Project#isSameProject(Project) for equality to ensure that the project being added or
- * updated is unique in terms of identity in the UniqueProjectList. However, the removal of a project uses
- * Project#equals(Object) to ensure that the project with exactly the same fields will be removed.
- * <p>
+ * A list of projects that enforces unique identifiers and normalised names and does not allow nulls.
+ * Adding or updating a project must preserve both uniqueness constraints.
+ * Updating a project must also preserve its identifier.
+ * Removal uses {@link Project#equals(Object)} to match the project's identifier and data fields.
  * Supports a minimal set of list operations.
- *
- * @see Project#isSameProject(Project)
  */
 public class UniqueProjectList implements Iterable<Project> {
 

@@ -1,10 +1,10 @@
 package seedu.address.ui;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Region;
 
 /**
@@ -17,12 +17,19 @@ public class StatusBarFooter extends UiPart<Region> {
     @FXML
     private Label saveLocationStatus;
 
+    @FXML
+    private Label savingDisabledStatus;
+
     /**
-     * Creates a {@code StatusBarFooter} with the given {@code Path}.
+     * Creates a {@code StatusBarFooter} with the given save location and session saving restriction.
      */
-    public StatusBarFooter(Path saveLocation) {
+    public StatusBarFooter(Path saveLocation, boolean savingDisabled) {
         super(FXML);
-        saveLocationStatus.setText(Paths.get(".").resolve(saveLocation).toString());
+        String absolutePath = saveLocation.toAbsolutePath().normalize().toString();
+        saveLocationStatus.setText(absolutePath);
+        saveLocationStatus.setTooltip(new Tooltip(absolutePath));
+        savingDisabledStatus.setVisible(savingDisabled);
+        savingDisabledStatus.setManaged(savingDisabled);
     }
 
 }

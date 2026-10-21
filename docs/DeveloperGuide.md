@@ -4,7 +4,7 @@
   pageNav: 3
 ---
 
-# AB-3 Developer Guide
+# UniTeam Developer Guide
 
 <!-- * Table of Contents -->
 <page-nav-print />
@@ -13,7 +13,7 @@
 
 ## **Acknowledgements**
 
-* _{List the sources of reused or adapted ideas, code, documentation, and third-party libraries here, with links to the originals.}_
+This project is based on [AddressBook-Level3](https://github.com/se-edu/addressbook-level3), created by the [SE-EDU initiative](https://se-education.org).
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -35,8 +35,11 @@ The following provides a quick overview of the main components and their interac
 
 **Main components of the architecture**
 
-**`Main`** (consisting of classes [`Main`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/Main.java) and [`MainApp`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/MainApp.java)) is in charge of the app launch and shut down.
-* At app launch, it initializes the other components in the correct sequence, and connects them up with each other.
+**`Main`** (consisting of 
+classes [`Main`](https://github.com/AY2627S1-CS2103T-T08-2/tp/tree/master/src/main/java/seedu/address/Main.java) and 
+[`MainApp`](https://github.com/AY2627S1-CS2103T-T08-2/tp/tree/master/src/main/java/seedu/address/MainApp.java)) is 
+in charge of the app launch and shut down.
+* At app launch, it initialises the other components in the correct sequence, and connects them up with each other.
 * At shut down, it shuts down the other components and invokes cleanup methods where necessary.
 
 The bulk of the app's work is done by the following four components:
@@ -67,13 +70,18 @@ The sections below give more details of each component.
 
 ### UI component
 
-The **API** of this component is specified in [`Ui.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/ui/Ui.java)
+The **API** of this component is specified 
+in [`Ui.java`](https://github.com/AY2627S1-CS2103T-T08-2/tp/tree/master/src/main/java/seedu/address/ui/Ui.java)
 
 <puml src="diagrams/UiClassDiagram.puml" alt="Structure of the UI Component"/>
 
 The UI consists of a `MainWindow` and its parts, such as `CommandBox`, `ResultDisplay`, `PersonListPanel`, and `StatusBarFooter`. All of these, including `MainWindow`, inherit from the abstract `UiPart` class, which captures common behavior among classes that represent visible GUI parts.
 
-The `UI` component uses the JavaFX UI framework. The layouts of these UI parts are defined in matching `.fxml` files in `src/main/resources/view`. For example, [`MainWindow.fxml`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/resources/view/MainWindow.fxml) specifies the layout of [`MainWindow`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/ui/MainWindow.java).
+The `UI` component uses the JavaFX UI framework. The layouts of these UI parts are defined in matching `.fxml` files 
+in `src/main/resources/view`. For example,
+[`MainWindow.fxml`](https://github.com/AY2627S1-CS2103T-T08-2/tp/tree/master/src/main/resources/view/MainWindow.fxml)
+specifies the layout of
+[`MainWindow`](https://github.com/AY2627S1-CS2103T-T08-2/tp/tree/master/src/main/java/seedu/address/ui/MainWindow.java).
 
 The `UI` component,
 
@@ -84,7 +92,7 @@ The `UI` component,
 
 ### Logic component
 
-**API** : [`Logic.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/logic/Logic.java)
+**API** : [`Logic.java`](https://github.com/AY2627S1-CS2103T-T08-2/tp/tree/master/src/main/java/seedu/address/logic/Logic.java)
 
 Here's a (partial) class diagram of the `Logic` component:
 
@@ -117,7 +125,7 @@ How the parsing works:
 * All `XYZCommandParser` classes, such as `AddCommandParser` and `DeleteCommandParser`, implement the `Parser` interface so they can be treated similarly where appropriate, for example during testing.
 
 ### Model component
-**API** : [`Model.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/model/Model.java)
+**API** : [`Model.java`](https://github.com/AY2627S1-CS2103T-T08-2/tp/tree/master/src/main/java/seedu/address/model/Model.java)
 
 <puml src="diagrams/ModelClassDiagram.puml" width="650" />
 
@@ -155,8 +163,7 @@ diagnostic. The parser checks positive-integer syntax; the command checks the in
 The Contacts tab displays `Model#getFilteredPersonList()`, while the Projects tab displays `Model#getProjectList()`
 through `Logic#getProjectList()` and `ProjectListPanel`. The project list is neither sorted nor filtered by the UI,
 and project cards are numbered from 1 in list order. `pr/PROJECT_INDEX` uses that number, not the UUID shown beside
-`ID:` on the card. Switching tabs does not change the lists or reset the contact filter. Projects and memberships
-remain session-only until their persistence is implemented.
+`ID:` on the card. Switching tabs does not change the lists or reset the contact filter.
 
 
 <box type="info" seamless>
@@ -169,7 +176,7 @@ remain session-only until their persistence is implemented.
 
 ### Storage component
 
-**API** : [`Storage.java`](https://github.com/se-edu/addressbook-level3/tree/master/src/main/java/seedu/address/storage/Storage.java)
+**API** : [`Storage.java`](https://github.com/AY2627S1-CS2103T-T08-2/tp/tree/master/src/main/java/seedu/address/storage/Storage.java)
 
 <puml src="diagrams/StorageClassDiagram.puml" width="550" />
 
@@ -181,12 +188,6 @@ The `Storage` component,
 `JsonAdaptedPerson` saves each contact's `PersonId` as an `id` string in the address book JSON file and restores it when loading. A missing or null `id` is supported for legacy data and generates a new ID, which is persisted on the next save. A present ID must use the standard UUID format, with either uppercase or lowercase hexadecimal digits. Malformed IDs cause an `IllegalValueException`, which `JsonAddressBookStorage` reports as a `DataLoadingException`.
 
 `JsonSerializableAddressBook#toModelType()` also tracks restored IDs in a `Set<PersonId>` and rejects duplicate IDs with a dedicated error message. UUIDs that differ only in capitalization represent the same ID. The existing name-based duplicate-person check runs first, and a contact is added only after both checks pass. Duplicate IDs are reported as invalid data through the same storage-loading exception path as malformed IDs.
-
-Project and project-membership data are session-only in this iteration. `JsonSerializableAddressBook` serializes
-contacts but does not serialize projects or memberships, so projects and memberships are lost when the application
-terminates. There is no `JsonAdaptedProjectMembership` or `memberships` property in `addressbook.json`. Membership
-persistence should be introduced only after projects and their `ProjectId` values can be reconstructed from storage;
-otherwise a restored membership could not resolve its project reference.
 
 #### Legacy migration
 
@@ -380,10 +381,6 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 | `* * *`  | university student | view all projects | quickly find the project I am working on |
 | `* *`    | user                                       | hide private contact details | minimize chance of someone else seeing them by accident                |
 | `*`      | user with many persons in the address book | sort persons by name         | locate a person easily                                                 |
-
-The requirement to retain projects and their associations between sessions is not implemented in this iteration.
-Projects and memberships exist only for the active application session; only contacts are reconstructed from
-`addressbook.json` after a restart.
 
 ### Use cases
 
@@ -645,8 +642,7 @@ testers are expected to do more *exploratory* testing.
    1. Prerequisites: Use a disposable copy of the app in a fresh session with at least two contacts. Execute `list`
       and inspect the Contacts tab to note the first two contacts. Execute
       `addproject n/Association test project d/2026-11-13`, then open the Projects tab and confirm that the project
-      is numbered 1. Use this number for `pr/`, not the UUID beside `ID:`. Projects are not loaded across sessions
-      in this iteration.
+      is numbered 1. Use this number for `pr/`, not the UUID beside `ID:`.
 
    1. With the Contacts tab selected, execute `associate c/2 pr/1`.<br>
       Expected: The status message names the second displayed contact and `Association test project`.
@@ -701,7 +697,95 @@ testers are expected to do more *exploratory* testing.
       Expected: The already-associated error identifies the same contact and project, confirming that membership
       refers to the selected contact's ID rather than its temporary search-result index.
 
-Projects and memberships are not serialized in this iteration, so these associations do not survive a restart.
+Projects and memberships are saved with contacts after successful commands and restored when the app restarts.
+
+### Dissociating a contact from a project
+
+1. Successful removal while preserving other data
+
+   1. Prerequisites: Launch a disposable copy of the app in an empty folder with no existing data file. Execute
+      `list` and note the first two contacts' names and details. There must be at least two contacts. Execute
+      `addproject n/Zeta dissociation test d/2026-11-13` followed by
+      `addproject n/Alpha dissociation test d/2026-11-13`. Open the Projects tab and confirm that Zeta is numbered 1
+      and Alpha is numbered 2, following insertion order. Use these numbers for `pr/`, not the UUIDs beside `ID:`.
+
+   1. Execute `associate c/1 pr/1`, `associate c/1 pr/2`, and `associate c/2 pr/1`. Run
+      `listmembers pr/Zeta dissociation test` and `listmembers pr/Alpha dissociation test`.<br>
+      Expected: Zeta contains the first two contacts, and Alpha contains only the first contact.
+
+   1. With the Contacts tab selected, execute `dissociate c/1 pr/1`.<br>
+      Expected: The success message names the first contact and `Zeta dissociation test`.
+
+   1. Run both `listmembers` commands again, inspect the Contacts tab, and run `listprojects`.<br>
+      Expected: Zeta contains only the second contact, and Alpha still contains the first contact. Both contacts
+      retain their details, and both projects retain their details, IDs, and displayed order.
+
+1. Unsuccessful dissociation attempts
+
+   1. Prerequisites: Keep the preceding session. The first contact belongs only to Alpha, and the second belongs
+      only to Zeta. Both contacts are displayed and there are exactly two projects.
+
+   1. Test cases: `dissociate`, `dissociate c/1`, `dissociate pr/1`, `dissociate c/ pr/1`,
+      `dissociate c/0 pr/1`, `dissociate c/1 pr/abc`, `dissociate c/1 proj/1`, and
+      `dissociate c/1 pr/1 x/3`.<br>
+      Expected: Each command shows the `dissociate` usage message and removes no membership.
+
+   1. Test cases: `dissociate c/1 c/2 pr/1` and `dissociate c/2 pr/1 pr/2`.<br>
+      Expected: The duplicate-field diagnostic identifies `c/` and `pr/`, respectively.
+
+   1. Test case: `dissociate c/10000 pr/1`.<br>
+      Expected: An invalid contact-index error occurs.
+
+   1. Test case: `dissociate c/1 pr/3`.<br>
+      Expected: An invalid project-index error occurs.
+
+   1. Test case: `dissociate c/1 pr/1`.<br>
+      Expected: A not-associated error names the first contact and `Zeta dissociation test`.
+
+   1. After each rejected command, run both `listmembers` commands and inspect the contact and project lists.<br>
+      Expected: Zeta still contains only the second contact, Alpha still contains only the first contact, and all
+      contact and project details remain unchanged.
+
+1. Filtered contact indices and removal of a project's last member
+
+   1. Keep the preceding session and use `find` with a name keyword that matches only the second contact from the
+      original list. Confirm that this contact is now numbered 1 in the Contacts tab.
+
+   1. Switch to the Projects tab and execute `dissociate pr/1 c/1`.<br>
+      Expected: The success message names the search-result contact and `Zeta dissociation test`. The reversed
+      prefix order works, the contact search remains active, and project indices remain unchanged.
+
+   1. Run `listmembers pr/Zeta dissociation test`.<br>
+      Expected: UniTeam reports no contacts associated with Zeta. The project remains in the Projects tab.
+
+   1. Test case: `dissociate c/2 pr/2`.<br>
+      Expected: An invalid contact-index error occurs because only one contact is displayed, even though the full
+      contact list contains at least two contacts. `listmembers pr/Alpha dissociation test` still shows the first
+      contact from the original list.
+
+   1. Execute `list`.<br>
+      Expected: Both original contacts remain, with their original details.
+
+1. Saving and restarting, including an empty membership list
+
+   1. Keep the preceding session. Inspect `data/addressbook.json` and record the contact and project IDs. Zeta has
+      no members, and Alpha contains only the first contact.
+
+   1. Close and restart the app from the same folder. Execute `list`, `listprojects`, and both `listmembers`
+      commands.<br>
+      Expected: All contacts and projects retain their details and IDs. Zeta still has no members, Alpha still
+      contains the first contact, and both projects retain their displayed order.
+
+   1. Execute `dissociate c/1 pr/1` and `dissociate c/2 pr/1`.<br>
+      Expected: Both produce not-associated errors naming the selected entities; the removed memberships have not
+      reappeared after restarting.
+
+   1. Execute `dissociate c/1 pr/2`, then `listmembers pr/Alpha dissociation test`.<br>
+      Expected: Removal succeeds, and Alpha has no members. No memberships remain in the app.
+
+   1. Close and restart again, then inspect the contact and project lists, run both `listmembers` commands, and
+      compare the saved IDs with the recorded values.<br>
+      Expected: Both projects still have no members, and all contacts and projects retain their details and IDs.
 
 ### Listing contacts in a project
 
@@ -764,6 +848,16 @@ Projects and memberships are not serialized in this iteration, so these associat
 
 1. Dealing with missing/corrupted data files
 
-   1. _{Explain how to simulate missing or corrupted data files and state the expected behavior.}_
+   1. Use a disposable copy of the app and data file. Close the app and remove a closing brace from `data/addressbook.json`. Record the resulting file contents.
+   1. Restart the app and execute `list`, `listprojects`, `help`, a valid `add` command, and `exit`.<br>
+      Expected: The app starts with an empty address book and shows an error dialog with the absolute data file path and recovery instructions. After dismissing the dialog, a saving-disabled warning remains in the status bar, including after commands. Each successful command warns that saving is disabled and session changes will be lost. Help and exit still work. The original file contents remain unchanged. Hover over the status bar path to see its full value if it is truncated.
+   1. Restart again without repairing the file and execute `list`.<br>
+      Expected: Saving remains disabled and the original file contents remain unchanged.
+   1. Close the app, restore a valid backup, restart, add a contact, and restart again.<br>
+      Expected: The restored data and new contact load normally; saving is enabled. No loading-error dialog or saving-disabled status warning appears.
+   1. Close the app and move the disposable data file elsewhere, then restart and execute `list`.<br>
+      Expected: Sample contacts are loaded and saved normally; no loading-error dialog or saving-disabled warning appears. Moving the original file while the app is closed is also the intentional fresh-start procedure.
+   1. Where filesystem permissions allow it, close the disposable app and deny access to the data file's parent directory while keeping the file in place. Restart the app, then restore the permissions after testing.<br>
+      Expected: If file absence cannot be established, reading is attempted and the access failure produces a loading-error dialog with saving disabled, rather than loading sample contacts. The original file remains unchanged.
 
 1. _{ more test cases … }_

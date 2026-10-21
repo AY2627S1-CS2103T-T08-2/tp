@@ -22,7 +22,7 @@ UniTeam is a lightweight, local address book designed for university students wh
 2. Download the latest `uniteam.jar` from the [releases page](https://github.com/AY2627S1-CS2103T-T08-2/tp/releases).
 3. Copy the file into the folder you want to use as the home for UniTeam.
 4. Open a terminal in that folder and run `java -jar uniteam.jar`.
-5. Type a command box and press Enter.
+5. Type a command in the command box and press Enter.
 
 ## Documentation
 

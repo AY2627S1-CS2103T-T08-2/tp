@@ -14,6 +14,7 @@ import seedu.address.logic.commands.AssociateCommand;
 import seedu.address.logic.commands.ClearCommand;
 import seedu.address.logic.commands.Command;
 import seedu.address.logic.commands.DeleteCommand;
+import seedu.address.logic.commands.DissociateCommand;
 import seedu.address.logic.commands.EditCommand;
 import seedu.address.logic.commands.ExitCommand;
 import seedu.address.logic.commands.FindCommand;
@@ -60,20 +61,37 @@ public class AddressBookParser {
             case AddCommand.COMMAND_WORD -> new AddCommandParser().parse(arguments);
             case EditCommand.COMMAND_WORD -> new EditCommandParser().parse(arguments);
             case DeleteCommand.COMMAND_WORD -> new DeleteCommandParser().parse(arguments);
-            case ClearCommand.COMMAND_WORD -> new ClearCommand();
+            case ClearCommand.COMMAND_WORD -> parseParameterFreeCommand(
+                    arguments, ClearCommand.MESSAGE_USAGE, new ClearCommand());
             case FindCommand.COMMAND_WORD -> new FindCommandParser().parse(arguments);
-            case ListCommand.COMMAND_WORD -> new ListCommand();
-            case ListProjectsCommand.COMMAND_WORD -> new ListProjectsCommand();
+            case ListCommand.COMMAND_WORD -> parseParameterFreeCommand(
+                    arguments, ListCommand.MESSAGE_USAGE, new ListCommand());
+            case ListProjectsCommand.COMMAND_WORD -> parseParameterFreeCommand(
+                    arguments, ListProjectsCommand.MESSAGE_USAGE, new ListProjectsCommand());
             case ListMembersCommand.COMMAND_WORD -> new ListMembersCommandParser().parse(arguments);
-            case ExitCommand.COMMAND_WORD -> new ExitCommand();
-            case HelpCommand.COMMAND_WORD -> new HelpCommand();
+            case ExitCommand.COMMAND_WORD -> parseParameterFreeCommand(
+                    arguments, ExitCommand.MESSAGE_USAGE, new ExitCommand());
+            case HelpCommand.COMMAND_WORD -> parseParameterFreeCommand(
+                    arguments, HelpCommand.MESSAGE_USAGE, new HelpCommand());
             case AddProjectCommand.COMMAND_WORD -> new AddProjectCommandParser().parse(arguments);
             case AssociateCommand.COMMAND_WORD -> new AssociateCommandParser().parse(arguments);
-            case SetRoleCommand.COMMAND_WORD -> new SetRoleCommandParser().parse(arguments);
+            case DissociateCommand.COMMAND_WORD -> new DissociateCommandParser().parse(arguments);
             default -> {
                 logger.finer("This user input caused a ParseException: " + userInput);
                 throw new ParseException(MESSAGE_UNKNOWN_COMMAND);
             }
         };
+    }
+
+    /**
+     * Returns a parameter-free command only if no non-whitespace arguments were supplied.
+     *
+     * @throws ParseException if extra arguments are present, with the command's usage instructions.
+     */
+    private Command parseParameterFreeCommand(String arguments, String usage, Command command) throws ParseException {
+        if (!arguments.isBlank()) {
+            throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, usage));
+        }
+        return command;
     }
 }

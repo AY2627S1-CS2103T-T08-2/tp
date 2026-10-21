@@ -148,9 +148,9 @@ public class ModelManager implements Model {
     }
 
     @Override
-    public void setProjectMembership(ProjectMembership membership) {
+    public void removeProjectMembership(ProjectMembership membership) {
         requireNonNull(membership);
-        addressBook.setProjectMembership(membership);
+        addressBook.removeProjectMembership(membership);
     }
 
     //=========== Filtered Person List Accessors =============================================================
@@ -189,5 +189,10 @@ public class ModelManager implements Model {
         return addressBook.equals(otherModelManager.addressBook)
                 && userPrefs.equals(otherModelManager.userPrefs)
                 && filteredPersons.equals(otherModelManager.filteredPersons);
+    }
+
+    @Override
+    public Predicate<? super Person> getFilteredPersonListPredicate() {
+        return filteredPersons.getPredicate();
     }
 }

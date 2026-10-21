@@ -9,14 +9,14 @@ import seedu.address.model.project.Description;
 import seedu.address.model.project.Project;
 
 /**
- * Adds a project to the address book.
+ * Adds a project to UniTeam.
  */
 public class AddProjectCommand extends Command {
 
     public static final String COMMAND_WORD = "addproject";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
-            + ": Adds a project to the address book. "
+            + ": Adds a project to UniTeam. "
             + "Parameters: n/PROJECT_NAME d/DEADLINE [desc/DESCRIPTION]\n"
             + "Example: " + COMMAND_WORD
             + " n/CS2103T Team Project d/2026-11-13"

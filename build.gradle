@@ -8,6 +8,7 @@ plugins {
 
 application {
     mainClass = 'seedu.address.Main'
+    applicationDefaultJvmArgs = ['-ea']
 }
 
 java {
@@ -45,28 +46,22 @@ task coverage(type: JacocoReport) {
     }
 }
 
-def osName = System.getProperty('os.name').toLowerCase()
-def arch = System.getProperty('os.arch').toLowerCase()
-
-def javafxPlatform
-if (osName.contains('win')) {
-    javafxPlatform = 'win'
-} else if (osName.contains('mac')) {
-    javafxPlatform = arch in ['aarch64', 'arm64'] ? 'mac-aarch64' : 'mac'
-} else if (osName.contains('linux')) {
-    javafxPlatform = arch in ['aarch64', 'arm64'] ? 'linux-aarch64' : 'linux'
-} else {
-    throw new GradleException("Unsupported OS: ${System.getProperty('os.name')}")
-}
-
 dependencies {
     String jUnitVersion = '5.14.4'
     String javaFxVersion = '17.0.7'
 
-    implementation "org.openjfx:javafx-base:${javaFxVersion}:${javafxPlatform}"
-    implementation "org.openjfx:javafx-controls:${javaFxVersion}:${javafxPlatform}"
-    implementation "org.openjfx:javafx-fxml:${javaFxVersion}:${javafxPlatform}"
-    implementation "org.openjfx:javafx-graphics:${javaFxVersion}:${javafxPlatform}"
+    implementation "org.openjfx:javafx-base:${javaFxVersion}:win"
+    implementation "org.openjfx:javafx-base:${javaFxVersion}:mac"
+    implementation "org.openjfx:javafx-base:${javaFxVersion}:linux"
+    implementation "org.openjfx:javafx-controls:${javaFxVersion}:win"
+    implementation "org.openjfx:javafx-controls:${javaFxVersion}:mac"
+    implementation "org.openjfx:javafx-controls:${javaFxVersion}:linux"
+    implementation "org.openjfx:javafx-fxml:${javaFxVersion}:win"
+    implementation "org.openjfx:javafx-fxml:${javaFxVersion}:mac"
+    implementation "org.openjfx:javafx-fxml:${javaFxVersion}:linux"
+    implementation "org.openjfx:javafx-graphics:${javaFxVersion}:win"
+    implementation "org.openjfx:javafx-graphics:${javaFxVersion}:mac"
+    implementation "org.openjfx:javafx-graphics:${javaFxVersion}:linux"
 
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.7.0'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.7.4'
@@ -78,7 +73,11 @@ dependencies {
 }
 
 shadowJar {
-    archiveFileName = 'addressbook.jar'
+    archiveFileName = 'uniteam.jar'
+}
+
+run {
+    enableAssertions = true
 }
 
 defaultTasks 'clean', 'test'

@@ -42,7 +42,7 @@ class JsonSerializableAddressBook {
     private final List<JsonAdaptedProjectMembership> memberships = new ArrayList<>();
 
     /**
-     * Constructs a {@code JsonSerializableAddressBook} with the given persons.
+     * Constructs a {@code JsonSerializableAddressBook} with the given persons, projects, and memberships.
      */
     @JsonCreator
     public JsonSerializableAddressBook(@JsonProperty("persons") List<JsonAdaptedPerson> persons,
@@ -59,11 +59,6 @@ class JsonSerializableAddressBook {
         }
     }
 
-    /** Constructs test data containing only persons, as in legacy address-book files. */
-    JsonSerializableAddressBook(List<JsonAdaptedPerson> persons) {
-        this(persons, null, null);
-    }
-
     /**
      * Converts a given {@code ReadOnlyAddressBook} into this class for Jackson use.
      *
@@ -73,7 +68,8 @@ class JsonSerializableAddressBook {
         persons.addAll(source.getPersonList().stream().map(JsonAdaptedPerson::new).collect(Collectors.toList()));
         projects.addAll(source.getProjectList().stream().map(JsonAdaptedProject::new).collect(Collectors.toList()));
         memberships.addAll(source.getProjectMembershipList().stream()
-                .map(JsonAdaptedProjectMembership::new).collect(Collectors.toList()));
+                .map(JsonAdaptedProjectMembership::new)
+                .collect(Collectors.toList()));
     }
 
     /**

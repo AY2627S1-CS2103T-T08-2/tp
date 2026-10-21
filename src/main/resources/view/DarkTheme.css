@@ -188,6 +188,12 @@
     -fx-pref-height: 30px;
 }
 
+.status-bar .saving-disabled-status {
+    -fx-text-fill: #ffcc66;
+    -fx-font-weight: bold;
+    -fx-pref-height: -1;
+}
+
 .status-bar-with-border {
     -fx-background-color: derive(#1d1d1d, 30%);
     -fx-border-color: derive(#1d1d1d, 25%);

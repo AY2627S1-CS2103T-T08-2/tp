@@ -10,7 +10,8 @@ import java.util.UUID;
  */
 public class ProjectId {
 
-    public static final String MESSAGE_CONSTRAINTS = "Project IDs must use the standard UUID format.";
+    public static final String MESSAGE_CONSTRAINTS =
+            "Project IDs must use the standard UUID format.";
 
     public final UUID value;
 
@@ -36,7 +37,11 @@ public class ProjectId {
      */
     public static ProjectId fromString(String value) {
         requireNonNull(value);
-        return new ProjectId(UUID.fromString(value));
+        UUID parsedValue = UUID.fromString(value);
+        if (!parsedValue.toString().equalsIgnoreCase(value)) {
+            throw new IllegalArgumentException(MESSAGE_CONSTRAINTS);
+        }
+        return new ProjectId(parsedValue);
     }
 
     @Override

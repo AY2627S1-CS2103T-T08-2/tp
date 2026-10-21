@@ -18,6 +18,7 @@ import seedu.address.commons.core.GuiSettings;
 import seedu.address.model.membership.ProjectMembership;
 import seedu.address.model.membership.Role;
 import seedu.address.model.membership.exceptions.DuplicateProjectMembershipException;
+import seedu.address.model.membership.exceptions.ProjectMembershipNotFoundException;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
 import seedu.address.model.person.exceptions.PersonNotFoundException;
 import seedu.address.model.project.Deadline;
@@ -283,6 +284,65 @@ public class ModelManagerTest {
         assertThrows(ProjectNotFoundException.class, () -> modelManager.addProjectMembership(membership));
 
         assertEquals(expectedAddressBook, modelManager.getAddressBook());
+    }
+
+    @Test
+    public void removeProjectMembership_nullMembership_throwsNullPointerException() {
+        AddressBook expectedAddressBook = new AddressBook(modelManager.getAddressBook());
+
+        assertThrows(NullPointerException.class, () -> modelManager.removeProjectMembership(null));
+
+        assertEquals(expectedAddressBook, modelManager.getAddressBook());
+    }
+
+    @Test
+    public void removeProjectMembership_existingMembership_removesOnlySelectedPairAndPreservesFilter() {
+        Model model = modelManager;
+        Project firstProject = createProject("CS2103T");
+        Project secondProject = createProject("Orbital");
+        model.addPerson(ALICE);
+        model.addPerson(BENSON);
+        model.addProject(firstProject);
+        model.addProject(secondProject);
+        ProjectMembership selectedMembership =
+                new ProjectMembership(ALICE.getPersonId(), firstProject.getProjectId());
+        ProjectMembership sameContactMembership =
+                new ProjectMembership(ALICE.getPersonId(), secondProject.getProjectId());
+        ProjectMembership sameProjectMembership =
+                new ProjectMembership(BENSON.getPersonId(), firstProject.getProjectId());
+        model.addProjectMembership(selectedMembership);
+        model.addProjectMembership(sameContactMembership);
+        model.addProjectMembership(sameProjectMembership);
+        model.updateFilteredPersonList(person -> person.equals(BENSON));
+        var memberships = model.getAddressBook().getProjectMembershipList();
+
+        model.removeProjectMembership(new ProjectMembership(ALICE.getPersonId(), firstProject.getProjectId()));
+
+        assertFalse(model.hasProjectMembership(selectedMembership));
+        assertEquals(List.of(sameContactMembership, sameProjectMembership), memberships);
+        assertEquals(List.of(ALICE, BENSON), model.getAddressBook().getPersonList());
+        assertEquals(List.of(firstProject, secondProject), model.getProjectList());
+        assertEquals(List.of(BENSON), model.getFilteredPersonList());
+        assertEquals(List.of(BENSON), model.getProjectMembers(firstProject));
+        assertEquals(List.of(ALICE), model.getProjectMembers(secondProject));
+    }
+
+    @Test
+    public void removeProjectMembership_missingMembership_throwsProjectMembershipNotFoundException() {
+        Project project = createProject("CS2103T");
+        modelManager.addPerson(ALICE);
+        modelManager.addPerson(BENSON);
+        modelManager.addProject(project);
+        modelManager.addProjectMembership(new ProjectMembership(ALICE.getPersonId(), project.getProjectId()));
+        modelManager.updateFilteredPersonList(person -> person.equals(BENSON));
+        ProjectMembership missingMembership = new ProjectMembership(BENSON.getPersonId(), project.getProjectId());
+        AddressBook expectedAddressBook = new AddressBook(modelManager.getAddressBook());
+
+        assertThrows(ProjectMembershipNotFoundException.class, () -> modelManager.removeProjectMembership(
+                missingMembership));
+
+        assertEquals(expectedAddressBook, modelManager.getAddressBook());
+        assertEquals(List.of(BENSON), modelManager.getFilteredPersonList());
     }
 
     @Test

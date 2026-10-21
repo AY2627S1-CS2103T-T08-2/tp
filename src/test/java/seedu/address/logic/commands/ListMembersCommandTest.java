@@ -15,6 +15,7 @@ import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
 import seedu.address.model.membership.ProjectMembership;
+import seedu.address.model.membership.Role;
 import seedu.address.model.project.Deadline;
 import seedu.address.model.project.Description;
 import seedu.address.model.project.Project;
@@ -68,6 +69,20 @@ public class ListMembersCommandTest {
 
         String expectedMessage = "Contacts in project \"CS2103T Team Project\" (2):\n1. Alice Pauline\n2. Benson Meier";
         assertEquals(expectedMessage, result.getFeedbackToUser());
+    }
+
+    @Test
+    public void execute_projectWithMemberRole_listsRoleBesideName() throws Exception {
+        Model model = new ModelManager();
+        model.addPerson(ALICE);
+        model.addProject(project);
+        model.addProjectMembership(new ProjectMembership(ALICE.getPersonId(), project.getProjectId())
+                .withRole(new Role("Implement parser")));
+
+        CommandResult result = new ListMembersCommand(project.getName()).execute(model);
+
+        assertEquals("Contacts in project \"CS2103T Team Project\" (1):\n1. Alice Pauline — Implement parser",
+                result.getFeedbackToUser());
     }
 
     @Test

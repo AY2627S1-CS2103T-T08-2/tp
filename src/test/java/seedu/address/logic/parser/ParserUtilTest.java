@@ -13,6 +13,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.membership.Role;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
@@ -315,5 +316,17 @@ public class ParserUtilTest {
         assertEquals(
                 new Description(description),
                 ParserUtil.parseDescription("  " + description + "  "));
+    }
+
+    @Test
+    public void parseRole_validValue_trimsOuterWhitespace() throws Exception {
+        assertEquals(new Role("Implement parser"), ParserUtil.parseRole("  Implement parser  "));
+    }
+
+    @Test
+    public void parseRole_invalidValue_throwsParseException() {
+        assertThrows(ParseException.class, () -> ParserUtil.parseRole(" "));
+        assertThrows(ParseException.class, () -> ParserUtil.parseRole("x".repeat(201)));
+        assertThrows(ParseException.class, () -> ParserUtil.parseRole("line one\nline two"));
     }
 }

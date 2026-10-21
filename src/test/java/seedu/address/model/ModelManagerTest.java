@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.model.membership.ProjectMembership;
+import seedu.address.model.membership.Role;
 import seedu.address.model.membership.exceptions.DuplicateProjectMembershipException;
 import seedu.address.model.person.NameContainsKeywordsPredicate;
 import seedu.address.model.person.exceptions.PersonNotFoundException;
@@ -226,6 +227,23 @@ public class ModelManagerTest {
         assertEquals(List.of(ALICE, BENSON), model.getAddressBook().getPersonList());
         assertEquals(List.of(project), model.getProjectList());
         assertEquals(List.of(BENSON), model.getFilteredPersonList());
+    }
+
+    @Test
+    public void setProjectMembership_existingMembership_updatesRoleAndPreservesFilter() {
+        Project project = createProject("CS2103T");
+        modelManager.addPerson(ALICE);
+        modelManager.addPerson(BENSON);
+        modelManager.addProject(project);
+        ProjectMembership membership = new ProjectMembership(ALICE.getPersonId(), project.getProjectId());
+        modelManager.addProjectMembership(membership);
+        modelManager.updateFilteredPersonList(person -> person.equals(BENSON));
+        ProjectMembership updated = membership.withRole(new Role("Review tests"));
+
+        modelManager.setProjectMembership(updated);
+
+        assertEquals(List.of(updated), modelManager.getAddressBook().getProjectMembershipList());
+        assertEquals(List.of(BENSON), modelManager.getFilteredPersonList());
     }
 
     @Test

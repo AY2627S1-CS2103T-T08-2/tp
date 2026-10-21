@@ -64,6 +64,17 @@ public class UniqueProjectMembershipListTest {
     }
 
     @Test
+    public void set_existingMembership_updatesRoleWithoutChangingIdentity() {
+        memberships.add(MEMBERSHIP);
+        ProjectMembership updatedMembership = MEMBERSHIP.withRole(new Role("Review PRs"));
+
+        memberships.set(updatedMembership);
+
+        assertEquals(List.of(updatedMembership), memberships.asUnmodifiableObservableList());
+        assertTrue(memberships.contains(MEMBERSHIP));
+    }
+
+    @Test
     public void add_samePersonOrProjectDifferentPair_success() {
         memberships.add(MEMBERSHIP);
         memberships.add(SAME_PERSON_OTHER_PROJECT);

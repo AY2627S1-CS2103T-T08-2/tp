@@ -14,8 +14,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import seedu.address.commons.exceptions.IllegalValueException;
 import seedu.address.commons.util.JsonUtil;
 import seedu.address.model.AddressBook;
+import seedu.address.model.membership.ProjectMembership;
+import seedu.address.model.membership.Role;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.PersonId;
+import seedu.address.model.project.Deadline;
+import seedu.address.model.project.Description;
+import seedu.address.model.project.Project;
+import seedu.address.model.project.ProjectName;
 import seedu.address.testutil.TypicalPersons;
 
 public class JsonSerializableAddressBookTest {
@@ -107,6 +113,35 @@ public class JsonSerializableAddressBookTest {
 
         assertThrows(IllegalValueException.class, JsonSerializableAddressBook.MESSAGE_DUPLICATE_PERSON,
                 data::toModelType);
+    }
+
+    @Test
+    public void jsonRoundTrip_projectMembershipWithRole_preservesRole() throws Exception {
+        AddressBook addressBook = new AddressBook();
+        Project project = new Project(new ProjectName("Role persistence"),
+                new Deadline(java.time.LocalDate.of(2026, 12, 1)), Description.EMPTY);
+        addressBook.addPerson(TypicalPersons.ALICE);
+        addressBook.addProject(project);
+        ProjectMembership membership = new ProjectMembership(TypicalPersons.ALICE.getPersonId(),
+                project.getProjectId(), new Role("Implement parser"));
+        addressBook.addProjectMembership(membership);
+
+        String json = JsonUtil.toJsonString(new JsonSerializableAddressBook(addressBook));
+        JsonSerializableAddressBook restored = JsonUtil.fromJsonString(json, JsonSerializableAddressBook.class);
+
+        assertEquals(List.of(project), restored.toModelType().getProjectList());
+        assertEquals(List.of(membership), restored.toModelType().getProjectMembershipList());
+    }
+
+    @Test
+    public void toModelType_legacyFileWithoutProjectsAndMemberships_usesEmptyLists() throws Exception {
+        JsonSerializableAddressBook data = new JsonSerializableAddressBook(List.of(
+                new JsonAdaptedPerson(TypicalPersons.ALICE)));
+
+        AddressBook restored = data.toModelType();
+
+        assertEquals(List.of(), restored.getProjectList());
+        assertEquals(List.of(), restored.getProjectMembershipList());
     }
 
 }

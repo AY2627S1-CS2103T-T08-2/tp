@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import seedu.address.model.membership.ProjectMembership;
+import seedu.address.model.membership.Role;
 import seedu.address.model.membership.exceptions.DuplicateProjectMembershipException;
 import seedu.address.model.membership.exceptions.ProjectMembershipNotFoundException;
 import seedu.address.model.person.Person;
@@ -281,6 +282,27 @@ public class AddressBookTest {
         addressBook.removeProjectMembership(membership);
 
         assertTrue(addressBook.getProjectMembershipList().isEmpty());
+    }
+
+    @Test
+    public void setProjectMembership_existingMembership_updatesRole() {
+        Project project = new ProjectBuilder().build();
+        addressBook.addProject(project);
+        ProjectMembership original = addMembership(addressBook, ALICE, project);
+        ProjectMembership updated = original.withRole(new Role("Write tests"));
+
+        addressBook.setProjectMembership(updated);
+
+        assertEquals(List.of(updated), addressBook.getProjectMembershipList());
+    }
+
+    @Test
+    public void setProjectMembership_missingMembership_throwsNotFoundException() {
+        Project project = new ProjectBuilder().build();
+        addressBook.addProject(project);
+        ProjectMembership membership = new ProjectMembership(ALICE.getPersonId(), project.getProjectId());
+
+        assertThrows(ProjectMembershipNotFoundException.class, () -> addressBook.setProjectMembership(membership));
     }
 
     @Test

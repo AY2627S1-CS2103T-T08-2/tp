@@ -128,6 +128,7 @@
         "associating-a-contact-with-a-project-associate": "Associating a contact with a project: associate",
         "dissociating-a-contact-from-a-project-dissociate": "Dissociating a contact from a project: dissociate",
         "listing-project-members-listmembers": "Listing project members: listmembers",
+        "setting-a-project-member-s-role-setrole": "Setting a project member's role: setrole",
         "clearing-all-entries-clear": "Clearing all entries: clear",
         "exiting-the-program-exit": "Exiting the program: exit",
         "saving-the-data": "Saving the data",

@@ -14,14 +14,73 @@ import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 import static seedu.address.testutil.TypicalPersons.BOB;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.jupiter.api.Test;
 
+import seedu.address.model.tag.Tag;
 import seedu.address.testutil.PersonBuilder;
 
 public class PersonTest {
 
     private static final PersonId PERSON_ID = PersonId.fromString("550e8400-e29b-41d4-a716-446655440000");
     private static final PersonId OTHER_PERSON_ID = PersonId.fromString("550e8400-e29b-41d4-a716-446655440001");
+
+    @Test
+    public void constructor_nullDetails_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> new Person(PERSON_ID, null, ALICE.getPhone(),
+                ALICE.getEmail(), ALICE.getAddress(), ALICE.getTags()));
+        assertThrows(NullPointerException.class, () -> new Person(PERSON_ID, ALICE.getName(), null,
+                ALICE.getEmail(), ALICE.getAddress(), ALICE.getTags()));
+        assertThrows(NullPointerException.class, () -> new Person(PERSON_ID, ALICE.getName(), ALICE.getPhone(),
+                null, ALICE.getAddress(), ALICE.getTags()));
+        assertThrows(NullPointerException.class, () -> new Person(PERSON_ID, ALICE.getName(), ALICE.getPhone(),
+                ALICE.getEmail(), null, ALICE.getTags()));
+        assertThrows(NullPointerException.class, () -> new Person(PERSON_ID, ALICE.getName(), ALICE.getPhone(),
+                ALICE.getEmail(), ALICE.getAddress(), null));
+    }
+
+    @Test
+    public void constructor_nullTagElement_throwsNullPointerException() {
+        Set<Tag> tags = new HashSet<>();
+        tags.add(null);
+        assertThrows(NullPointerException.class, () -> new Person(PERSON_ID, ALICE.getName(), ALICE.getPhone(),
+                ALICE.getEmail(), ALICE.getAddress(), tags));
+    }
+
+    @Test
+    public void constructor_mutatingSuppliedTags_doesNotChangePerson() {
+        Set<Tag> tags = new HashSet<>();
+        Tag friend = new Tag("friend");
+        tags.add(friend);
+        Person person = new Person(PERSON_ID, ALICE.getName(), ALICE.getPhone(), ALICE.getEmail(),
+                ALICE.getAddress(), tags);
+        int originalHashCode = person.hashCode();
+
+        tags.clear();
+        tags.add(new Tag("colleague"));
+
+        assertEquals(Set.of(friend), person.getTags());
+        assertEquals(originalHashCode, person.hashCode());
+        assertThrows(UnsupportedOperationException.class, () -> person.getTags().add(new Tag("other")));
+        assertThrows(UnsupportedOperationException.class, () -> person.getTags().remove(friend));
+    }
+
+    @Test
+    public void equals_emptyAndReorderedTags_preservesSetSemantics() {
+        Person noTags = new PersonBuilder(ALICE).withTags().build();
+        Person noTagsCopy = new PersonBuilder(noTags).withPersonId(OTHER_PERSON_ID).build();
+        assertTrue(noTags.getTags().isEmpty());
+        assertEquals(noTags, noTagsCopy);
+        assertEquals(noTags.hashCode(), noTagsCopy.hashCode());
+
+        Person person = new PersonBuilder(ALICE).withTags("friend", "colleague").build();
+        Person reordered = new PersonBuilder(person).withTags("colleague", "friend").build();
+        assertEquals(person, reordered);
+        assertEquals(person.hashCode(), reordered.hashCode());
+        assertNotEquals(noTags, person);
+    }
 
     @Test
     public void constructor_withoutId_generatesDistinctNonNullIds() {

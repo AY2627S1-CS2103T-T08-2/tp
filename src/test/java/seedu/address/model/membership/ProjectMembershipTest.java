@@ -22,6 +22,24 @@ public class ProjectMembershipTest {
             ProjectId.fromString("00000000-0000-4000-8000-000000000002");
 
     @Test
+    public void withRole_changedAndClearedRole_preservesOriginalAndIdentity() {
+        Role originalRole = new Role("Write tests");
+        ProjectMembership original = new ProjectMembership(PERSON_ID, PROJECT_ID, originalRole);
+        ProjectMembership changed = original.withRole(new Role("Review tests"));
+        ProjectMembership cleared = changed.withRole(Role.EMPTY);
+
+        assertEquals(originalRole, original.getRole());
+        assertEquals(new Role("Review tests"), changed.getRole());
+        assertEquals(Role.EMPTY, cleared.getRole());
+        assertEquals(PERSON_ID, cleared.getPersonId());
+        assertEquals(PROJECT_ID, cleared.getProjectId());
+        assertEquals(original, changed);
+        assertEquals(changed, cleared);
+        assertEquals(original.hashCode(), changed.hashCode());
+        assertEquals(changed.hashCode(), cleared.hashCode());
+    }
+
+    @Test
     public void constructor_nullPersonId_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new ProjectMembership(null, PROJECT_ID));
     }

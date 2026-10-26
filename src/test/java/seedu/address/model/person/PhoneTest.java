@@ -1,5 +1,6 @@
 package seedu.address.model.person;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
@@ -7,6 +8,23 @@ import static seedu.address.testutil.Assert.assertThrows;
 import org.junit.jupiter.api.Test;
 
 public class PhoneTest {
+
+    @Test
+    public void constructor_twoThreeAndFourDigits_checksMinimumLength() {
+        assertFalse(Phone.isValidPhone("00"));
+        assertThrows(IllegalArgumentException.class, () -> new Phone("00"));
+        assertEquals("000", new Phone("000").value);
+        assertEquals("0000", new Phone("0000").value);
+    }
+
+    @Test
+    public void constructor_nonDigitCharacters_throwsIllegalArgumentException() {
+        String[] invalidPhones = {"+123", "-123", "1.23", "123 ", " 123", "123\n", "12\t3"};
+        for (String phone : invalidPhones) {
+            assertFalse(Phone.isValidPhone(phone), phone);
+            assertThrows(IllegalArgumentException.class, () -> new Phone(phone));
+        }
+    }
 
     @Test
     public void constructor_null_throwsNullPointerException() {

@@ -1,5 +1,6 @@
 package seedu.address.model.project;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
@@ -7,6 +8,32 @@ import static seedu.address.testutil.Assert.assertThrows;
 import org.junit.jupiter.api.Test;
 
 public class DescriptionTest {
+
+    @Test
+    public void constructor_lengthBoundaries_countsCodePoints() {
+        String supplementaryCharacter = new String(Character.toChars(0x1f600));
+        for (String character : new String[] {"a", supplementaryCharacter}) {
+            for (int length : new int[] {0, 1, 199, 200}) {
+                String value = character.repeat(length);
+                assertTrue(Description.isValidDescription(value));
+                assertEquals(value, new Description(value).toString());
+            }
+            String tooLong = character.repeat(201);
+            assertFalse(Description.isValidDescription(tooLong));
+            assertThrows(IllegalArgumentException.class, () -> new Description(tooLong));
+        }
+        assertEquals(Description.EMPTY, new Description(""));
+    }
+
+    @Test
+    public void constructor_lineBreakAtAnyPosition_throwsIllegalArgumentException() {
+        for (String lineBreak : new String[] {"\n", "\r", "\r\n", "\u0085", "\u2028", "\u2029"}) {
+            for (String value : new String[] {lineBreak + "a", "a" + lineBreak + "b", "a" + lineBreak}) {
+                assertFalse(Description.isValidDescription(value));
+                assertThrows(IllegalArgumentException.class, () -> new Description(value));
+            }
+        }
+    }
 
     @Test
     public void constructor_null_throwsNullPointerException() {

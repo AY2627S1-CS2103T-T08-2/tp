@@ -1,5 +1,6 @@
 package seedu.address.model.person;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
@@ -7,6 +8,32 @@ import static seedu.address.testutil.Assert.assertThrows;
 import org.junit.jupiter.api.Test;
 
 public class EmailTest {
+
+    @Test
+    public void constructor_finalLabelLengthBoundary_checksMinimumLength() {
+        assertFalse(Email.isValidEmail("a@b"));
+        assertThrows(IllegalArgumentException.class, () -> new Email("a@b"));
+        assertEquals("a@bc", new Email("a@bc").value);
+        assertEquals("a@b.cd", new Email("a@b.cd").value);
+    }
+
+    @Test
+    public void constructor_singleCharacterHyphenatedFinalLabel_acceptsValidEmail() {
+        // Each label may contain an internal hyphen and must start and end with a letter or digit.
+        assertTrue(Email.isValidEmail("a@b-c"));
+        assertEquals("a@b-c", new Email("a@b-c").value);
+        assertEquals("a@x.b-c", new Email("a@x.b-c").value);
+    }
+
+    @Test
+    public void constructor_invalidLabelAndLocalPartBoundaries_throwsIllegalArgumentException() {
+        String[] invalidEmails = {"a@b..cd", "a@b-.cd", "a@b.-cd", "a@b.cd-",
+            ".a@bc", "a.@bc", "+a@bc", "a+@bc", "a__b@cd", "a@bc\n"};
+        for (String email : invalidEmails) {
+            assertFalse(Email.isValidEmail(email), email);
+            assertThrows(IllegalArgumentException.class, () -> new Email(email));
+        }
+    }
 
     @Test
     public void constructor_null_throwsNullPointerException() {

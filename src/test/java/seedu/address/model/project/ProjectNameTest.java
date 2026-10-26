@@ -10,6 +10,32 @@ import org.junit.jupiter.api.Test;
 public class ProjectNameTest {
 
     @Test
+    public void constructor_lengthBoundaries_checksNormalisedLength() {
+        for (int length : new int[] {1, 49, 50}) {
+            String name = "a".repeat(length);
+            assertTrue(ProjectName.isValidName(name));
+            assertEquals(name, new ProjectName("  " + name + "  ").toString());
+        }
+        assertThrows(IllegalArgumentException.class, () -> new ProjectName("a".repeat(51)));
+        assertThrows(IllegalArgumentException.class, () -> new ProjectName(" \t\n "));
+    }
+
+    @Test
+    public void constructor_supplementaryLetters_countsCodePoints() {
+        // Deseret letters use two UTF-16 code units each but count as one character.
+        String letter = new String(Character.toChars(0x10400));
+        assertEquals(letter.repeat(50), new ProjectName(letter.repeat(50)).toString());
+        assertFalse(ProjectName.isValidName(letter.repeat(51)));
+        assertThrows(IllegalArgumentException.class, () -> new ProjectName(letter.repeat(51)));
+    }
+
+    @Test
+    public void constructor_whitespaceNormalisation_appliesBeforeLengthValidation() {
+        String name = "a".repeat(24) + " \t\n " + "b".repeat(25);
+        assertEquals("a".repeat(24) + " " + "b".repeat(25), new ProjectName(name).toString());
+    }
+
+    @Test
     public void constructor_null_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new ProjectName(null));
     }

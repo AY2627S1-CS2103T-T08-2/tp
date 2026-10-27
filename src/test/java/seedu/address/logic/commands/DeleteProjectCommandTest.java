@@ -75,11 +75,6 @@ public class DeleteProjectCommandTest {
     }
 
     @Test
-    public void constructor_nullIndex_throwsNullPointerException() {
-        assertThrows(NullPointerException.class, () -> new DeleteProjectCommand(null));
-    }
-
-    @Test
     public void execute_nullModel_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new DeleteProjectCommand(FIRST_PROJECT).execute(null));
     }

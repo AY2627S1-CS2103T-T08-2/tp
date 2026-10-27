@@ -107,6 +107,9 @@ public class ModelManager implements Model {
     public void deleteProject(Project target) {
         requireNonNull(target);
         addressBook.removeProject(target);
+
+        Predicate<? super Person> currentPredicate = getFilteredPersonListPredicate();
+        updateFilteredPersonList(currentPredicate::test);
     }
 
     @Override

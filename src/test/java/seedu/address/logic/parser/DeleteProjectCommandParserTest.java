@@ -96,8 +96,7 @@ public class DeleteProjectCommandParserTest {
     }
 
     @Test
-    public void parseCommand_deleteProject_routesToProjectDeletion()
-        throws Exception {
+    public void parseCommand_deleteProject_routesToProjectDeletion() throws Exception {
         assertEquals(
             new DeleteProjectCommand(Index.fromOneBased(2)),
             addressBookParser.parseCommand("deleteproject 2"));
@@ -113,15 +112,13 @@ public class DeleteProjectCommandParserTest {
             "deleteproject", "deleteproject 0", "deleteproject 1 2"
         }) {
             assertThrows(
-                ParseException.class,
-                USAGE_MESSAGE,
-                () -> addressBookParser.parseCommand(command));
+                ParseException.class, USAGE_MESSAGE, () -> addressBookParser.parseCommand(command)
+            );
         }
     }
 
     @Test
-    public void parseCommand_largeValidIndex_defersBoundsCheckToCommand()
-        throws Exception {
+    public void parseCommand_largeValidIndex_defersBoundsCheckToCommand() throws Exception {
         assertEquals(
             new DeleteProjectCommand(Index.fromOneBased(Integer.MAX_VALUE)),
             addressBookParser.parseCommand("deleteproject 2147483647"));

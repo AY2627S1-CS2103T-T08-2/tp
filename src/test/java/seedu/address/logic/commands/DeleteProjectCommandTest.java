@@ -76,19 +76,16 @@ public class DeleteProjectCommandTest {
 
     @Test
     public void constructor_nullIndex_throwsNullPointerException() {
-        assertThrows(NullPointerException.class,
-            () -> new DeleteProjectCommand(null));
+        assertThrows(NullPointerException.class, () -> new DeleteProjectCommand(null));
     }
 
     @Test
     public void execute_nullModel_throwsNullPointerException() {
-        assertThrows(NullPointerException.class,
-            () -> new DeleteProjectCommand(FIRST_PROJECT).execute(null));
+        assertThrows(NullPointerException.class, () -> new DeleteProjectCommand(FIRST_PROJECT).execute(null));
     }
 
     @Test
-    public void execute_firstProject_removesOnlySelectedProjectAndItsMemberships()
-        throws Exception {
+    public void execute_firstProject_removesOnlySelectedProjectAndItsMemberships() throws Exception {
         CommandResult result =
             new DeleteProjectCommand(FIRST_PROJECT).execute(model);
 
@@ -105,8 +102,7 @@ public class DeleteProjectCommandTest {
     }
 
     @Test
-    public void execute_middleProject_preservesRemainingOrderAndRoles()
-        throws Exception {
+    public void execute_middleProject_preservesRemainingOrderAndRoles() throws Exception {
         CommandResult result =
             new DeleteProjectCommand(SECOND_PROJECT).execute(model);
 
@@ -138,8 +134,7 @@ public class DeleteProjectCommandTest {
     }
 
     @Test
-    public void execute_projectWithoutMembers_preservesAllExistingMemberships()
-        throws Exception {
+    public void execute_projectWithoutMembers_preservesAllExistingMemberships() throws Exception {
         Project emptyProject =
             new ProjectBuilder().withName("Empty Project").build();
         model.addProject(emptyProject);
@@ -159,8 +154,7 @@ public class DeleteProjectCommandTest {
     }
 
     @Test
-    public void execute_onlyProject_leavesContactsAndNoMemberships()
-        throws Exception {
+    public void execute_onlyProject_leavesContactsAndNoMemberships() throws Exception {
         model = new ModelManager();
         model.addPerson(firstContact);
         model.addProject(firstProject);
@@ -225,8 +219,7 @@ public class DeleteProjectCommandTest {
     }
 
     @Test
-    public void execute_contactFilterActive_usesProjectIndexAndPreservesFilter()
-        throws Exception {
+    public void execute_contactFilterActive_usesProjectIndexAndPreservesFilter() throws Exception {
         model.updateFilteredPersonList(person ->
             person.getPersonId().equals(secondContact.getPersonId()));
 
@@ -247,8 +240,7 @@ public class DeleteProjectCommandTest {
     }
 
     @Test
-    public void execute_noDisplayedContacts_stillDeletesProject()
-        throws Exception {
+    public void execute_noDisplayedContacts_stillDeletesProject() throws Exception {
         model.updateFilteredPersonList(person -> false);
 
         new DeleteProjectCommand(SECOND_PROJECT).execute(model);
@@ -262,8 +254,7 @@ public class DeleteProjectCommandTest {
     }
 
     @Test
-    public void execute_deletedProjectMemberFilter_reEvaluatesToEmptyList()
-        throws Exception {
+    public void execute_deletedProjectMemberFilter_reEvaluatesToEmptyList() throws Exception {
         model.updateFilteredPersonList(person -> model.hasProjectMembership(
             new ProjectMembership(
                 person.getPersonId(), firstProject.getProjectId())));
@@ -279,8 +270,7 @@ public class DeleteProjectCommandTest {
     }
 
     @Test
-    public void execute_anotherProjectMemberFilter_preservesVisibleMembers()
-        throws Exception {
+    public void execute_anotherProjectMemberFilter_preservesVisibleMembers() throws Exception {
         Predicate<Person> memberFilter = person -> model.hasProjectMembership(
             new ProjectMembership(
                 person.getPersonId(), secondProject.getProjectId()));
@@ -301,8 +291,7 @@ public class DeleteProjectCommandTest {
     }
 
     @Test
-    public void execute_sameDisplayedIndexTwice_deletesNextProjectAfterReindexing()
-        throws Exception {
+    public void execute_sameDisplayedIndexTwice_deletesNextProjectAfterReindexing() throws Exception {
         DeleteProjectCommand command = new DeleteProjectCommand(FIRST_PROJECT);
 
         command.execute(model);
@@ -318,8 +307,7 @@ public class DeleteProjectCommandTest {
     }
 
     @Test
-    public void execute_deletedNameReused_doesNotRestoreOldMemberships()
-        throws Exception {
+    public void execute_deletedNameReused_doesNotRestoreOldMemberships() throws Exception {
         new DeleteProjectCommand(FIRST_PROJECT).execute(model);
 
         Project replacement = new ProjectBuilder()

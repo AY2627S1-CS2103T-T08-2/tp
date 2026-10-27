@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
+import static seedu.address.testutil.TypicalPersons.BENSON;
 
 import java.time.LocalDate;
 
@@ -65,6 +66,23 @@ public class SetRoleCommandTest {
         assertEquals(new Role("Implement parser"), model.getAddressBook().getProjectMembershipList().get(0).getRole());
         assertEquals("Set role for \"Alice Pauline\" in project \"CS2103T Team Project\": Implement parser",
                 result.getFeedbackToUser());
+    }
+
+    @Test
+    public void execute_afterListingMembers_usesDisplayedContactIndex() throws Exception {
+        Model model = new ModelManager();
+        model.addPerson(ALICE);
+        model.addPerson(BENSON);
+        model.addProject(project);
+        model.addProjectMembership(new ProjectMembership(BENSON.getPersonId(), project.getProjectId()));
+        new ListMembersCommand(project.getName()).execute(model);
+
+        new SetRoleCommand(Index.fromOneBased(1), Index.fromOneBased(1), new Role("Implement parser"))
+                .execute(model);
+
+        ProjectMembership updatedMembership = model.getAddressBook().getProjectMembershipList().get(0);
+        assertEquals(BENSON.getPersonId(), updatedMembership.getPersonId());
+        assertEquals(new Role("Implement parser"), updatedMembership.getRole());
     }
 
     @Test

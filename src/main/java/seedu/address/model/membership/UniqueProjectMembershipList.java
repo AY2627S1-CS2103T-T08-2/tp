@@ -3,8 +3,10 @@ package seedu.address.model.membership;
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -68,7 +70,9 @@ public class UniqueProjectMembershipList implements Iterable<ProjectMembership> 
      */
     public void setMemberships(UniqueProjectMembershipList replacement) {
         requireNonNull(replacement);
-        internalList.setAll(replacement.internalList);
+        if (replacement != this) {
+            internalList.setAll(replacement.internalList);
+        }
     }
 
     /**
@@ -138,13 +142,7 @@ public class UniqueProjectMembershipList implements Iterable<ProjectMembership> 
      * Returns true if {@code memberships} contains only unique person-project pairs.
      */
     private boolean membershipsAreUnique(List<ProjectMembership> memberships) {
-        for (int i = 0; i < memberships.size() - 1; i++) {
-            for (int j = i + 1; j < memberships.size(); j++) {
-                if (memberships.get(i).equals(memberships.get(j))) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        Set<ProjectMembership> seen = new HashSet<>();
+        return memberships.stream().allMatch(seen::add);
     }
 }

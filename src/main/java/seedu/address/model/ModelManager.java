@@ -107,6 +107,7 @@ public class ModelManager implements Model {
     public void deleteProject(Project target) {
         requireNonNull(target);
         addressBook.removeProject(target);
+        refreshPersonFilter();
     }
 
     @Override

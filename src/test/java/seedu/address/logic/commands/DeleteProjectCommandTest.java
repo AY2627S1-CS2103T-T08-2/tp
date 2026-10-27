@@ -17,6 +17,7 @@ import seedu.address.commons.core.index.Index;
 import seedu.address.logic.Messages;
 import seedu.address.model.Model;
 import seedu.address.model.ModelManager;
+import seedu.address.model.UserPrefs;
 import seedu.address.model.membership.ProjectMembership;
 import seedu.address.model.membership.Role;
 import seedu.address.model.person.Person;
@@ -320,6 +321,30 @@ public class DeleteProjectCommandTest {
         assertEquals(
             List.of(thirdProject),
             model.getPersonProjects(secondContact));
+    }
+
+    @Test
+    public void execute_immediatelyAfterLoadingData_success() throws Exception {
+        model = new ModelManager(model.getAddressBook(), new UserPrefs());
+
+        new DeleteProjectCommand(FIRST_PROJECT).execute(model);
+
+        assertEquals(
+            List.of(secondProject, thirdProject),
+            model.getProjectList()
+        );
+
+        assertMembershipsEqual(
+            List.of(thirdMembership, fourthMembership),
+            model.getAddressBook().getProjectMembershipList()
+        );
+
+        assertEquals(
+            List.of(firstContact, secondContact, unassociatedContact),
+            model.getFilteredPersonList()
+        );
+
+        assertContactsUnchanged();
     }
 
     @Test

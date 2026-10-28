@@ -123,7 +123,7 @@ public class LogicManagerTest {
 
     @Test
     public void execute_associateCommandProjectListOrder_success() throws Exception {
-        List<Project> displayedProjects = logic.getProjectList();
+        List<Project> displayedProjects = logic.getFilteredProjectList();
         Project firstProject = new ProjectBuilder().withName("Zeta").build();
         Project secondProject = new ProjectBuilder().withName("Alpha").build();
         model.addPerson(AMY);
@@ -319,12 +319,12 @@ public class LogicManagerTest {
         Project project = new ProjectBuilder().build();
         model.addProject(project);
 
-        assertEquals(List.of(project), logic.getProjectList());
+        assertEquals(List.of(project), logic.getFilteredProjectList());
     }
 
     @Test
     public void getProjectList_modifyList_throwsUnsupportedOperationException() {
-        assertThrows(UnsupportedOperationException.class, () -> logic.getProjectList().remove(0));
+        assertThrows(UnsupportedOperationException.class, () -> logic.getFilteredProjectList().remove(0));
     }
 
     /**

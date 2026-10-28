@@ -50,6 +50,7 @@ public class LogicManager implements Logic {
         CommandResult commandResult;
         AddressBook beforeCommand = new AddressBook(model.getAddressBook());
         Predicate<? super Person> previousFilter = model.getFilteredPersonListPredicate();
+        Predicate<? super Project> previousProjectFilter = model.getFilteredProjectListPredicate();
         Command command = addressBookParser.parseCommand(commandText);
         commandResult = command.execute(model);
 
@@ -78,6 +79,8 @@ public class LogicManager implements Logic {
             model.setAddressBook(beforeCommand);
             model.updateFilteredPersonList(previousFilter == null
                     ? Model.PREDICATE_SHOW_ALL_PERSONS : previousFilter::test);
+            model.updateFilteredProjectList(previousProjectFilter == null
+                    ? Model.PREDICATE_SHOW_ALL_PROJECTS : previousProjectFilter::test);
             throw new CommandException(errorMessage
                     + "\nThe command was not applied. Fix the save problem and try again.", e);
         }
@@ -91,7 +94,7 @@ public class LogicManager implements Logic {
     }
 
     @Override
-    public ObservableList<Project> getProjectList() {
+    public ObservableList<Project> getFilteredProjectList() {
         return model.getFilteredProjectList();
     }
 

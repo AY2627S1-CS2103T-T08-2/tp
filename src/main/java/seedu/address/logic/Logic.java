@@ -24,8 +24,8 @@ public interface Logic {
     /** Returns an unmodifiable view of the filtered list of persons */
     ObservableList<Person> getFilteredPersonList();
 
-    /** Returns an unmodifiable view of the list of projects. */
-    ObservableList<Project> getProjectList();
+    /** Returns an unmodifiable view of the filtered list of projects. */
+    ObservableList<Project> getFilteredProjectList();
 
     /**
      * Returns the user prefs' GUI settings.

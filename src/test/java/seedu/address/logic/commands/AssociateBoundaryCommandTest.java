@@ -95,7 +95,7 @@ public class AssociateBoundaryCommandTest {
         assertEquals(PERSONS, model.getAddressBook().getPersonList());
         assertEquals(PERSONS.stream().map(Person::getPersonId).toList(), model.getAddressBook().getPersonList()
                 .stream().map(Person::getPersonId).toList());
-        assertEquals(projects, model.getProjectList());
+        assertEquals(projects, model.getAddressBook().getProjectList());
         assertEquals(visible, model.getFilteredPersonList());
     }
 }

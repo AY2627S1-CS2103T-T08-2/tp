@@ -20,11 +20,14 @@ public class SetRoleCommand extends Command {
 
     public static final String COMMAND_WORD = "setrole";
     public static final String MESSAGE_USAGE = COMMAND_WORD
-            + ": Sets a member's role in a project.\nParameters: " + CliSyntax.PREFIX_CONTACT + "CONTACT_INDEX "
-            + CliSyntax.PREFIX_PROJECT + "PROJECT_INDEX " + CliSyntax.PREFIX_ROLE + "ROLE\n"
-            + "Example: " + COMMAND_WORD + " c/2 pr/1 r/Implement the parser";
+        + ": Sets or clears a member's role in a project.\n"
+        + "Parameters: " + CliSyntax.PREFIX_CONTACT + "CONTACT_INDEX "
+        + CliSyntax.PREFIX_PROJECT + "PROJECT_INDEX " + CliSyntax.PREFIX_ROLE + "ROLE\n"
+        + "Leave ROLE empty to clear the role while retaining the association.\n"
+        + "Example: " + COMMAND_WORD + " c/2 pr/1 r/Implement the parser";
     public static final String MESSAGE_NOT_ASSOCIATED = "Contact \"%1$s\" is not associated with project \"%2$s\".";
     public static final String MESSAGE_SUCCESS = "Set role for \"%1$s\" in project \"%2$s\": %3$s";
+    public static final String MESSAGE_CLEAR_SUCCESS = "Cleared role for \"%1$s\" in project \"%2$s\".";
 
     private final Index contactIndex;
     private final Index projectIndex;
@@ -58,6 +61,11 @@ public class SetRoleCommand extends Command {
             throw new CommandException(String.format(MESSAGE_NOT_ASSOCIATED, contact.getName(), project.getName()));
         }
         model.setProjectMembership(membership.withRole(role));
+
+        if (role.equals(Role.EMPTY)) {
+            return new CommandResult(String.format(MESSAGE_CLEAR_SUCCESS, contact.getName(), project.getName()));
+        }
+
         return new CommandResult(String.format(MESSAGE_SUCCESS, contact.getName(), project.getName(), role));
     }
 

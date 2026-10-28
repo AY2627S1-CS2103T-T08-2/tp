@@ -5,6 +5,7 @@ import static seedu.address.testutil.Assert.assertThrows;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -248,4 +249,35 @@ public class JsonSerializableAddressBookTest {
                 JsonSerializableAddressBook.MESSAGE_MEMBERSHIP_PROJECT_NOT_FOUND, data::toModelType);
     }
 
+    @Test
+    public void toModelType_nullPersonEntry_throwsIllegalValueException() {
+        JsonSerializableAddressBook data = new JsonSerializableAddressBook(
+            Collections.singletonList(null), List.of(), List.of());
+
+        assertThrows(IllegalValueException.class, JsonSerializableAddressBook.MESSAGE_NULL_PERSON, data::toModelType);
+    }
+
+    @Test
+    public void toModelType_nullProjectEntry_throwsIllegalValueException() {
+        JsonSerializableAddressBook data = new JsonSerializableAddressBook(
+            List.of(), Collections.singletonList(null), List.of());
+
+        assertThrows(IllegalValueException.class, JsonSerializableAddressBook.MESSAGE_NULL_PROJECT, data::toModelType);
+    }
+
+    @Test
+    public void toModelType_nullMembershipEntry_throwsIllegalValueException() {
+        JsonSerializableAddressBook data = new JsonSerializableAddressBook(
+            List.of(), List.of(), Collections.singletonList(null));
+
+        assertThrows(IllegalValueException.class,
+            JsonSerializableAddressBook.MESSAGE_NULL_PROJECT_MEMBERSHIP, data::toModelType);
+    }
+
+    @Test
+    public void toModelType_nullCollectionFields_preservesLegacyDefaults() throws Exception {
+        JsonSerializableAddressBook data = new JsonSerializableAddressBook(null, null, null);
+
+        assertEquals(new AddressBook(), data.toModelType());
+    }
 }

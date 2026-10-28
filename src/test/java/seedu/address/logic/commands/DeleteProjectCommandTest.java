@@ -87,7 +87,7 @@ public class DeleteProjectCommandTest {
 
         assertEquals(
             List.of(secondProject, thirdProject),
-            model.getProjectList());
+            model.getFilteredProjectList());
 
         assertMembershipsEqual(
             List.of(thirdMembership, fourthMembership),
@@ -104,7 +104,7 @@ public class DeleteProjectCommandTest {
 
         assertEquals(
             List.of(firstProject, thirdProject),
-            model.getProjectList());
+            model.getFilteredProjectList());
 
         assertMembershipsEqual(
             List.of(firstMembership, secondMembership, fourthMembership),
@@ -120,7 +120,7 @@ public class DeleteProjectCommandTest {
 
         assertEquals(
             List.of(firstProject, secondProject),
-            model.getProjectList());
+            model.getFilteredProjectList());
 
         assertMembershipsEqual(
             List.of(firstMembership, secondMembership, thirdMembership),
@@ -139,7 +139,7 @@ public class DeleteProjectCommandTest {
 
         assertEquals(
             List.of(firstProject, secondProject, thirdProject),
-            model.getProjectList());
+            model.getFilteredProjectList());
 
         assertMembershipsEqual(
             List.of(firstMembership, secondMembership,
@@ -158,7 +158,7 @@ public class DeleteProjectCommandTest {
 
         new DeleteProjectCommand(FIRST_PROJECT).execute(model);
 
-        assertTrue(model.getProjectList().isEmpty());
+        assertTrue(model.getFilteredProjectList().isEmpty());
         assertTrue(model.getAddressBook().getProjectMembershipList().isEmpty());
 
         assertEquals(
@@ -227,7 +227,7 @@ public class DeleteProjectCommandTest {
 
         assertEquals(
             List.of(firstProject, thirdProject),
-            model.getProjectList());
+            model.getFilteredProjectList());
         assertEquals(
             List.of(secondContact),
             model.getFilteredPersonList());
@@ -243,7 +243,7 @@ public class DeleteProjectCommandTest {
 
         assertEquals(
             List.of(firstProject, thirdProject),
-            model.getProjectList());
+            model.getFilteredProjectList());
 
         assertTrue(model.getFilteredPersonList().isEmpty());
         assertContactsUnchanged();
@@ -293,7 +293,7 @@ public class DeleteProjectCommandTest {
         command.execute(model);
         command.execute(model);
 
-        assertEquals(List.of(thirdProject), model.getProjectList());
+        assertEquals(List.of(thirdProject), model.getFilteredProjectList());
 
         assertMembershipsEqual(
             List.of(fourthMembership),
@@ -331,7 +331,7 @@ public class DeleteProjectCommandTest {
 
         assertEquals(
             List.of(secondProject, thirdProject),
-            model.getProjectList()
+            model.getFilteredProjectList()
         );
 
         assertMembershipsEqual(

@@ -123,7 +123,7 @@ public class LogicManagerTest {
 
     @Test
     public void execute_associateCommandProjectListOrder_success() throws Exception {
-        List<Project> displayedProjects = logic.getProjectList();
+        List<Project> displayedProjects = logic.getFilteredProjectList();
         Project firstProject = new ProjectBuilder().withName("Zeta").build();
         Project secondProject = new ProjectBuilder().withName("Alpha").build();
         model.addPerson(AMY);
@@ -208,9 +208,9 @@ public class LogicManagerTest {
         assertEquals(List.of(AMY, BENSON), restartedModel.getAddressBook().getPersonList());
         assertEquals(List.of(AMY.getPersonId(), BENSON.getPersonId()),
                 restartedModel.getAddressBook().getPersonList().stream().map(Person::getPersonId).toList());
-        assertEquals(List.of(firstProject, secondProject), restartedModel.getProjectList());
+        assertEquals(List.of(firstProject, secondProject), restartedModel.getFilteredProjectList());
         assertEquals(List.of(firstProject.getProjectId(), secondProject.getProjectId()),
-                restartedModel.getProjectList().stream().map(Project::getProjectId).toList());
+                restartedModel.getFilteredProjectList().stream().map(Project::getProjectId).toList());
         assertEquals(List.of(BENSON), restartedModel.getProjectMembers(firstProject));
         assertEquals(List.of(AMY), restartedModel.getProjectMembers(secondProject));
         assertEquals(model, restartedModel);
@@ -319,12 +319,12 @@ public class LogicManagerTest {
         Project project = new ProjectBuilder().build();
         model.addProject(project);
 
-        assertEquals(List.of(project), logic.getProjectList());
+        assertEquals(List.of(project), logic.getFilteredProjectList());
     }
 
     @Test
     public void getProjectList_modifyList_throwsUnsupportedOperationException() {
-        assertThrows(UnsupportedOperationException.class, () -> logic.getProjectList().remove(0));
+        assertThrows(UnsupportedOperationException.class, () -> logic.getFilteredProjectList().remove(0));
     }
 
     /**

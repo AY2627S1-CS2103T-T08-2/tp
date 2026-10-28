@@ -44,7 +44,7 @@ public class SetRoleCommand extends Command {
     public CommandResult execute(Model model) throws CommandException {
         requireNonNull(model);
         List<Person> contacts = model.getFilteredPersonList();
-        List<Project> projects = model.getProjectList();
+        List<Project> projects = model.getFilteredProjectList();
         if (contactIndex.getZeroBased() >= contacts.size()) {
             throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
         }

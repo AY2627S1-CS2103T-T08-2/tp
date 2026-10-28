@@ -114,7 +114,7 @@ public class AssociateCommandTest {
     @Test
     public void execute_invalidProjectIndex_throwsCommandException() {
         model.addProjectMembership(new ProjectMembership(ALICE.getPersonId(), firstProject.getProjectId()));
-        Index invalidProjectIndex = Index.fromOneBased(model.getProjectList().size() + 1);
+        Index invalidProjectIndex = Index.fromOneBased(model.getFilteredProjectList().size() + 1);
         AssociateCommand command = new AssociateCommand(INDEX_FIRST_PERSON, invalidProjectIndex);
 
         assertCommandFailure(command, model, Messages.MESSAGE_INVALID_PROJECT_DISPLAYED_INDEX);

@@ -62,7 +62,7 @@ public class AddProjectCommandTest {
 
         CommandResult result = new AddProjectCommand(project).execute(model);
 
-        assertEquals(List.of(project), model.getProjectList());
+        assertEquals(List.of(project), model.getFilteredProjectList());
         assertEquals(
                 "New project added:\nCS2103T\nDeadline: 2026-11-13\n"
                         + "Description: Build a contact manager",
@@ -76,7 +76,7 @@ public class AddProjectCommandTest {
 
         CommandResult result = new AddProjectCommand(project).execute(model);
 
-        assertEquals(List.of(project), model.getProjectList());
+        assertEquals(List.of(project), model.getFilteredProjectList());
         assertEquals(
                 "New project added:\nCS2103T\nDeadline: 2026-11-13\n"
                         + "Description: No description provided",
@@ -92,7 +92,7 @@ public class AddProjectCommandTest {
 
         new AddProjectCommand(newProject).execute(model);
 
-        assertEquals(List.of(existingProject, newProject), model.getProjectList());
+        assertEquals(List.of(existingProject, newProject), model.getFilteredProjectList());
     }
 
     @Test
@@ -110,7 +110,7 @@ public class AddProjectCommandTest {
                 ), () -> command.execute(model)
         );
 
-        assertEquals(List.of(project), model.getProjectList());
+        assertEquals(List.of(project), model.getFilteredProjectList());
     }
 
     @Test
@@ -133,7 +133,7 @@ public class AddProjectCommandTest {
                 ), () -> command.execute(model)
         );
 
-        assertEquals(List.of(existingProject), model.getProjectList());
+        assertEquals(List.of(existingProject), model.getFilteredProjectList());
     }
 
     @Test
@@ -153,7 +153,7 @@ public class AddProjectCommandTest {
                 ), () -> command.execute(model)
         );
 
-        assertEquals(List.of(existingProject), model.getProjectList());
+        assertEquals(List.of(existingProject), model.getFilteredProjectList());
     }
 
     private static Project createProject(String name, Description description) {

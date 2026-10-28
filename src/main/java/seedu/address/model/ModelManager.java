@@ -26,6 +26,7 @@ public class ModelManager implements Model {
     private final AddressBook addressBook;
     private final UserPrefs userPrefs;
     private final FilteredList<Person> filteredPersons;
+    private final FilteredList<Project> filteredProjects;
 
     /**
      * Initializes a ModelManager with the given addressBook and userPrefs.
@@ -38,6 +39,7 @@ public class ModelManager implements Model {
         this.addressBook = new AddressBook(addressBook);
         this.userPrefs = new UserPrefs(userPrefs);
         filteredPersons = new FilteredList<>(this.addressBook.getPersonList());
+        filteredProjects = new FilteredList<>(this.addressBook.getProjectList());
     }
 
     public ModelManager() {
@@ -114,6 +116,7 @@ public class ModelManager implements Model {
     public void addProject(Project project) {
         requireNonNull(project);
         addressBook.addProject(project);
+        updateFilteredProjectList(PREDICATE_SHOW_ALL_PROJECTS);
     }
 
     @Override
@@ -195,8 +198,26 @@ public class ModelManager implements Model {
     }
 
     @Override
-    public ObservableList<Project> getProjectList() {
-        return addressBook.getProjectList();
+    public Predicate<? super Person> getFilteredPersonListPredicate() {
+        return filteredPersons.getPredicate();
+    }
+
+    //=========== Filtered Project List Accessors =============================================================
+
+    @Override
+    public ObservableList<Project> getFilteredProjectList() {
+        return filteredProjects;
+    }
+
+    @Override
+    public void updateFilteredProjectList(Predicate<Project> predicate) {
+        requireNonNull(predicate);
+        filteredProjects.setPredicate(predicate);
+    }
+
+    @Override
+    public Predicate<? super Project> getFilteredProjectListPredicate() {
+        return filteredProjects.getPredicate();
     }
 
     @Override
@@ -211,12 +232,8 @@ public class ModelManager implements Model {
         }
 
         return addressBook.equals(otherModelManager.addressBook)
-                && userPrefs.equals(otherModelManager.userPrefs)
-                && filteredPersons.equals(otherModelManager.filteredPersons);
-    }
-
-    @Override
-    public Predicate<? super Person> getFilteredPersonListPredicate() {
-        return filteredPersons.getPredicate();
+            && userPrefs.equals(otherModelManager.userPrefs)
+            && filteredPersons.equals(otherModelManager.filteredPersons)
+            && filteredProjects.equals(otherModelManager.filteredProjects);
     }
 }

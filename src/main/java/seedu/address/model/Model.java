@@ -17,6 +17,7 @@ import seedu.address.model.project.ProjectName;
 public interface Model {
     /** {@code Predicate} that always evaluates to true */
     Predicate<Person> PREDICATE_SHOW_ALL_PERSONS = unused -> true;
+    Predicate<Project> PREDICATE_SHOW_ALL_PROJECTS = unused -> true;
 
     /**
      * Returns the user prefs.
@@ -99,10 +100,8 @@ public interface Model {
      */
     void setProject(Project target, Project editedProject);
 
-    /**
-     * Returns an unmodifiable view of the project list.
-     */
-    ObservableList<Project> getProjectList();
+    /** Returns an unmodifiable view of the filtered project list */
+    ObservableList<Project> getFilteredProjectList();
 
     /**
      * Returns the project with the given name, or an empty Optional if none exists.
@@ -145,4 +144,15 @@ public interface Model {
      * Returns the current contact filter, or null if no filter is set.
      */
     Predicate<? super Person> getFilteredPersonListPredicate();
+
+    /**
+     * Updates the filter of the filtered project list to filter by the given {@code predicate}.
+     * @throws NullPointerException if {@code predicate} is null.
+     */
+    void updateFilteredProjectList(Predicate<Project> predicate);
+
+    /**
+     * Returns the current project filter, or null if no filter is set.
+     */
+    Predicate<? super Project> getFilteredProjectListPredicate();
 }

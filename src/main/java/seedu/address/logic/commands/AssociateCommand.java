@@ -50,7 +50,7 @@ public class AssociateCommand extends Command {
         requireNonNull(model);
 
         List<Person> displayedContacts = model.getFilteredPersonList();
-        List<Project> projects = model.getProjectList();
+        List<Project> projects = model.getFilteredProjectList();
 
         if (contactIndex.getZeroBased() >= displayedContacts.size()) {
             throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);

@@ -242,8 +242,8 @@ public class AddProjectCommandParserTest {
 
         assertDoesNotThrow(() -> command.execute(model));
 
-        assertEquals(1, model.getProjectList().size());
-        Project actualProject = model.getProjectList().get(0);
+        assertEquals(1, model.getFilteredProjectList().size());
+        Project actualProject = model.getFilteredProjectList().get(0);
 
         assertNotNull(actualProject.getProjectId());
         assertEquals(expectedProject.getName().toString(), actualProject.getName().toString());

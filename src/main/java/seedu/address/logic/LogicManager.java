@@ -92,7 +92,7 @@ public class LogicManager implements Logic {
 
     @Override
     public ObservableList<Project> getProjectList() {
-        return model.getProjectList();
+        return model.getFilteredProjectList();
     }
 
     @Override

@@ -208,9 +208,9 @@ public class LogicManagerTest {
         assertEquals(List.of(AMY, BENSON), restartedModel.getAddressBook().getPersonList());
         assertEquals(List.of(AMY.getPersonId(), BENSON.getPersonId()),
                 restartedModel.getAddressBook().getPersonList().stream().map(Person::getPersonId).toList());
-        assertEquals(List.of(firstProject, secondProject), restartedModel.getProjectList());
+        assertEquals(List.of(firstProject, secondProject), restartedModel.getFilteredProjectList());
         assertEquals(List.of(firstProject.getProjectId(), secondProject.getProjectId()),
-                restartedModel.getProjectList().stream().map(Project::getProjectId).toList());
+                restartedModel.getFilteredProjectList().stream().map(Project::getProjectId).toList());
         assertEquals(List.of(BENSON), restartedModel.getProjectMembers(firstProject));
         assertEquals(List.of(AMY), restartedModel.getProjectMembers(secondProject));
         assertEquals(model, restartedModel);

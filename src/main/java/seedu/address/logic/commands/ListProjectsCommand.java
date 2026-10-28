@@ -49,7 +49,7 @@ public class ListProjectsCommand extends Command {
             return executeForContact(model, contactIndex.get());
         }
 
-        List<Project> projects = model.getProjectList();
+        List<Project> projects = model.getFilteredProjectList();
         if (projects.isEmpty()) {
             return new CommandResult(MESSAGE_EMPTY, CommandResult.ListViewTarget.PROJECTS);
         }
@@ -73,7 +73,7 @@ public class ListProjectsCommand extends Command {
             return new CommandResult(String.format(MESSAGE_NO_PROJECTS, contact.getName()));
         }
 
-        List<Project> allProjects = model.getProjectList();
+        List<Project> allProjects = model.getFilteredProjectList();
         String projectDetails = projects.stream()
                 .map(project -> formatProject(project, allProjects.indexOf(project) + 1))
                 .collect(Collectors.joining("\n"));

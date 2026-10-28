@@ -91,7 +91,7 @@ public class ModelManagerTest {
         Project project = createProject("CS2103T");
 
         // Obtain the view before adding to verify that it stays up to date.
-        var projectList = model.getProjectList();
+        var projectList = model.getFilteredProjectList();
 
         assertFalse(model.hasProject(project));
 
@@ -111,7 +111,7 @@ public class ModelManagerTest {
 
         assertThrows(DuplicateProjectException.class, () -> model.addProject(duplicate));
 
-        assertEquals(List.of(original), model.getProjectList());
+        assertEquals(List.of(original), model.getFilteredProjectList());
     }
 
     @Test
@@ -196,7 +196,7 @@ public class ModelManagerTest {
 
         ModelManager model = new ModelManager(addressBook, new UserPrefs());
 
-        assertEquals(List.of(project), model.getProjectList());
+        assertEquals(List.of(project), model.getFilteredProjectList());
         assertEquals(Optional.of(project), model.findProject(project.getName()));
     }
 
@@ -204,7 +204,7 @@ public class ModelManagerTest {
     public void setAddressBook_withProjects_replacesProjects() {
         ModelManager model = new ModelManager();
         model.addProject(createProject("Old Project"));
-        var projectList = model.getProjectList();
+        var projectList = model.getFilteredProjectList();
 
         AddressBook replacement = new AddressBook();
         Project project = createProject("New Project");
@@ -259,7 +259,7 @@ public class ModelManagerTest {
                 new ProjectMembership(ALICE.getPersonId(), project.getProjectId())));
         assertEquals(List.of(membership), model.getAddressBook().getProjectMembershipList());
         assertEquals(List.of(ALICE, BENSON), model.getAddressBook().getPersonList());
-        assertEquals(List.of(project), model.getProjectList());
+        assertEquals(List.of(project), model.getFilteredProjectList());
         assertEquals(List.of(BENSON), model.getFilteredPersonList());
     }
 
@@ -337,7 +337,7 @@ public class ModelManagerTest {
         assertFalse(model.hasProjectMembership(selectedMembership));
         assertEquals(List.of(sameContactMembership, sameProjectMembership), memberships);
         assertEquals(List.of(ALICE, BENSON), model.getAddressBook().getPersonList());
-        assertEquals(List.of(firstProject, secondProject), model.getProjectList());
+        assertEquals(List.of(firstProject, secondProject), model.getFilteredProjectList());
         assertEquals(List.of(BENSON), model.getFilteredPersonList());
         assertEquals(List.of(BENSON), model.getProjectMembers(firstProject));
         assertEquals(List.of(ALICE), model.getProjectMembers(secondProject));

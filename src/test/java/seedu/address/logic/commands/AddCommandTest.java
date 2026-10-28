@@ -217,7 +217,7 @@ public class AddCommandTest {
         }
 
         @Override
-        public ObservableList<Project> getProjectList() {
+        public ObservableList<Project> getFilteredProjectList() {
             throw new AssertionError("This method should not be called.");
         }
 

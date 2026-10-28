@@ -8,7 +8,7 @@ import seedu.address.model.Model;
 import seedu.address.model.project.ProjectNameContainsKeywordsPredicate;
 
 /**
- * Finds and lists all contacts whose name contains any of the argument keywords.
+ * Finds and lists all projects whose name contains any of the argument keywords.
  * Keyword matching is case-insensitive.
  */
 public class FindProjectCommand extends Command {
@@ -31,7 +31,7 @@ public class FindProjectCommand extends Command {
         requireNonNull(model);
         model.updateFilteredProjectList(predicate);
         return new CommandResult(
-            String.format(Messages.MESSAGE_PERSONS_LISTED_OVERVIEW, model.getFilteredProjectList().size()),
+            String.format(Messages.MESSAGE_PROJECTS_LISTED_OVERVIEW, model.getFilteredProjectList().size()),
             CommandResult.ListViewTarget.PROJECTS);
     }
 

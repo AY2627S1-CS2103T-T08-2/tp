@@ -2,6 +2,7 @@ package seedu.address.logic.commands;
 
 import static java.util.Objects.requireNonNull;
 import static seedu.address.logic.parser.CliSyntax.PREFIX_CONTACT;
+import static seedu.address.model.Model.PREDICATE_SHOW_ALL_PROJECTS;
 
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +50,7 @@ public class ListProjectsCommand extends Command {
             return executeForContact(model, contactIndex.get());
         }
 
+        model.updateFilteredProjectList(PREDICATE_SHOW_ALL_PROJECTS);
         List<Project> projects = model.getFilteredProjectList();
         if (projects.isEmpty()) {
             return new CommandResult(MESSAGE_EMPTY, CommandResult.ListViewTarget.PROJECTS);
@@ -68,17 +70,27 @@ public class ListProjectsCommand extends Command {
         }
 
         Person contact = displayedContacts.get(index.getZeroBased());
+
+        // Restore all projects so reported indices match the Projects tab
+        model.updateFilteredProjectList(Model.PREDICATE_SHOW_ALL_PROJECTS);
         List<Project> projects = model.getPersonProjects(contact);
         if (projects.isEmpty()) {
-            return new CommandResult(String.format(MESSAGE_NO_PROJECTS, contact.getName()));
+            return new CommandResult(
+                String.format(MESSAGE_NO_PROJECTS, contact.getName())
+            );
         }
 
-        List<Project> allProjects = model.getFilteredProjectList();
+        List<Project> allProjects = model.getAddressBook().getProjectList();
         String projectDetails = projects.stream()
-                .map(project -> formatProject(project, allProjects.indexOf(project) + 1))
-                .collect(Collectors.joining("\n"));
+            .map(project -> formatProject(project, allProjects.indexOf(project) + 1))
+            .collect(Collectors.joining("\n"));
+
         return new CommandResult(String.format(
-                MESSAGE_CONTACT_PROJECTS, contact.getName(), projects.size(), projectDetails));
+            MESSAGE_CONTACT_PROJECTS,
+            contact.getName(),
+            projects.size(),
+            projectDetails)
+        );
     }
 
     private static String formatProject(Project project, int displayedIndex) {

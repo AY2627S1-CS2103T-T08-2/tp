@@ -17,6 +17,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.exceptions.DataLoadingException;
+import seedu.address.commons.util.JsonUtil;
 import seedu.address.model.AddressBook;
 import seedu.address.model.ReadOnlyAddressBook;
 import seedu.address.model.UserPrefs;
@@ -129,6 +130,24 @@ public class StorageManagerTest {
         for (int index = 0; index < invalidJsonValues.length; index++) {
             String json = invalidJsonValues[index];
             Path filePath = testFolder.resolve("null-case-" + index + ".json");
+            Files.writeString(filePath, json);
+            StorageManager storage = new StorageManager(new JsonAddressBookStorage(filePath),
+                new JsonUserPrefsStorage(testFolder.resolve("preferences.json")));
+
+            assertThrows(DataLoadingException.class, storage::readAddressBook);
+            assertTrue(storage.isAddressBookSavingBlocked());
+            assertThrows(IOException.class, () -> storage.saveAddressBook(new AddressBook()));
+            assertEquals(json, Files.readString(filePath));
+        }
+    }
+
+    @Test
+    public void readAddressBook_trailingContent_blocksSavingAndPreservesFile() throws Exception {
+        String validJson = JsonUtil.toJsonString(new JsonSerializableAddressBook(getTypicalAddressBook()));
+        String[] trailingValues = {"garbage", "{}", "[]", "null"};
+        for (int index = 0; index < trailingValues.length; index++) {
+            String json = validJson + "\n" + trailingValues[index];
+            Path filePath = testFolder.resolve("trailing-content-" + index + ".json");
             Files.writeString(filePath, json);
             StorageManager storage = new StorageManager(new JsonAddressBookStorage(filePath),
                 new JsonUserPrefsStorage(testFolder.resolve("preferences.json")));

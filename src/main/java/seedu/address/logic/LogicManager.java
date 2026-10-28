@@ -115,7 +115,7 @@ public class LogicManager implements Logic {
      */
     private boolean hasSameStoredData(ReadOnlyAddressBook first, ReadOnlyAddressBook second) {
         if (!first.getPersonList().equals(second.getPersonList())
-            || first.getProjectList().equals(second.getProjectList())
+            || !first.getProjectList().equals(second.getProjectList())
             || !first.getProjectMembershipList().equals(second.getProjectMembershipList())
         ) {
             return false;
@@ -124,8 +124,8 @@ public class LogicManager implements Logic {
         return (
             first.getPersonList().stream().map(Person::getPersonId).toList()
                 .equals(second.getPersonList().stream().map(Person::getPersonId).toList())
-            && first.getProjectList().stream().map(Project::getProjectId).toList()
-                .equals(second.getProjectList().stream().map(Project::getProjectId).toList())
+            && first.getProjectList().stream().map(project -> project.getName().projectName).toList()
+                .equals(second.getProjectList().stream().map(project -> project.getName().projectName).toList())
             && first.getProjectMembershipList().stream().map(ProjectMembership::getRole).toList()
                 .equals(second.getProjectMembershipList().stream().map(ProjectMembership::getRole).toList())
             );

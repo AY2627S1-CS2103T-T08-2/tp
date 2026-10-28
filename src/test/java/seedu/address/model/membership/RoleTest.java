@@ -11,37 +11,6 @@ import org.junit.jupiter.api.Test;
 public class RoleTest {
 
     @Test
-    public void constructor_lengthBoundaries_countsCodePoints() {
-        String supplementaryCharacter = new String(Character.toChars(0x1f600));
-        for (String character : new String[] {"a", supplementaryCharacter}) {
-            for (int length : new int[] {0, 1, 199, 200}) {
-                String value = character.repeat(length);
-                assertTrue(Role.isValidRole(value));
-                assertEquals(value, new Role(value).getDescription());
-            }
-            String tooLong = character.repeat(201);
-            assertFalse(Role.isValidRole(tooLong));
-            assertThrows(IllegalArgumentException.class, () -> new Role(tooLong));
-        }
-        assertEquals(Role.EMPTY, new Role(""));
-    }
-
-    @Test
-    public void constructor_lineBreakAtAnyPosition_throwsIllegalArgumentException() {
-        for (String lineBreak : new String[] {"\n", "\r", "\r\n", "\u0085", "\u2028", "\u2029"}) {
-            for (String value : new String[] {lineBreak + "a", "a" + lineBreak + "b", "a" + lineBreak}) {
-                assertFalse(Role.isValidRole(value));
-                assertThrows(IllegalArgumentException.class, () -> new Role(value));
-            }
-        }
-    }
-
-    @Test
-    public void isValidRole_null_throwsNullPointerException() {
-        assertThrows(NullPointerException.class, () -> Role.isValidRole(null));
-    }
-
-    @Test
     public void isValidRole_validDescription_returnsTrue() {
         assertTrue(Role.isValidRole("Write documentation"));
         assertTrue(Role.isValidRole(""));

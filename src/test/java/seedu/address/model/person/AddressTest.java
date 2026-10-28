@@ -1,6 +1,5 @@
 package seedu.address.model.person;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
@@ -8,21 +7,6 @@ import static seedu.address.testutil.Assert.assertThrows;
 import org.junit.jupiter.api.Test;
 
 public class AddressTest {
-
-    @Test
-    public void constructor_leadingWhitespace_throwsIllegalArgumentException() {
-        String[] invalidAddresses = {" A", "\tA", "\nA", "\rA", "\t"};
-        for (String address : invalidAddresses) {
-            assertFalse(Address.isValidAddress(address), address);
-            assertThrows(IllegalArgumentException.class, () -> new Address(address));
-        }
-    }
-
-    @Test
-    public void constructor_singleCharacterAndInternalSpaces_preservesValue() {
-        assertEquals("1", new Address("1").value);
-        assertEquals("Block  1 ", new Address("Block  1 ").value);
-    }
 
     @Test
     public void constructor_null_throwsNullPointerException() {

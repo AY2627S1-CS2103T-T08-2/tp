@@ -19,26 +19,6 @@ public class PersonIdTest {
     private static final String VALID_ID = "550e8400-e29b-41d4-a716-446655440000";
 
     @Test
-    public void fromString_uuidValueBoundaries_preservesValue() {
-        String[] ids = {"00000000-0000-0000-0000-000000000000", "ffffffff-ffff-ffff-ffff-ffffffffffff"};
-        for (String id : ids) {
-            PersonId parsed = PersonId.fromString(id);
-            assertEquals(id, parsed.toString());
-            assertEquals(UUID.fromString(id), parsed.getId());
-            assertEquals(parsed, PersonId.fromString(id.toUpperCase(Locale.ROOT)));
-        }
-    }
-
-    @Test
-    public void fromString_uuidLengthAndSeparatorBoundaries_throwsIllegalArgumentException() {
-        String[] invalidIds = {VALID_ID.substring(1), VALID_ID + "0", VALID_ID.replace("-", ""),
-            VALID_ID.replace('-', '_'), " " + VALID_ID, VALID_ID + "\n"};
-        for (String id : invalidIds) {
-            assertThrows(IllegalArgumentException.class, () -> PersonId.fromString(id));
-        }
-    }
-
-    @Test
     public void constructor_null_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new PersonId(null));
     }

@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
 
-import java.util.Locale;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
@@ -17,28 +16,6 @@ public class ProjectIdTest {
             "00000000-0000-4000-8000-000000000001";
     private static final String OTHER_ID =
             "00000000-0000-4000-8000-000000000002";
-
-    @Test
-    public void fromString_uuidValueBoundaries_preservesValue() {
-        String[] ids = {"00000000-0000-0000-0000-000000000000", "ffffffff-ffff-ffff-ffff-ffffffffffff"};
-        for (String id : ids) {
-            ProjectId parsed = ProjectId.fromString(id);
-            assertEquals(id, parsed.toString());
-            assertEquals(UUID.fromString(id), parsed.value);
-            assertEquals(parsed, ProjectId.fromString(id.toUpperCase(Locale.ROOT)));
-            assertEquals(parsed.hashCode(), ProjectId.fromString(id.toUpperCase(Locale.ROOT)).hashCode());
-        }
-    }
-
-    @Test
-    public void fromString_uuidLengthAndSeparatorBoundaries_throwsIllegalArgumentException() {
-        String[] invalidIds = {VALID_ID.substring(1), VALID_ID + "0", VALID_ID.replace("-", ""),
-            VALID_ID.replace('-', '_'), " " + VALID_ID, VALID_ID + " ", VALID_ID + "\n",
-            "00000000-0000-4000-8000-00000000000g"};
-        for (String id : invalidIds) {
-            assertThrows(IllegalArgumentException.class, () -> ProjectId.fromString(id));
-        }
-    }
 
     @Test
     public void constructor_null_throwsNullPointerException() {

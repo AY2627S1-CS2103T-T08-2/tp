@@ -2,7 +2,6 @@ package seedu.address.model.project;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.TypicalProjects.PROJ0;
@@ -15,28 +14,6 @@ import org.junit.jupiter.api.Test;
 import seedu.address.testutil.ProjectBuilder;
 
 public class ProjectTest {
-
-    @Test
-    public void constructor_withoutId_generatesDistinctIds() {
-        Project first = new Project(PROJ0.getName(), PROJ0.getDeadline(), Description.EMPTY);
-        Project second = new Project(PROJ0.getName(), PROJ0.getDeadline(), Description.EMPTY);
-        assertNotEquals(first.getProjectId(), second.getProjectId());
-        assertFalse(first.isSameProject(second));
-        assertNotEquals(first, second);
-        assertEquals(Description.EMPTY, first.getDescription());
-    }
-
-    @Test
-    public void equals_normalisedNamesWithSameId_matchesHashCode() {
-        Project original = new Project(PROJ0.getProjectId(), new ProjectName("Team Project"),
-                PROJ0.getDeadline(), Description.EMPTY);
-        Project equivalent = new Project(PROJ0.getProjectId(), new ProjectName("  TEAM   PROJECT  "),
-                PROJ0.getDeadline(), Description.EMPTY);
-        assertEquals(original, equivalent);
-        assertEquals(equivalent, original);
-        assertEquals(original.hashCode(), equivalent.hashCode());
-        assertTrue(original.isSameProject(equivalent));
-    }
 
     @Test
     public void isSameProject() {

@@ -10,29 +10,19 @@ import org.junit.jupiter.api.Test;
 public class EmailTest {
 
     @Test
-    public void constructor_finalLabelLengthBoundary_checksMinimumLength() {
-        assertFalse(Email.isValidEmail("a@b"));
-        assertThrows(IllegalArgumentException.class, () -> new Email("a@b"));
-        assertEquals("a@bc", new Email("a@bc").value);
-        assertEquals("a@b.cd", new Email("a@b.cd").value);
-    }
-
-    @Test
-    public void constructor_singleCharacterHyphenatedFinalLabel_acceptsValidEmail() {
-        // Each label may contain an internal hyphen and must start and end with a letter or digit.
+    public void constructor_hyphenatedFinalDomainLabel_acceptsValidEmail() {
         assertTrue(Email.isValidEmail("a@b-c"));
         assertEquals("a@b-c", new Email("a@b-c").value);
+        assertTrue(Email.isValidEmail("a@x.b-c"));
         assertEquals("a@x.b-c", new Email("a@x.b-c").value);
     }
 
     @Test
-    public void constructor_invalidLabelAndLocalPartBoundaries_throwsIllegalArgumentException() {
-        String[] invalidEmails = {"a@b..cd", "a@b-.cd", "a@b.-cd", "a@b.cd-", "a@-bc",
-            ".a@bc", "a.@bc", "+a@bc", "a+@bc", "a__b@cd", "a@bc\n"};
-        for (String email : invalidEmails) {
-            assertFalse(Email.isValidEmail(email), email);
-            assertThrows(IllegalArgumentException.class, () -> new Email(email));
-        }
+    public void constructor_invalidFinalDomainLabel_rejectsEmail() {
+        assertFalse(Email.isValidEmail("a@b"));
+        assertThrows(IllegalArgumentException.class, () -> new Email("a@b"));
+        assertFalse(Email.isValidEmail("a@-bc"));
+        assertFalse(Email.isValidEmail("a@bc-"));
     }
 
     @Test

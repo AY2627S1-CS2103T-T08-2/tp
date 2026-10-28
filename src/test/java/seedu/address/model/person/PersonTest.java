@@ -14,8 +14,12 @@ import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 import static seedu.address.testutil.TypicalPersons.BOB;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.jupiter.api.Test;
 
+import seedu.address.model.tag.Tag;
 import seedu.address.testutil.PersonBuilder;
 
 public class PersonTest {
@@ -48,6 +52,53 @@ public class PersonTest {
     public void constructor_nullId_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new Person(null, ALICE.getName(), ALICE.getPhone(),
                 ALICE.getEmail(), ALICE.getAddress(), ALICE.getTags()));
+    }
+
+    @Test
+    public void constructor_nullTagSet_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> new Person(ALICE.getName(), ALICE.getPhone(),
+                ALICE.getEmail(), ALICE.getAddress(), null));
+        assertThrows(NullPointerException.class, () -> new Person(PERSON_ID, ALICE.getName(), ALICE.getPhone(),
+                ALICE.getEmail(), ALICE.getAddress(), null));
+    }
+
+    @Test
+    public void constructor_nullTagElement_throwsNullPointerException() {
+        Set<Tag> allNullTags = new HashSet<>();
+        allNullTags.add(null);
+        Set<Tag> mixedTags = new HashSet<>(ALICE.getTags());
+        mixedTags.add(null);
+
+        assertThrows(NullPointerException.class, () -> new Person(ALICE.getName(), ALICE.getPhone(),
+                ALICE.getEmail(), ALICE.getAddress(), allNullTags));
+        assertThrows(NullPointerException.class, () -> new Person(ALICE.getName(), ALICE.getPhone(),
+                ALICE.getEmail(), ALICE.getAddress(), mixedTags));
+        assertThrows(NullPointerException.class, () -> new Person(PERSON_ID, ALICE.getName(), ALICE.getPhone(),
+                ALICE.getEmail(), ALICE.getAddress(), allNullTags));
+        assertThrows(NullPointerException.class, () -> new Person(PERSON_ID, ALICE.getName(), ALICE.getPhone(),
+                ALICE.getEmail(), ALICE.getAddress(), mixedTags));
+    }
+
+    @Test
+    public void constructor_emptyTags_isAccepted() {
+        Person person = new Person(ALICE.getName(), ALICE.getPhone(), ALICE.getEmail(),
+                ALICE.getAddress(), Set.of());
+        Person personWithId = new Person(PERSON_ID, ALICE.getName(), ALICE.getPhone(), ALICE.getEmail(),
+                ALICE.getAddress(), Set.of());
+
+        assertTrue(person.getTags().isEmpty());
+        assertTrue(personWithId.getTags().isEmpty());
+    }
+
+    @Test
+    public void constructor_mutatingSuppliedTags_doesNotChangePersonTags() {
+        Set<Tag> suppliedTags = new HashSet<>(ALICE.getTags());
+        Person person = new Person(ALICE.getName(), ALICE.getPhone(), ALICE.getEmail(),
+                ALICE.getAddress(), suppliedTags);
+
+        suppliedTags.add(new Tag("newtag"));
+
+        assertEquals(ALICE.getTags(), person.getTags());
     }
 
     @Test

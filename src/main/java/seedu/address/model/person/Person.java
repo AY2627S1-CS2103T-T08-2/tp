@@ -45,6 +45,9 @@ public class Person {
         this.phone = phone;
         this.email = email;
         this.address = address;
+        for (Tag tag : tags) {
+            Objects.requireNonNull(tag);
+        }
         this.tags.addAll(tags);
     }
 

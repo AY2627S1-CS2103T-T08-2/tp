@@ -27,7 +27,7 @@ public class EmailTest {
 
     @Test
     public void constructor_invalidLabelAndLocalPartBoundaries_throwsIllegalArgumentException() {
-        String[] invalidEmails = {"a@b..cd", "a@b-.cd", "a@b.-cd", "a@b.cd-",
+        String[] invalidEmails = {"a@b..cd", "a@b-.cd", "a@b.-cd", "a@b.cd-", "a@-bc",
             ".a@bc", "a.@bc", "+a@bc", "a+@bc", "a__b@cd", "a@bc\n"};
         for (String email : invalidEmails) {
             assertFalse(Email.isValidEmail(email), email);

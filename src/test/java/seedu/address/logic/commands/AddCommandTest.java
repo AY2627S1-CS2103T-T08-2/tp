@@ -262,7 +262,7 @@ public class AddCommandTest {
         }
 
         @Override
-        public Predicate<? super Project>  getFilteredProjectListPredicate() {
+        public Predicate<? super Project> getFilteredProjectListPredicate() {
             throw new AssertionError("This method should not be called.");
         }
 

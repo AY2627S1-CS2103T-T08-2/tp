@@ -6,6 +6,9 @@ import java.util.function.Predicate;
 import seedu.address.commons.util.StringUtil;
 import seedu.address.commons.util.ToStringBuilder;
 
+/**
+ * Tests that a {@code Project}'s {@code ProjectName} matches any of the keywords given.
+ */
 public class ProjectNameContainsKeywordsPredicate implements Predicate<Project> {
 
     private final List<String> keywords;

@@ -11,7 +11,7 @@ import seedu.address.model.project.ProjectNameContainsKeywordsPredicate;
  * Finds and lists all contacts whose name contains any of the argument keywords.
  * Keyword matching is case-insensitive.
  */
-public class FindProjectCommand  extends Command {
+public class FindProjectCommand extends Command {
 
     public static final String COMMAND_WORD = "findproject";
 

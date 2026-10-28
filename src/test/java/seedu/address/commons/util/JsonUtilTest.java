@@ -100,6 +100,43 @@ public class JsonUtilTest {
         assertEquals(serializableTestClass.getMapOfIntegerToString(), SerializableTestClass.getHashMapTestValues());
     }
 
+    @Test
+    public void readJsonFile_nullRoot_throwsDataLoadingExceptionAndPreservesFile() throws Exception {
+        Path filePath = testFolder.resolve("null-root.json");
+        for (String json : new String[] {"null", " \n null \t "}) {
+            Files.writeString(filePath, json);
+
+            assertThrows(DataLoadingException.class, () -> {
+                JsonUtil.readJsonFile(filePath, SerializableTestClass.class);
+            });
+
+            assertEquals(json, Files.readString(filePath));
+        }
+    }
+
+    @Test
+    public void fromJsonString_trailingContent_throwsIoException() {
+        String[] trailingValues = {"garbage", "{}", "[]", "null", "true", "123", "\"text\"", "}", "{"};
+        for (String trailingValue : trailingValues) {
+            String json = SerializableTestClass.JSON_STRING_REPRESENTATION + " \n " + trailingValue;
+            assertThrows(IOException.class, () -> JsonUtil.fromJsonString(json, SerializableTestClass.class));
+        }
+    }
+
+    @Test
+    public void readJsonFile_trailingWhitespace_returnsObject() throws Exception {
+        Path filePath = testFolder.resolve("trailing-whitespace.json");
+        String json = SerializableTestClass.JSON_STRING_REPRESENTATION + " \t\r\n ";
+        Files.writeString(filePath, json);
+
+        SerializableTestClass result = JsonUtil.readJsonFile(filePath, SerializableTestClass.class).orElseThrow();
+
+        assertEquals(SerializableTestClass.getNameTestValue(), result.getName());
+        assertEquals(SerializableTestClass.getListTestValues(), result.getListOfLocalDateTimes());
+        assertEquals(SerializableTestClass.getHashMapTestValues(), result.getMapOfIntegerToString());
+        assertEquals(json, Files.readString(filePath));
+    }
+
     //TODO: @Test jsonUtil_readJsonStringToObjectInstance_correctObject()
 
     //TODO: @Test jsonUtil_writeThenReadObjectToJson_correctObject()

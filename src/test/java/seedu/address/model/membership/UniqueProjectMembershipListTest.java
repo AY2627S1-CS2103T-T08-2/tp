@@ -130,6 +130,16 @@ public class UniqueProjectMembershipListTest {
     }
 
     @Test
+    public void setMemberships_samePersonProjectWithDifferentRoles_throwsDuplicateProjectMembershipException() {
+        ProjectMembership firstRole = MEMBERSHIP.withRole(new Role("Implement parser"));
+        ProjectMembership secondRole = MEMBERSHIP.withRole(new Role("Write tests"));
+        assertThrows(DuplicateProjectMembershipException.class, () -> {
+            memberships.setMemberships(List.of(firstRole, secondRole));
+        });
+        assertTrue(memberships.asUnmodifiableObservableList().isEmpty());
+    }
+
+    @Test
     public void setMemberships_validList_replacesMemberships() {
         memberships.add(MEMBERSHIP);
 
@@ -137,6 +147,16 @@ public class UniqueProjectMembershipListTest {
 
         assertEquals(List.of(SAME_PERSON_OTHER_PROJECT, OTHER_PERSON_SAME_PROJECT),
                 memberships.asUnmodifiableObservableList());
+    }
+
+    @Test
+    public void setMemberships_selfReplacement_preservesMemberships() {
+        memberships.add(MEMBERSHIP);
+        memberships.add(SAME_PERSON_OTHER_PROJECT);
+
+        memberships.setMemberships(memberships);
+
+        assertEquals(List.of(MEMBERSHIP, SAME_PERSON_OTHER_PROJECT), memberships.asUnmodifiableObservableList());
     }
 
     @Test

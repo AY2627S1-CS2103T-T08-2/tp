@@ -15,6 +15,8 @@ import seedu.address.logic.parser.AddressBookParser;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.AddressBook;
 import seedu.address.model.Model;
+import seedu.address.model.ReadOnlyAddressBook;
+import seedu.address.model.membership.ProjectMembership;
 import seedu.address.model.person.Person;
 import seedu.address.model.project.Project;
 import seedu.address.storage.Storage;
@@ -50,6 +52,7 @@ public class LogicManager implements Logic {
         CommandResult commandResult;
         AddressBook beforeCommand = new AddressBook(model.getAddressBook());
         Predicate<? super Person> previousFilter = model.getFilteredPersonListPredicate();
+        Predicate<? super Project> previousProjectFilter = model.getFilteredProjectListPredicate();
         Command command = addressBookParser.parseCommand(commandText);
         commandResult = command.execute(model);
 
@@ -70,7 +73,7 @@ public class LogicManager implements Logic {
                     e.getMessage());
             logger.warning(errorMessage);
 
-            if (beforeCommand.equals(model.getAddressBook())) {
+            if (hasSameStoredData(beforeCommand, model.getAddressBook())) {
                 return new CommandResult(commandResult.getFeedbackToUser() + "\nWarning: " + errorMessage,
                         commandResult.isShowHelp(), commandResult.isExit(), commandResult.getListViewTarget());
             }
@@ -78,6 +81,8 @@ public class LogicManager implements Logic {
             model.setAddressBook(beforeCommand);
             model.updateFilteredPersonList(previousFilter == null
                     ? Model.PREDICATE_SHOW_ALL_PERSONS : previousFilter::test);
+            model.updateFilteredProjectList(previousProjectFilter == null
+                    ? Model.PREDICATE_SHOW_ALL_PROJECTS : previousProjectFilter::test);
             throw new CommandException(errorMessage
                     + "\nThe command was not applied. Fix the save problem and try again.", e);
         }
@@ -91,8 +96,8 @@ public class LogicManager implements Logic {
     }
 
     @Override
-    public ObservableList<Project> getProjectList() {
-        return model.getProjectList();
+    public ObservableList<Project> getFilteredProjectList() {
+        return model.getFilteredProjectList();
     }
 
     @Override
@@ -103,5 +108,26 @@ public class LogicManager implements Logic {
     @Override
     public void setGuiSettings(GuiSettings guiSettings) {
         model.setGuiSettings(guiSettings);
+    }
+
+    /**
+     * Compares all stored data, including fields ignored by the model's equality methods.
+     */
+    private boolean hasSameStoredData(ReadOnlyAddressBook first, ReadOnlyAddressBook second) {
+        if (!first.getPersonList().equals(second.getPersonList())
+            || !first.getProjectList().equals(second.getProjectList())
+            || !first.getProjectMembershipList().equals(second.getProjectMembershipList())
+        ) {
+            return false;
+        }
+
+        return (
+            first.getPersonList().stream().map(Person::getPersonId).toList()
+                .equals(second.getPersonList().stream().map(Person::getPersonId).toList())
+            && first.getProjectList().stream().map(project -> project.getName().projectName).toList()
+                .equals(second.getProjectList().stream().map(project -> project.getName().projectName).toList())
+            && first.getProjectMembershipList().stream().map(ProjectMembership::getRole).toList()
+                .equals(second.getProjectMembershipList().stream().map(ProjectMembership::getRole).toList())
+            );
     }
 }

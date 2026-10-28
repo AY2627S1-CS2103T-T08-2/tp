@@ -203,16 +203,18 @@ public class ParserUtil {
         return new Description(trimmedDescription);
     }
 
-    /** Parses a role description after trimming surrounding whitespace. */
+    /** Parses a role description, returning {@code Role.EMPTY} when the trimmed description is empty. */
     public static Role parseRole(String role) throws ParseException {
         requireNonNull(role);
         if (!role.matches(Role.VALIDATION_REGEX)) {
             throw new ParseException(Role.MESSAGE_CONSTRAINTS);
         }
+
         String trimmedRole = role.strip();
-        if (trimmedRole.isEmpty() || !Role.isValidRole(trimmedRole)) {
+        if (!Role.isValidRole(trimmedRole)) {
             throw new ParseException(Role.MESSAGE_CONSTRAINTS);
         }
-        return new Role(trimmedRole);
+
+        return trimmedRole.isEmpty() ? Role.EMPTY : new Role(trimmedRole);
     }
 }

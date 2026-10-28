@@ -237,8 +237,8 @@ public class AddressBookParserTest {
         Model model = new ModelManager();
         command.execute(model);
 
-        assertEquals(1, model.getProjectList().size());
-        Project actualProject = model.getProjectList().get(0);
+        assertEquals(1, model.getFilteredProjectList().size());
+        Project actualProject = model.getFilteredProjectList().get(0);
 
         assertNotNull(actualProject.getProjectId());
         assertEquals("CS2103T", actualProject.getName().toString());

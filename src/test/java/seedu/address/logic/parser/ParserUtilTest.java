@@ -13,6 +13,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import seedu.address.logic.parser.exceptions.ParseException;
+import seedu.address.model.membership.Role;
 import seedu.address.model.person.Address;
 import seedu.address.model.person.Email;
 import seedu.address.model.person.Name;
@@ -315,5 +316,37 @@ public class ParserUtilTest {
         assertEquals(
                 new Description(description),
                 ParserUtil.parseDescription("  " + description + "  "));
+    }
+
+    @Test
+    public void parseRole_emptyOrWhitespace_returnsEmptyRole() throws ParseException {
+        assertEquals(Role.EMPTY, ParserUtil.parseRole(""));
+        assertEquals(Role.EMPTY, ParserUtil.parseRole(" \t "));
+        assertEquals(Role.EMPTY, ParserUtil.parseRole("\u2003"));
+    }
+
+    @Test
+    public void parseRole_nonEmptyValue_preservesValidation() throws ParseException {
+        assertEquals(new Role("Review PRs"), ParserUtil.parseRole("  Review PRs  "));
+        assertEquals(new Role("a".repeat(200)), ParserUtil.parseRole("a".repeat(200)));
+
+        assertThrows(ParseException.class, Role.MESSAGE_CONSTRAINTS, () -> {
+            ParserUtil.parseRole("a".repeat(201));
+        });
+    }
+
+    @Test
+    public void parseRole_lineBreaks_throwsParseException() {
+        for (String lineBreak : new String[] {"\r", "\n", "\u0085", "\u2028", "\u2029"}) {
+            assertThrows(ParseException.class, Role.MESSAGE_CONSTRAINTS, () -> ParserUtil.parseRole(lineBreak));
+            assertThrows(ParseException.class, Role.MESSAGE_CONSTRAINTS, () -> {
+                ParserUtil.parseRole("First" + lineBreak + "Second");
+            });
+        }
+    }
+
+    @Test
+    public void parseRole_null_throwsNullPointerException() {
+        assertThrows(NullPointerException.class, () -> ParserUtil.parseRole(null));
     }
 }

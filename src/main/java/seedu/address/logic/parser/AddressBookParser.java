@@ -14,11 +14,13 @@ import seedu.address.logic.commands.AssociateCommand;
 import seedu.address.logic.commands.ClearCommand;
 import seedu.address.logic.commands.Command;
 import seedu.address.logic.commands.DeleteCommand;
+import seedu.address.logic.commands.DeleteProjectCommand;
 import seedu.address.logic.commands.DissociateCommand;
 import seedu.address.logic.commands.EditCommand;
 import seedu.address.logic.commands.EditProjectCommand;
 import seedu.address.logic.commands.ExitCommand;
 import seedu.address.logic.commands.FindCommand;
+import seedu.address.logic.commands.FindProjectCommand;
 import seedu.address.logic.commands.HelpCommand;
 import seedu.address.logic.commands.ListCommand;
 import seedu.address.logic.commands.ListMembersCommand;
@@ -65,6 +67,7 @@ public class AddressBookParser {
             case ClearCommand.COMMAND_WORD -> parseParameterFreeCommand(
                     arguments, ClearCommand.MESSAGE_USAGE, new ClearCommand());
             case FindCommand.COMMAND_WORD -> new FindCommandParser().parse(arguments);
+            case FindProjectCommand.COMMAND_WORD -> new FindProjectCommandParser().parse(arguments);
             case ListCommand.COMMAND_WORD -> parseParameterFreeCommand(
                     arguments, ListCommand.MESSAGE_USAGE, new ListCommand());
             case ListProjectsCommand.COMMAND_WORD -> new ListProjectsCommandParser().parse(arguments);
@@ -78,6 +81,7 @@ public class AddressBookParser {
             case AssociateCommand.COMMAND_WORD -> new AssociateCommandParser().parse(arguments);
             case DissociateCommand.COMMAND_WORD -> new DissociateCommandParser().parse(arguments);
             case EditProjectCommand.COMMAND_WORD -> new EditProjectCommandParser().parse(arguments);
+            case DeleteProjectCommand.COMMAND_WORD -> new DeleteProjectCommandParser().parse(arguments);
             default -> {
                 logger.finer("This user input caused a ParseException: " + userInput);
                 throw new ParseException(MESSAGE_UNKNOWN_COMMAND);

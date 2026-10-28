@@ -90,9 +90,9 @@ public class EditProjectCommandTest {
 
         CommandResult result = new EditProjectCommand(FIRST_PROJECT, descriptor).execute(model);
 
-        assertEquals(List.of(expectedProject, secondProject), model.getProjectList());
+        assertEquals(List.of(expectedProject, secondProject), model.getFilteredProjectList());
         assertEquals(firstProject.getProjectId(),
-            model.getProjectList().getFirst().getProjectId());
+            model.getFilteredProjectList().getFirst().getProjectId());
         assertEquals(
             "Edited project: Updated Project; Deadline: 2027-01-01; "
                 + "Description: Updated description",
@@ -138,7 +138,7 @@ public class EditProjectCommandTest {
 
         CommandResult result = new EditProjectCommand(FIRST_PROJECT, descriptor).execute(model);
 
-        assertEquals(List.of(expectedProject, secondProject), model.getProjectList());
+        assertEquals(List.of(expectedProject, secondProject), model.getFilteredProjectList());
         assertEquals(
             "Edited project: CS2103T; Deadline: 2026-11-13; "
                 + "Description: No description provided",
@@ -187,7 +187,7 @@ public class EditProjectCommandTest {
 
     @Test
     public void execute_invalidIndex_failure() {
-        Index invalidIndex = Index.fromOneBased(model.getProjectList().size() + 1);
+        Index invalidIndex = Index.fromOneBased(model.getFilteredProjectList().size() + 1);
         EditProjectDescriptor descriptor = new EditProjectDescriptor();
         descriptor.setName(new ProjectName("New Name"));
 
@@ -222,12 +222,12 @@ public class EditProjectCommandTest {
 
         new EditProjectCommand(FIRST_PROJECT, descriptor).execute(model);
 
-        Project editedProject = model.getProjectList().getFirst();
+        Project editedProject = model.getFilteredProjectList().getFirst();
         assertEquals(firstProject.getProjectId(), editedProject.getProjectId());
         assertEquals(List.of(membership),
             model.getAddressBook().getProjectMembershipList());
         assertEquals(List.of(contact), model.getProjectMembers(editedProject));
-        assertEquals(secondProject, model.getProjectList().get(1));
+        assertEquals(secondProject, model.getFilteredProjectList().get(1));
     }
 
     @Test
@@ -247,7 +247,7 @@ public class EditProjectCommandTest {
 
         assertEquals(List.of(shownContact), model.getFilteredPersonList());
         assertEquals(new ProjectName("Updated Project"),
-            model.getProjectList().getFirst().getName());
+            model.getFilteredProjectList().getFirst().getName());
     }
 
     @Test
@@ -298,7 +298,7 @@ public class EditProjectCommandTest {
      * Verifies the feedback and complete model state after a successful edit.
      */
     private void assertEditSuccess(Index index, EditProjectDescriptor descriptor, Project expectedProject) {
-        Project target = model.getProjectList().get(index.getZeroBased());
+        Project target = model.getFilteredProjectList().get(index.getZeroBased());
         Model expectedModel = new ModelManager(
             new AddressBook(model.getAddressBook()), new UserPrefs());
         expectedModel.setProject(target, expectedProject);
@@ -314,6 +314,6 @@ public class EditProjectCommandTest {
         );
 
         assertEquals(target.getProjectId(),
-            model.getProjectList().get(index.getZeroBased()).getProjectId());
+            model.getFilteredProjectList().get(index.getZeroBased()).getProjectId());
     }
 }

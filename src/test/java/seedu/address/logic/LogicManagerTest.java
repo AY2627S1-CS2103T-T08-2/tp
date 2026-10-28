@@ -32,6 +32,7 @@ import seedu.address.logic.commands.ClearCommand;
 import seedu.address.logic.commands.CommandResult;
 import seedu.address.logic.commands.DissociateCommand;
 import seedu.address.logic.commands.ListCommand;
+import seedu.address.logic.commands.SetRoleCommand;
 import seedu.address.logic.commands.exceptions.CommandException;
 import seedu.address.logic.parser.AddressBookParser;
 import seedu.address.logic.parser.exceptions.ParseException;
@@ -40,6 +41,7 @@ import seedu.address.model.ModelManager;
 import seedu.address.model.ReadOnlyAddressBook;
 import seedu.address.model.UserPrefs;
 import seedu.address.model.membership.ProjectMembership;
+import seedu.address.model.membership.Role;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.PersonId;
 import seedu.address.model.project.Project;
@@ -123,7 +125,7 @@ public class LogicManagerTest {
 
     @Test
     public void execute_associateCommandProjectListOrder_success() throws Exception {
-        List<Project> displayedProjects = logic.getProjectList();
+        List<Project> displayedProjects = logic.getFilteredProjectList();
         Project firstProject = new ProjectBuilder().withName("Zeta").build();
         Project secondProject = new ProjectBuilder().withName("Alpha").build();
         model.addPerson(AMY);
@@ -208,9 +210,9 @@ public class LogicManagerTest {
         assertEquals(List.of(AMY, BENSON), restartedModel.getAddressBook().getPersonList());
         assertEquals(List.of(AMY.getPersonId(), BENSON.getPersonId()),
                 restartedModel.getAddressBook().getPersonList().stream().map(Person::getPersonId).toList());
-        assertEquals(List.of(firstProject, secondProject), restartedModel.getProjectList());
+        assertEquals(List.of(firstProject, secondProject), restartedModel.getFilteredProjectList());
         assertEquals(List.of(firstProject.getProjectId(), secondProject.getProjectId()),
-                restartedModel.getProjectList().stream().map(Project::getProjectId).toList());
+                restartedModel.getFilteredProjectList().stream().map(Project::getProjectId).toList());
         assertEquals(List.of(BENSON), restartedModel.getProjectMembers(firstProject));
         assertEquals(List.of(AMY), restartedModel.getProjectMembers(secondProject));
         assertEquals(model, restartedModel);
@@ -319,12 +321,94 @@ public class LogicManagerTest {
         Project project = new ProjectBuilder().build();
         model.addProject(project);
 
-        assertEquals(List.of(project), logic.getProjectList());
+        assertEquals(List.of(project), logic.getFilteredProjectList());
     }
 
     @Test
     public void getProjectList_modifyList_throwsUnsupportedOperationException() {
-        assertThrows(UnsupportedOperationException.class, () -> logic.getProjectList().remove(0));
+        assertThrows(UnsupportedOperationException.class, () -> logic.getFilteredProjectList().remove(0));
+    }
+
+    @Test
+    public void execute_roleChangeSaveFails_restoresRolesFiltersAndFile() throws Exception {
+        Role[] originalRoles = {Role.EMPTY, new Role("Lead"), new Role("Lead")};
+        String[] requestedRoles = {"Lead", "Tester", ""};
+        for (int index = 0; index < originalRoles.length; index++) {
+            model = new ModelManager();
+            Project hiddenProject = new ProjectBuilder().withName("Hidden").build();
+            Project selectedProject = new ProjectBuilder().withName("Selected").build();
+            model.addPerson(AMY);
+            model.addPerson(BENSON);
+            model.addProject(hiddenProject);
+            model.addProject(selectedProject);
+            ProjectMembership untouched = new ProjectMembership(AMY.getPersonId(), hiddenProject.getProjectId(),
+                new Role("Reviewer"));
+            ProjectMembership selected = new ProjectMembership(BENSON.getPersonId(), selectedProject.getProjectId(),
+                originalRoles[index]);
+            model.addProjectMembership(untouched);
+            model.addProjectMembership(selected);
+            model.updateFilteredPersonList(person -> person.getPersonId().equals(BENSON.getPersonId()));
+            model.updateFilteredProjectList(project -> project.getProjectId().equals(selectedProject.getProjectId()));
+            Path filePath = setUpSaveFailure();
+            String savedJson = Files.readString(filePath);
+            String commandText = "setrole c/1 pr/1 r/" + requestedRoles[index];
+            String expectedMessage = String.format(LogicManager.FILE_OPS_ERROR_FORMAT, DUMMY_IO_EXCEPTION.getMessage())
+                + "\nThe command was not applied. Fix the save problem and try again.";
+
+            assertThrows(CommandException.class, expectedMessage, () -> logic.execute(commandText));
+
+            List<ProjectMembership> memberships = model.getAddressBook().getProjectMembershipList();
+            assertEquals(List.of(untouched, selected), memberships);
+            assertEquals(untouched.getRole(), memberships.get(0).getRole());
+            assertEquals(originalRoles[index], memberships.get(1).getRole());
+            assertEquals(List.of(AMY, BENSON), model.getAddressBook().getPersonList());
+            assertEquals(List.of(hiddenProject, selectedProject), model.getAddressBook().getProjectList());
+            assertEquals(List.of(BENSON), model.getFilteredPersonList());
+            assertEquals(List.of(selectedProject), model.getFilteredProjectList());
+            assertEquals(savedJson, Files.readString(filePath));
+        }
+    }
+
+    @Test
+    public void execute_unchangedRoleSaveFails_returnsWarning() throws Exception {
+        for (Role role : List.of(Role.EMPTY, new Role("Lead"))) {
+            model = new ModelManager();
+            Project project = new ProjectBuilder().build();
+            model.addPerson(AMY);
+            model.addProject(project);
+            model.addProjectMembership(new ProjectMembership(AMY.getPersonId(), project.getProjectId(), role));
+            Path filePath = setUpSaveFailure();
+            String savedJson = Files.readString(filePath);
+            String feedback = role.equals(Role.EMPTY)
+                ? String.format(SetRoleCommand.MESSAGE_CLEAR_SUCCESS, AMY.getName(), project.getName())
+                : String.format(SetRoleCommand.MESSAGE_SUCCESS, AMY.getName(), project.getName(), role);
+            String warning = "\nWarning: " + String.format(LogicManager.FILE_OPS_ERROR_FORMAT,
+                DUMMY_IO_EXCEPTION.getMessage());
+
+            CommandResult result = logic.execute("setrole c/1 pr/1 r/" + role);
+
+            assertEquals(new CommandResult(feedback + warning), result);
+            assertEquals(role, model.getAddressBook().getProjectMembershipList().getFirst().getRole());
+            assertEquals(savedJson, Files.readString(filePath));
+        }
+    }
+
+    @Test
+    public void execute_caseOnlyProjectRenameSaveFails_restoresNameFilterAndFile() throws Exception {
+        Project hiddenProject = new ProjectBuilder().withName("Hidden").build();
+        Project selectedProject = new ProjectBuilder().withName("Selected").build();
+        model.addProject(hiddenProject);
+        model.addProject(selectedProject);
+        model.updateFilteredProjectList(project -> project.getProjectId().equals(selectedProject.getProjectId()));
+        Path filePath = setUpSaveFailure();
+        String savedJson = Files.readString(filePath);
+
+        assertThrows(CommandException.class, () -> logic.execute("editproject 1 n/SELECTED"));
+
+        assertEquals("Selected", model.getAddressBook().getProjectList().get(1).getName().projectName);
+        assertEquals(List.of(selectedProject), model.getFilteredProjectList());
+        assertEquals("Selected", model.getFilteredProjectList().getFirst().getName().projectName);
+        assertEquals(savedJson, Files.readString(filePath));
     }
 
     /**
@@ -413,5 +497,22 @@ public class LogicManagerTest {
                 expectedMessage + "\nThe command was not applied. Fix the save problem and try again.",
                 expectedModel
         );
+    }
+
+    /**
+     * Saves the current model, then injects storage that fails on subsequent saves.
+     */
+    private Path setUpSaveFailure() throws IOException {
+        Path filePath = temporaryFolder.resolve("save-failure.json");
+        new JsonAddressBookStorage(filePath).saveAddressBook(model.getAddressBook());
+        JsonAddressBookStorage failingStorage = new JsonAddressBookStorage(filePath) {
+            @Override
+            public void saveAddressBook(ReadOnlyAddressBook addressBook) throws IOException {
+                throw DUMMY_IO_EXCEPTION;
+            }
+        };
+        logic = new LogicManager(model, new StorageManager(failingStorage,
+            new JsonUserPrefsStorage(temporaryFolder.resolve("preferences.json"))));
+        return filePath;
     }
 }

@@ -36,6 +36,10 @@ class JsonSerializableAddressBook {
             "Project membership references a person that does not exist.";
     public static final String MESSAGE_MEMBERSHIP_PROJECT_NOT_FOUND =
             "Project membership references a project that does not exist.";
+    public static final String MESSAGE_NULL_PERSON = "Persons list contains a null entry.";
+    public static final String MESSAGE_NULL_PROJECT = "Projects list contains a null entry.";
+    public static final String MESSAGE_NULL_PROJECT_MEMBERSHIP =
+            "Project memberships list contains a null entry.";
 
     private final List<JsonAdaptedPerson> persons = new ArrayList<>();
     private final List<JsonAdaptedProject> projects = new ArrayList<>();
@@ -81,6 +85,10 @@ class JsonSerializableAddressBook {
         AddressBook addressBook = new AddressBook();
         Set<PersonId> personIds = new HashSet<>();
         for (JsonAdaptedPerson jsonAdaptedPerson : persons) {
+            if (jsonAdaptedPerson == null) {
+                throw new IllegalValueException(MESSAGE_NULL_PERSON);
+            }
+
             Person person = jsonAdaptedPerson.toModelType();
             if (addressBook.hasPerson(person)) {
                 throw new IllegalValueException(MESSAGE_DUPLICATE_PERSON);
@@ -94,6 +102,10 @@ class JsonSerializableAddressBook {
         Set<ProjectId> projectIds = new HashSet<>();
         Set<ProjectName> projectNames = new HashSet<>();
         for (JsonAdaptedProject jsonAdaptedProject : projects) {
+            if (jsonAdaptedProject == null) {
+                throw new IllegalValueException(MESSAGE_NULL_PROJECT);
+            }
+
             Project project = jsonAdaptedProject.toModelType();
             if (!projectIds.add(project.getProjectId())) {
                 throw new IllegalValueException(MESSAGE_DUPLICATE_PROJECT_ID);
@@ -105,6 +117,10 @@ class JsonSerializableAddressBook {
         }
 
         for (JsonAdaptedProjectMembership jsonAdaptedMembership : memberships) {
+            if (jsonAdaptedMembership == null) {
+                throw new IllegalValueException(MESSAGE_NULL_PROJECT_MEMBERSHIP);
+            }
+
             ProjectMembership membership = jsonAdaptedMembership.toModelType();
             if (!personIds.contains(membership.getPersonId())) {
                 throw new IllegalValueException(MESSAGE_MEMBERSHIP_PERSON_NOT_FOUND);

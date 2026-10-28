@@ -112,4 +112,31 @@ public class StorageManagerTest {
         assertNotNull(storageManager.getAddressBookFilePath());
     }
 
+    @Test
+    public void readAddressBook_nullJsonValues_blocksSavingAndPreservesFile() throws Exception {
+        String nullTagJson = """
+            {"persons":[{"name":"Alex","phone":"123","email":"alex@example.com",
+            "address":"Block 1","tags":[null]}]}
+            """;
+        String[] invalidJsonValues = {
+            "null",
+            "{\"persons\":[null]}",
+            "{\"projects\":[null]}",
+            "{\"memberships\":[null]}",
+            nullTagJson
+        };
+
+        for (int index = 0; index < invalidJsonValues.length; index++) {
+            String json = invalidJsonValues[index];
+            Path filePath = testFolder.resolve("null-case-" + index + ".json");
+            Files.writeString(filePath, json);
+            StorageManager storage = new StorageManager(new JsonAddressBookStorage(filePath),
+                new JsonUserPrefsStorage(testFolder.resolve("preferences.json")));
+
+            assertThrows(DataLoadingException.class, storage::readAddressBook);
+            assertTrue(storage.isAddressBookSavingBlocked());
+            assertThrows(IOException.class, () -> storage.saveAddressBook(new AddressBook()));
+            assertEquals(json, Files.readString(filePath));
+        }
+    }
 }

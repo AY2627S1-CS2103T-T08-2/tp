@@ -100,6 +100,20 @@ public class JsonUtilTest {
         assertEquals(serializableTestClass.getMapOfIntegerToString(), SerializableTestClass.getHashMapTestValues());
     }
 
+    @Test
+    public void readJsonFile_nullRoot_throwsDataLoadingExceptionAndPreservesFile() throws Exception {
+        Path filePath = testFolder.resolve("null-root.json");
+        for (String json : new String[] {"null", " \n null \t "}) {
+            Files.writeString(filePath, json);
+
+            assertThrows(DataLoadingException.class, () -> {
+                JsonUtil.readJsonFile(filePath, SerializableTestClass.class);
+            });
+
+            assertEquals(json, Files.readString(filePath));
+        }
+    }
+
     //TODO: @Test jsonUtil_readJsonStringToObjectInstance_correctObject()
 
     //TODO: @Test jsonUtil_writeThenReadObjectToJson_correctObject()

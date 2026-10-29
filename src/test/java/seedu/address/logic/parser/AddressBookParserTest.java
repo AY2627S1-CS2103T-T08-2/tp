@@ -64,6 +64,8 @@ public class AddressBookParserTest {
 
         assertEquals(expectedCommand, parser.parseCommand("associate c/2 pr/1"));
         assertEquals(expectedCommand, parser.parseCommand("associate pr/1 c/2"));
+        assertEquals(expectedCommand, parser.parseCommand("associate c/2\tpr/1"));
+        assertEquals(expectedCommand, parser.parseCommand("associate pr/1\tc/2"));
     }
 
     @Test
@@ -96,6 +98,8 @@ public class AddressBookParserTest {
 
         assertEquals(expectedCommand, parser.parseCommand("dissociate c/2 pr/1"));
         assertEquals(expectedCommand, parser.parseCommand("dissociate pr/1 c/2"));
+        assertEquals(expectedCommand, parser.parseCommand("dissociate c/2\tpr/1"));
+        assertEquals(expectedCommand, parser.parseCommand("dissociate pr/1\tc/2"));
     }
 
     @Test
@@ -181,6 +185,7 @@ public class AddressBookParserTest {
         assertEquals(new ListProjectsCommand(), parser.parseCommand(" \tlistprojects \t"));
         assertEquals(new ListProjectsCommand(INDEX_SECOND_PERSON), parser.parseCommand("listprojects c/2"));
         assertEquals(new ListProjectsCommand(INDEX_SECOND_PERSON), parser.parseCommand("  listprojects   c/ 2  "));
+        assertEquals(new ListProjectsCommand(INDEX_SECOND_PERSON), parser.parseCommand("listprojects\tc/2"));
     }
 
     @Test

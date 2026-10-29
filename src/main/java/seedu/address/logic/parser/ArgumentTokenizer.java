@@ -71,9 +71,21 @@ public class ArgumentTokenizer {
      * {@code fromIndex} = 0, this method returns 5.
      */
     private static int findPrefixPosition(String argsString, String prefix, int fromIndex) {
-        int prefixIndex = argsString.indexOf(" " + prefix, fromIndex);
-        return prefixIndex == -1 ? -1
-            : prefixIndex + 1; // +1 as offset for whitespace
+        int prefixIndex = argsString.indexOf(prefix, fromIndex);
+        while (prefixIndex != -1) {
+            if (prefixIndex > 0 && isHorizontalWhitespace(argsString.charAt(prefixIndex - 1))) {
+                return prefixIndex;
+            }
+            prefixIndex = argsString.indexOf(prefix, prefixIndex + 1);
+        }
+        return -1;
+    }
+
+    /**
+     * Returns whether {@code character} is a supported horizontal argument separator.
+     */
+    private static boolean isHorizontalWhitespace(char character) {
+        return character == ' ' || character == '\t';
     }
 
     /**

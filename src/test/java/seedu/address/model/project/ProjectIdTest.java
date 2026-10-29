@@ -13,9 +13,9 @@ import org.junit.jupiter.api.Test;
 public class ProjectIdTest {
 
     private static final String VALID_ID =
-            "00000000-0000-4000-8000-000000000001";
+        "00000000-0000-4000-8000-000000000001";
     private static final String OTHER_ID =
-            "00000000-0000-4000-8000-000000000002";
+        "00000000-0000-4000-8000-000000000002";
 
     @Test
     public void constructor_null_throwsNullPointerException() {
@@ -52,14 +52,14 @@ public class ProjectIdTest {
     @Test
     public void fromString_nonCanonicalUuid_throwsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class,
-                ProjectId.MESSAGE_CONSTRAINTS, () -> ProjectId.fromString("1-1-1-1-1"));
+            ProjectId.MESSAGE_CONSTRAINTS, () -> ProjectId.fromString("1-1-1-1-1"));
     }
 
     @Test
     public void fromString_validValue_returnsExpectedId() {
         assertEquals(
-                new ProjectId(UUID.fromString(VALID_ID)),
-                ProjectId.fromString(VALID_ID));
+            new ProjectId(UUID.fromString(VALID_ID)),
+            ProjectId.fromString(VALID_ID));
     }
 
     @Test

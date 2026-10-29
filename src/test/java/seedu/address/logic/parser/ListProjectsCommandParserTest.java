@@ -14,7 +14,7 @@ import seedu.address.logic.commands.ListProjectsCommand;
 public class ListProjectsCommandParserTest {
 
     private static final String USAGE_MESSAGE = String.format(
-            MESSAGE_INVALID_COMMAND_FORMAT, ListProjectsCommand.MESSAGE_USAGE);
+        MESSAGE_INVALID_COMMAND_FORMAT, ListProjectsCommand.MESSAGE_USAGE);
 
     private final ListProjectsCommandParser parser = new ListProjectsCommandParser();
 
@@ -30,7 +30,7 @@ public class ListProjectsCommandParserTest {
         assertParseSuccess(parser, " c/2", new ListProjectsCommand(Index.fromOneBased(2)));
         assertParseSuccess(parser, "   c/  2   ", new ListProjectsCommand(Index.fromOneBased(2)));
         assertParseSuccess(parser, " c/2147483647",
-                new ListProjectsCommand(Index.fromOneBased(Integer.MAX_VALUE)));
+            new ListProjectsCommand(Index.fromOneBased(Integer.MAX_VALUE)));
     }
 
     @Test

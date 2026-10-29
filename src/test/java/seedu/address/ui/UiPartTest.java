@@ -32,7 +32,9 @@ public class UiPartTest {
 
     @Test
     public void constructor_missingFileUrl_throwsAssertionError() throws Exception {
-        URL missingFileUrl = new URL(testFolder.toUri().toURL(), MISSING_FILE_PATH);
+        URL missingFileUrl = new URL(testFolder
+            .toUri()
+            .toURL(), MISSING_FILE_PATH);
         assertThrows(AssertionError.class, () -> new TestUiPart<Object>(missingFileUrl));
         assertThrows(AssertionError.class, () -> new TestUiPart<Object>(missingFileUrl, new Object()));
     }

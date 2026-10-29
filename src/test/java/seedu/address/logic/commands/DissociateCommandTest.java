@@ -35,10 +35,14 @@ public class DissociateCommandTest {
     private static final Index INDEX_FIRST_PROJECT = Index.fromOneBased(1);
     private static final Index INDEX_SECOND_PROJECT = Index.fromOneBased(2);
 
-    private final Project firstProject = new ProjectBuilder().withName("CS2103T Team Project")
-            .withDeadline(LocalDate.of(2026, 11, 13)).build();
-    private final Project secondProject = new ProjectBuilder().withName("Orbital")
-            .withDeadline(LocalDate.of(2027, 7, 1)).build();
+    private final Project firstProject = new ProjectBuilder()
+        .withName("CS2103T Team Project")
+        .withDeadline(LocalDate.of(2026, 11, 13))
+        .build();
+    private final Project secondProject = new ProjectBuilder()
+        .withName("Orbital")
+        .withDeadline(LocalDate.of(2027, 7, 1))
+        .build();
     private Model model;
 
     @BeforeEach
@@ -73,9 +77,12 @@ public class DissociateCommandTest {
         DissociateCommand command = new DissociateCommand(INDEX_SECOND_PERSON, INDEX_SECOND_PROJECT);
 
         assertCommandSuccess(command, model,
-                String.format(DissociateCommand.MESSAGE_SUCCESS, BENSON.getName(), secondProject.getName()),
-                expectedModel);
-        assertTrue(model.getAddressBook().getProjectMembershipList().isEmpty());
+            String.format(DissociateCommand.MESSAGE_SUCCESS, BENSON.getName(), secondProject.getName()),
+            expectedModel);
+        assertTrue(model
+            .getAddressBook()
+            .getProjectMembershipList()
+            .isEmpty());
     }
 
     @Test
@@ -91,9 +98,11 @@ public class DissociateCommandTest {
         DissociateCommand command = new DissociateCommand(INDEX_FIRST_PERSON, INDEX_FIRST_PROJECT);
 
         assertCommandSuccess(command, model,
-                String.format(DissociateCommand.MESSAGE_SUCCESS, BENSON.getName(), firstProject.getName()),
-                expectedModel);
-        assertEquals(List.of(aliceMembership), model.getAddressBook().getProjectMembershipList());
+            String.format(DissociateCommand.MESSAGE_SUCCESS, BENSON.getName(), firstProject.getName()),
+            expectedModel);
+        assertEquals(List.of(aliceMembership), model
+            .getAddressBook()
+            .getProjectMembershipList());
         assertEquals(List.of(BENSON), model.getFilteredPersonList());
     }
 
@@ -101,9 +110,9 @@ public class DissociateCommandTest {
     public void execute_entitiesInOtherMemberships_removesOnlySelectedPair() {
         ProjectMembership selectedMembership = new ProjectMembership(ALICE.getPersonId(), firstProject.getProjectId());
         ProjectMembership sameContactMembership =
-                new ProjectMembership(ALICE.getPersonId(), secondProject.getProjectId());
+            new ProjectMembership(ALICE.getPersonId(), secondProject.getProjectId());
         ProjectMembership sameProjectMembership =
-                new ProjectMembership(BENSON.getPersonId(), firstProject.getProjectId());
+            new ProjectMembership(BENSON.getPersonId(), firstProject.getProjectId());
         model.addProjectMembership(selectedMembership);
         model.addProjectMembership(sameContactMembership);
         model.addProjectMembership(sameProjectMembership);
@@ -112,19 +121,27 @@ public class DissociateCommandTest {
         DissociateCommand command = new DissociateCommand(INDEX_FIRST_PERSON, INDEX_FIRST_PROJECT);
 
         assertCommandSuccess(command, model,
-                String.format(DissociateCommand.MESSAGE_SUCCESS, ALICE.getName(), firstProject.getName()),
-                expectedModel);
+            String.format(DissociateCommand.MESSAGE_SUCCESS, ALICE.getName(), firstProject.getName()),
+            expectedModel);
         assertFalse(model.hasProjectMembership(selectedMembership));
         assertEquals(List.of(sameContactMembership, sameProjectMembership),
-                model.getAddressBook().getProjectMembershipList());
-        assertEquals(List.of(ALICE, BENSON), model.getAddressBook().getPersonList());
+            model
+                .getAddressBook()
+                .getProjectMembershipList());
+        assertEquals(List.of(ALICE, BENSON), model
+            .getAddressBook()
+            .getPersonList());
         assertEquals(List.of(firstProject, secondProject), model.getFilteredProjectList());
     }
 
     @Test
     public void execute_projectListInsertionOrder_success() {
-        Project zetaProject = new ProjectBuilder().withName("Zeta").build();
-        Project alphaProject = new ProjectBuilder().withName("Alpha").build();
+        Project zetaProject = new ProjectBuilder()
+            .withName("Zeta")
+            .build();
+        Project alphaProject = new ProjectBuilder()
+            .withName("Alpha")
+            .build();
         model = new ModelManager();
         model.addPerson(ALICE);
         model.addProject(zetaProject);
@@ -138,15 +155,19 @@ public class DissociateCommandTest {
         DissociateCommand command = new DissociateCommand(INDEX_FIRST_PERSON, INDEX_SECOND_PROJECT);
 
         assertCommandSuccess(command, model,
-                String.format(DissociateCommand.MESSAGE_SUCCESS, ALICE.getName(), alphaProject.getName()),
-                expectedModel);
-        assertEquals(List.of(zetaMembership), model.getAddressBook().getProjectMembershipList());
+            String.format(DissociateCommand.MESSAGE_SUCCESS, ALICE.getName(), alphaProject.getName()),
+            expectedModel);
+        assertEquals(List.of(zetaMembership), model
+            .getAddressBook()
+            .getProjectMembershipList());
     }
 
     @Test
     public void execute_invalidContactIndexUnfilteredList_throwsCommandException() {
         model.addProjectMembership(new ProjectMembership(ALICE.getPersonId(), firstProject.getProjectId()));
-        Index invalidContactIndex = Index.fromOneBased(model.getFilteredPersonList().size() + 1);
+        Index invalidContactIndex = Index.fromOneBased(model
+            .getFilteredPersonList()
+            .size() + 1);
         DissociateCommand command = new DissociateCommand(invalidContactIndex, INDEX_FIRST_PROJECT);
 
         assertCommandFailure(command, model, Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
@@ -156,7 +177,10 @@ public class DissociateCommandTest {
     public void execute_invalidContactIndexFilteredList_throwsCommandException() {
         model.addProjectMembership(new ProjectMembership(ALICE.getPersonId(), firstProject.getProjectId()));
         showPersonAtIndex(model, INDEX_FIRST_PERSON);
-        assertTrue(INDEX_SECOND_PERSON.getZeroBased() < model.getAddressBook().getPersonList().size());
+        assertTrue(INDEX_SECOND_PERSON.getZeroBased() < model
+            .getAddressBook()
+            .getPersonList()
+            .size());
         DissociateCommand command = new DissociateCommand(INDEX_SECOND_PERSON, INDEX_FIRST_PROJECT);
 
         assertCommandFailure(command, model, Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
@@ -165,7 +189,9 @@ public class DissociateCommandTest {
     @Test
     public void execute_invalidProjectIndex_throwsCommandException() {
         model.addProjectMembership(new ProjectMembership(ALICE.getPersonId(), firstProject.getProjectId()));
-        Index invalidProjectIndex = Index.fromOneBased(model.getFilteredProjectList().size() + 1);
+        Index invalidProjectIndex = Index.fromOneBased(model
+            .getFilteredProjectList()
+            .size() + 1);
         DissociateCommand command = new DissociateCommand(INDEX_FIRST_PERSON, invalidProjectIndex);
 
         assertCommandFailure(command, model, Messages.MESSAGE_INVALID_PROJECT_DISPLAYED_INDEX);
@@ -197,7 +223,7 @@ public class DissociateCommandTest {
         DissociateCommand command = new DissociateCommand(INDEX_FIRST_PERSON, INDEX_FIRST_PROJECT);
 
         assertCommandFailure(command, model,
-                String.format(DissociateCommand.MESSAGE_NOT_ASSOCIATED, BENSON.getName(), firstProject.getName()));
+            String.format(DissociateCommand.MESSAGE_NOT_ASSOCIATED, BENSON.getName(), firstProject.getName()));
     }
 
     @Test
@@ -217,7 +243,7 @@ public class DissociateCommandTest {
     public void toStringMethod() {
         DissociateCommand command = new DissociateCommand(INDEX_FIRST_PERSON, INDEX_SECOND_PROJECT);
         String expected = DissociateCommand.class.getCanonicalName()
-                + "{contactIndex=" + INDEX_FIRST_PERSON + ", projectIndex=" + INDEX_SECOND_PROJECT + "}";
+            + "{contactIndex=" + INDEX_FIRST_PERSON + ", projectIndex=" + INDEX_SECOND_PROJECT + "}";
 
         assertEquals(expected, command.toString());
     }

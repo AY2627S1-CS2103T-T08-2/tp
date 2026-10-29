@@ -82,7 +82,9 @@ public class ModelManagerTest {
 
     @Test
     public void getFilteredPersonList_modifyList_throwsUnsupportedOperationException() {
-        assertThrows(UnsupportedOperationException.class, () -> modelManager.getFilteredPersonList().remove(0));
+        assertThrows(UnsupportedOperationException.class, () -> modelManager
+            .getFilteredPersonList()
+            .remove(0));
     }
 
     @Test
@@ -99,7 +101,9 @@ public class ModelManagerTest {
 
         assertTrue(model.hasProject(project));
         assertEquals(List.of(project), projectList);
-        assertEquals(List.of(project), model.getAddressBook().getProjectList());
+        assertEquals(List.of(project), model
+            .getAddressBook()
+            .getProjectList());
     }
 
     @Test
@@ -121,7 +125,7 @@ public class ModelManagerTest {
         model.addProject(project);
 
         assertEquals(Optional.of(project),
-                model.findProject(new ProjectName("  cs2103t   team  ")));
+            model.findProject(new ProjectName("  cs2103t   team  ")));
     }
 
     @Test
@@ -130,9 +134,9 @@ public class ModelManagerTest {
         model.addProject(createProject("CS2103T Team"));
 
         assertEquals(Optional.empty(),
-                model.findProject(new ProjectName("Orbital")));
+            model.findProject(new ProjectName("Orbital")));
         assertEquals(Optional.empty(),
-                model.findProject(new ProjectName("CS2103T")));
+            model.findProject(new ProjectName("CS2103T")));
     }
 
     @Test
@@ -167,7 +171,9 @@ public class ModelManagerTest {
         modelManager.addProject(project);
         ProjectMembership membership = new ProjectMembership(ALICE.getPersonId(), project.getProjectId());
         modelManager.addProjectMembership(membership);
-        modelManager.updateFilteredPersonList(person -> person.getPersonId().equals(BENSON.getPersonId()));
+        modelManager.updateFilteredPersonList(person -> person
+            .getPersonId()
+            .equals(BENSON.getPersonId()));
         AddressBook original = new AddressBook(modelManager.getAddressBook());
 
         assertEquals(List.of(project), modelManager.getPersonProjects(ALICE));
@@ -175,7 +181,9 @@ public class ModelManagerTest {
         assertEquals(List.of(BENSON), modelManager.getFilteredPersonList());
 
         modelManager.removeProjectMembership(membership);
-        assertTrue(modelManager.getPersonProjects(ALICE).isEmpty());
+        assertTrue(modelManager
+            .getPersonProjects(ALICE)
+            .isEmpty());
     }
 
     @Test
@@ -215,7 +223,7 @@ public class ModelManagerTest {
         assertEquals(List.of(project), projectList);
         assertEquals(Optional.of(project), model.findProject(project.getName()));
         assertEquals(Optional.empty(),
-                model.findProject(new ProjectName("Old Project")));
+            model.findProject(new ProjectName("Old Project")));
     }
 
     @Test
@@ -256,9 +264,13 @@ public class ModelManagerTest {
         model.addProjectMembership(membership);
 
         assertTrue(model.hasProjectMembership(
-                new ProjectMembership(ALICE.getPersonId(), project.getProjectId())));
-        assertEquals(List.of(membership), model.getAddressBook().getProjectMembershipList());
-        assertEquals(List.of(ALICE, BENSON), model.getAddressBook().getPersonList());
+            new ProjectMembership(ALICE.getPersonId(), project.getProjectId())));
+        assertEquals(List.of(membership), model
+            .getAddressBook()
+            .getProjectMembershipList());
+        assertEquals(List.of(ALICE, BENSON), model
+            .getAddressBook()
+            .getPersonList());
         assertEquals(List.of(project), model.getFilteredProjectList());
         assertEquals(List.of(BENSON), model.getFilteredPersonList());
     }
@@ -273,7 +285,7 @@ public class ModelManagerTest {
         AddressBook expectedAddressBook = new AddressBook(modelManager.getAddressBook());
 
         assertThrows(DuplicateProjectMembershipException.class, () -> modelManager.addProjectMembership(
-                new ProjectMembership(ALICE.getPersonId(), project.getProjectId())));
+            new ProjectMembership(ALICE.getPersonId(), project.getProjectId())));
 
         assertEquals(expectedAddressBook, modelManager.getAddressBook());
     }
@@ -321,22 +333,26 @@ public class ModelManagerTest {
         model.addProject(firstProject);
         model.addProject(secondProject);
         ProjectMembership selectedMembership =
-                new ProjectMembership(ALICE.getPersonId(), firstProject.getProjectId());
+            new ProjectMembership(ALICE.getPersonId(), firstProject.getProjectId());
         ProjectMembership sameContactMembership =
-                new ProjectMembership(ALICE.getPersonId(), secondProject.getProjectId());
+            new ProjectMembership(ALICE.getPersonId(), secondProject.getProjectId());
         ProjectMembership sameProjectMembership =
-                new ProjectMembership(BENSON.getPersonId(), firstProject.getProjectId());
+            new ProjectMembership(BENSON.getPersonId(), firstProject.getProjectId());
         model.addProjectMembership(selectedMembership);
         model.addProjectMembership(sameContactMembership);
         model.addProjectMembership(sameProjectMembership);
         model.updateFilteredPersonList(person -> person.equals(BENSON));
-        var memberships = model.getAddressBook().getProjectMembershipList();
+        var memberships = model
+            .getAddressBook()
+            .getProjectMembershipList();
 
         model.removeProjectMembership(new ProjectMembership(ALICE.getPersonId(), firstProject.getProjectId()));
 
         assertFalse(model.hasProjectMembership(selectedMembership));
         assertEquals(List.of(sameContactMembership, sameProjectMembership), memberships);
-        assertEquals(List.of(ALICE, BENSON), model.getAddressBook().getPersonList());
+        assertEquals(List.of(ALICE, BENSON), model
+            .getAddressBook()
+            .getPersonList());
         assertEquals(List.of(firstProject, secondProject), model.getFilteredProjectList());
         assertEquals(List.of(BENSON), model.getFilteredPersonList());
         assertEquals(List.of(BENSON), model.getProjectMembers(firstProject));
@@ -355,7 +371,7 @@ public class ModelManagerTest {
         AddressBook expectedAddressBook = new AddressBook(modelManager.getAddressBook());
 
         assertThrows(ProjectMembershipNotFoundException.class, () -> modelManager.removeProjectMembership(
-                missingMembership));
+            missingMembership));
 
         assertEquals(expectedAddressBook, modelManager.getAddressBook());
         assertEquals(List.of(BENSON), modelManager.getFilteredPersonList());
@@ -363,7 +379,10 @@ public class ModelManagerTest {
 
     @Test
     public void equals() {
-        AddressBook addressBook = new AddressBookBuilder().withPerson(ALICE).withPerson(BENSON).build();
+        AddressBook addressBook = new AddressBookBuilder()
+            .withPerson(ALICE)
+            .withPerson(BENSON)
+            .build();
         AddressBook differentAddressBook = new AddressBook();
         UserPrefs userPrefs = new UserPrefs();
 
@@ -400,8 +419,8 @@ public class ModelManagerTest {
 
     private Project createProject(String name) {
         return new Project(
-                new ProjectName(name),
-                new Deadline(LocalDate.of(2026, 11, 1)),
-                Description.EMPTY);
+            new ProjectName(name),
+            new Deadline(LocalDate.of(2026, 11, 1)),
+            Description.EMPTY);
     }
 }

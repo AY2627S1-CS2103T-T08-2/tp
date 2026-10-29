@@ -13,27 +13,38 @@ import seedu.address.model.project.Project;
  */
 public class TypicalProjects {
 
-    public static final Project PROJ0 = new ProjectBuilder().withName("Project 0")
-            .withDeadline(LocalDate.now())
-            .withDescription("This is Project 0").build();
+    public static final Project PROJ0 = new ProjectBuilder()
+        .withName("Project 0")
+        .withDeadline(LocalDate.now())
+        .withDescription("This is Project 0")
+        .build();
 
-    public static final Project PROJ1 = new ProjectBuilder().withName("Project 1")
-            .withDeadline(LocalDate.now())
-            .withDescription("This is Project 1").build();
+    public static final Project PROJ1 = new ProjectBuilder()
+        .withName("Project 1")
+        .withDeadline(LocalDate.now())
+        .withDescription("This is Project 1")
+        .build();
 
-    public static final Project PROJ2 = new ProjectBuilder().withName("Project 2")
-            .withDeadline(LocalDate.now())
-            .withDescription("This is Project 2").build();
+    public static final Project PROJ2 = new ProjectBuilder()
+        .withName("Project 2")
+        .withDeadline(LocalDate.now())
+        .withDescription("This is Project 2")
+        .build();
 
-    public static final Project PROJ3 = new ProjectBuilder().withName("Project 3")
-            .withDeadline(LocalDate.now())
-            .withDescription("This is Project 3").build();
+    public static final Project PROJ3 = new ProjectBuilder()
+        .withName("Project 3")
+        .withDeadline(LocalDate.now())
+        .withDescription("This is Project 3")
+        .build();
 
-    public static final Project PROJ4 = new ProjectBuilder().withName("Project 4")
-            .withDeadline(LocalDate.now())
-            .withDescription("This is Project 4").build();
+    public static final Project PROJ4 = new ProjectBuilder()
+        .withName("Project 4")
+        .withDeadline(LocalDate.now())
+        .withDescription("This is Project 4")
+        .build();
 
-    private TypicalProjects() {} // prevents instantiation
+    private TypicalProjects() {
+    } // prevents instantiation
 
     /**
      * Returns an {@code AddressBook} with all the typical projects.

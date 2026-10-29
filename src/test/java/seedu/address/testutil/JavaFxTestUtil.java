@@ -7,14 +7,21 @@ import java.util.concurrent.TimeUnit;
 
 import javafx.application.Platform;
 
-/** Shares the JavaFX toolkit across UI tests running in the same JVM. */
+/**
+ * Shares the JavaFX toolkit across UI tests running in the same JVM.
+ */
 public class JavaFxTestUtil {
 
-    /** Starts JavaFX once, or schedules setup on its existing application thread. */
+    /**
+     * Starts JavaFX once, or schedules setup on its existing application thread.
+     */
     public static void startToolkit() throws Exception {
-        boolean isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
+        boolean isLinux = System
+            .getProperty("os.name")
+            .toLowerCase()
+            .contains("linux");
         assumeTrue(!isLinux || System.getenv("DISPLAY") != null || System.getenv("WAYLAND_DISPLAY") != null,
-                "JavaFX UI tests require a graphical display.");
+            "JavaFX UI tests require a graphical display.");
         FutureTask<Void> startup = new FutureTask<>(() -> Platform.setImplicitExit(false), null);
         try {
             Platform.startup(startup);

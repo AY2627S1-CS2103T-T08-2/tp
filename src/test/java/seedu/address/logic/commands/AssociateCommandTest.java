@@ -35,10 +35,14 @@ public class AssociateCommandTest {
     private static final Index INDEX_FIRST_PROJECT = Index.fromOneBased(1);
     private static final Index INDEX_SECOND_PROJECT = Index.fromOneBased(2);
 
-    private final Project firstProject = new ProjectBuilder().withName("CS2103T Team Project")
-            .withDeadline(LocalDate.of(2026, 11, 13)).build();
-    private final Project secondProject = new ProjectBuilder().withName("Orbital")
-            .withDeadline(LocalDate.of(2027, 7, 1)).build();
+    private final Project firstProject = new ProjectBuilder()
+        .withName("CS2103T Team Project")
+        .withDeadline(LocalDate.of(2026, 11, 13))
+        .build();
+    private final Project secondProject = new ProjectBuilder()
+        .withName("Orbital")
+        .withDeadline(LocalDate.of(2027, 7, 1))
+        .build();
     private Model model;
 
     @BeforeEach
@@ -72,9 +76,11 @@ public class AssociateCommandTest {
         expectedModel.addProjectMembership(membership);
 
         assertCommandSuccess(command, model,
-                String.format(AssociateCommand.MESSAGE_SUCCESS, BENSON.getName(), secondProject.getName()),
-                expectedModel);
-        assertEquals(List.of(membership), model.getAddressBook().getProjectMembershipList());
+            String.format(AssociateCommand.MESSAGE_SUCCESS, BENSON.getName(), secondProject.getName()),
+            expectedModel);
+        assertEquals(List.of(membership), model
+            .getAddressBook()
+            .getProjectMembershipList());
     }
 
     @Test
@@ -87,16 +93,20 @@ public class AssociateCommandTest {
         showPersonAtIndex(expectedModel, INDEX_SECOND_PERSON);
 
         assertCommandSuccess(command, model,
-                String.format(AssociateCommand.MESSAGE_SUCCESS, BENSON.getName(), firstProject.getName()),
-                expectedModel);
-        assertEquals(List.of(membership), model.getAddressBook().getProjectMembershipList());
+            String.format(AssociateCommand.MESSAGE_SUCCESS, BENSON.getName(), firstProject.getName()),
+            expectedModel);
+        assertEquals(List.of(membership), model
+            .getAddressBook()
+            .getProjectMembershipList());
         assertEquals(List.of(BENSON), model.getFilteredPersonList());
     }
 
     @Test
     public void execute_invalidContactIndexUnfilteredList_throwsCommandException() {
         model.addProjectMembership(new ProjectMembership(ALICE.getPersonId(), firstProject.getProjectId()));
-        Index invalidContactIndex = Index.fromOneBased(model.getFilteredPersonList().size() + 1);
+        Index invalidContactIndex = Index.fromOneBased(model
+            .getFilteredPersonList()
+            .size() + 1);
         AssociateCommand command = new AssociateCommand(invalidContactIndex, INDEX_FIRST_PROJECT);
 
         assertCommandFailure(command, model, Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
@@ -105,7 +115,10 @@ public class AssociateCommandTest {
     @Test
     public void execute_invalidContactIndexFilteredList_throwsCommandException() {
         showPersonAtIndex(model, INDEX_FIRST_PERSON);
-        assertTrue(INDEX_SECOND_PERSON.getZeroBased() < model.getAddressBook().getPersonList().size());
+        assertTrue(INDEX_SECOND_PERSON.getZeroBased() < model
+            .getAddressBook()
+            .getPersonList()
+            .size());
         AssociateCommand command = new AssociateCommand(INDEX_SECOND_PERSON, INDEX_FIRST_PROJECT);
 
         assertCommandFailure(command, model, Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
@@ -114,7 +127,9 @@ public class AssociateCommandTest {
     @Test
     public void execute_invalidProjectIndex_throwsCommandException() {
         model.addProjectMembership(new ProjectMembership(ALICE.getPersonId(), firstProject.getProjectId()));
-        Index invalidProjectIndex = Index.fromOneBased(model.getFilteredProjectList().size() + 1);
+        Index invalidProjectIndex = Index.fromOneBased(model
+            .getFilteredProjectList()
+            .size() + 1);
         AssociateCommand command = new AssociateCommand(INDEX_FIRST_PERSON, invalidProjectIndex);
 
         assertCommandFailure(command, model, Messages.MESSAGE_INVALID_PROJECT_DISPLAYED_INDEX);
@@ -146,8 +161,8 @@ public class AssociateCommandTest {
         AssociateCommand command = new AssociateCommand(INDEX_FIRST_PERSON, INDEX_FIRST_PROJECT);
 
         assertCommandFailure(command, model,
-                String.format(AssociateCommand.MESSAGE_DUPLICATE_ASSOCIATION,
-                        BENSON.getName(), firstProject.getName()));
+            String.format(AssociateCommand.MESSAGE_DUPLICATE_ASSOCIATION,
+                BENSON.getName(), firstProject.getName()));
     }
 
     @Test
@@ -160,8 +175,8 @@ public class AssociateCommandTest {
         AssociateCommand command = new AssociateCommand(INDEX_FIRST_PERSON, INDEX_SECOND_PROJECT);
 
         assertCommandSuccess(command, model,
-                String.format(AssociateCommand.MESSAGE_SUCCESS, ALICE.getName(), secondProject.getName()),
-                expectedModel);
+            String.format(AssociateCommand.MESSAGE_SUCCESS, ALICE.getName(), secondProject.getName()),
+            expectedModel);
     }
 
     @Test
@@ -181,7 +196,7 @@ public class AssociateCommandTest {
     public void toStringMethod() {
         AssociateCommand command = new AssociateCommand(INDEX_FIRST_PERSON, INDEX_SECOND_PROJECT);
         String expected = AssociateCommand.class.getCanonicalName()
-                + "{contactIndex=" + INDEX_FIRST_PERSON + ", projectIndex=" + INDEX_SECOND_PROJECT + "}";
+            + "{contactIndex=" + INDEX_FIRST_PERSON + ", projectIndex=" + INDEX_SECOND_PROJECT + "}";
 
         assertEquals(expected, command.toString());
     }

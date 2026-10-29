@@ -69,7 +69,7 @@ public class AddressBookParserTest {
     @Test
     public void parseCommand_setRole() throws Exception {
         SetRoleCommand expectedCommand = new SetRoleCommand(
-                Index.fromOneBased(2), Index.fromOneBased(1), new Role("Implement the parser"));
+            Index.fromOneBased(2), Index.fromOneBased(1), new Role("Implement the parser"));
 
         assertEquals(expectedCommand, parser.parseCommand("setrole c/2 pr/1 r/Implement the parser"));
     }
@@ -134,7 +134,7 @@ public class AddressBookParserTest {
     @Test
     public void parseCommand_delete() throws Exception {
         DeleteCommand command = (DeleteCommand) parser.parseCommand(
-                DeleteCommand.COMMAND_WORD + " " + INDEX_FIRST_PERSON.getOneBased());
+            DeleteCommand.COMMAND_WORD + " " + INDEX_FIRST_PERSON.getOneBased());
         assertEquals(new DeleteCommand(INDEX_FIRST_PERSON), command);
     }
 
@@ -143,7 +143,7 @@ public class AddressBookParserTest {
         Person person = new PersonBuilder().build();
         EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder(person).build();
         EditCommand command = (EditCommand) parser.parseCommand(EditCommand.COMMAND_WORD + " "
-                + INDEX_FIRST_PERSON.getOneBased() + " " + PersonUtil.getEditPersonDescriptorDetails(descriptor));
+            + INDEX_FIRST_PERSON.getOneBased() + " " + PersonUtil.getEditPersonDescriptorDetails(descriptor));
         assertEquals(new EditCommand(INDEX_FIRST_PERSON, descriptor), command);
     }
 
@@ -157,7 +157,9 @@ public class AddressBookParserTest {
     public void parseCommand_find() throws Exception {
         List<String> keywords = List.of("foo", "bar", "baz");
         FindCommand command = (FindCommand) parser.parseCommand(
-                FindCommand.COMMAND_WORD + " " + keywords.stream().collect(Collectors.joining(" ")));
+            FindCommand.COMMAND_WORD + " " + keywords
+                .stream()
+                .collect(Collectors.joining(" ")));
         assertEquals(new FindCommand(new NameContainsKeywordsPredicate(keywords)), command);
     }
 
@@ -198,22 +200,22 @@ public class AddressBookParserTest {
     public void parseCommand_listProjectsDuplicatePrefix_throwsParseException() {
         String expectedMessage = Messages.getErrorMessageForDuplicatePrefixes(PREFIX_CONTACT);
         assertThrows(ParseException.class,
-                expectedMessage, () -> parser.parseCommand("listprojects c/1 c/2"));
+            expectedMessage, () -> parser.parseCommand("listprojects c/1 c/2"));
     }
 
     @Test
     public void parseCommand_parameterFreeCommandsWithExtraArguments_throwsParseException() {
         Map<String, String> usages = Map.of(
-                ClearCommand.COMMAND_WORD, ClearCommand.MESSAGE_USAGE,
-                ExitCommand.COMMAND_WORD, ExitCommand.MESSAGE_USAGE,
-                HelpCommand.COMMAND_WORD, HelpCommand.MESSAGE_USAGE,
-                ListCommand.COMMAND_WORD, ListCommand.MESSAGE_USAGE);
+            ClearCommand.COMMAND_WORD, ClearCommand.MESSAGE_USAGE,
+            ExitCommand.COMMAND_WORD, ExitCommand.MESSAGE_USAGE,
+            HelpCommand.COMMAND_WORD, HelpCommand.MESSAGE_USAGE,
+            ListCommand.COMMAND_WORD, ListCommand.MESSAGE_USAGE);
 
         usages.forEach((commandWord, usage) -> {
             String expectedMessage = String.format(MESSAGE_INVALID_COMMAND_FORMAT, usage);
             for (String arguments : List.of(" 3", " unexpected text", " n/Alice", "\t123 \t")) {
                 assertThrows(ParseException.class,
-                        expectedMessage, () -> parser.parseCommand(commandWord + arguments));
+                    expectedMessage, () -> parser.parseCommand(commandWord + arguments));
             }
         });
     }
@@ -232,16 +234,22 @@ public class AddressBookParserTest {
     @Test
     public void parseCommand_addProject() throws Exception {
         AddProjectCommand command = (AddProjectCommand) parser.parseCommand(
-                "addproject n/CS2103T d/2026-11-13 desc/Build a contact manager");
+            "addproject n/CS2103T d/2026-11-13 desc/Build a contact manager");
 
         Model model = new ModelManager();
         command.execute(model);
 
-        assertEquals(1, model.getFilteredProjectList().size());
-        Project actualProject = model.getFilteredProjectList().get(0);
+        assertEquals(1, model
+            .getFilteredProjectList()
+            .size());
+        Project actualProject = model
+            .getFilteredProjectList()
+            .get(0);
 
         assertNotNull(actualProject.getProjectId());
-        assertEquals("CS2103T", actualProject.getName().toString());
+        assertEquals("CS2103T", actualProject
+            .getName()
+            .toString());
         assertEquals(new Deadline(LocalDate.of(2026, 11, 13)), actualProject.getDeadline());
         assertEquals(new Description("Build a contact manager"), actualProject.getDescription());
     }

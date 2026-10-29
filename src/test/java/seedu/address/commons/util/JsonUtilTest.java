@@ -31,7 +31,9 @@ public class JsonUtilTest {
 
     @Test
     public void readJsonFile_missingFile_returnsEmpty() throws Exception {
-        assertTrue(JsonUtil.readJsonFile(testFolder.resolve("missing.json"), SerializableTestClass.class).isEmpty());
+        assertTrue(JsonUtil
+            .readJsonFile(testFolder.resolve("missing.json"), SerializableTestClass.class)
+            .isEmpty());
     }
 
     @Test
@@ -39,7 +41,9 @@ public class JsonUtilTest {
         Path filePath = testFolder.resolve("valid.json");
         Files.writeString(filePath, SerializableTestClass.JSON_STRING_REPRESENTATION);
 
-        SerializableTestClass result = JsonUtil.readJsonFile(filePath, SerializableTestClass.class).orElseThrow();
+        SerializableTestClass result = JsonUtil
+            .readJsonFile(filePath, SerializableTestClass.class)
+            .orElseThrow();
         assertEquals(SerializableTestClass.getNameTestValue(), result.getName());
         assertEquals(SerializableTestClass.getListTestValues(), result.getListOfLocalDateTimes());
         assertEquals(SerializableTestClass.getHashMapTestValues(), result.getMapOfIntegerToString());
@@ -60,8 +64,10 @@ public class JsonUtilTest {
 
     @Test
     public void readJsonFile_inaccessibleParent_throwsDataLoadingException() throws Exception {
-        assumeTrue(Files.getFileStore(testFolder).supportsFileAttributeView("posix"),
-                "This test requires POSIX file permissions.");
+        assumeTrue(Files
+                .getFileStore(testFolder)
+                .supportsFileAttributeView("posix"),
+            "This test requires POSIX file permissions.");
         Path parent = Files.createDirectory(testFolder.resolve("restricted"));
         Path filePath = parent.resolve("data.json");
         Files.writeString(filePath, SerializableTestClass.JSON_STRING_REPRESENTATION);
@@ -72,7 +78,7 @@ public class JsonUtilTest {
             assertFalse(Files.exists(filePath));
             assertFalse(Files.notExists(filePath));
             assertThrows(DataLoadingException.class, () -> JsonUtil.readJsonFile(
-                    filePath, SerializableTestClass.class));
+                filePath, SerializableTestClass.class));
         } finally {
             Files.setPosixFilePermissions(parent, originalPermissions);
         }
@@ -85,7 +91,7 @@ public class JsonUtilTest {
 
         JsonUtil.serializeObjectToJsonFile(SERIALIZATION_FILE, serializableTestClass);
 
-        assertEquals(FileUtil.readFromFile(SERIALIZATION_FILE), SerializableTestClass.JSON_STRING_REPRESENTATION);
+        assertEquals(SerializableTestClass.JSON_STRING_REPRESENTATION, FileUtil.readFromFile(SERIALIZATION_FILE));
     }
 
     @Test
@@ -93,7 +99,7 @@ public class JsonUtilTest {
         FileUtil.writeToFile(SERIALIZATION_FILE, SerializableTestClass.JSON_STRING_REPRESENTATION);
 
         SerializableTestClass serializableTestClass = JsonUtil
-                .deserializeObjectFromJsonFile(SERIALIZATION_FILE, SerializableTestClass.class);
+            .deserializeObjectFromJsonFile(SERIALIZATION_FILE, SerializableTestClass.class);
 
         assertEquals(serializableTestClass.getName(), SerializableTestClass.getNameTestValue());
         assertEquals(serializableTestClass.getListOfLocalDateTimes(), SerializableTestClass.getListTestValues());
@@ -106,9 +112,8 @@ public class JsonUtilTest {
         for (String json : new String[] {"null", " \n null \t "}) {
             Files.writeString(filePath, json);
 
-            assertThrows(DataLoadingException.class, () -> {
-                JsonUtil.readJsonFile(filePath, SerializableTestClass.class);
-            });
+            assertThrows(DataLoadingException.class, () ->
+                JsonUtil.readJsonFile(filePath, SerializableTestClass.class));
 
             assertEquals(json, Files.readString(filePath));
         }
@@ -129,12 +134,44 @@ public class JsonUtilTest {
         String json = SerializableTestClass.JSON_STRING_REPRESENTATION + " \t\r\n ";
         Files.writeString(filePath, json);
 
-        SerializableTestClass result = JsonUtil.readJsonFile(filePath, SerializableTestClass.class).orElseThrow();
+        SerializableTestClass result = JsonUtil
+            .readJsonFile(filePath, SerializableTestClass.class)
+            .orElseThrow();
 
         assertEquals(SerializableTestClass.getNameTestValue(), result.getName());
         assertEquals(SerializableTestClass.getListTestValues(), result.getListOfLocalDateTimes());
         assertEquals(SerializableTestClass.getHashMapTestValues(), result.getMapOfIntegerToString());
         assertEquals(json, Files.readString(filePath));
+    }
+
+    @Test
+    public void readJsonFile_duplicateKeys_throwsDataLoadingExceptionAndPreservesFile() throws Exception {
+        String[] invalidJsonValues = {
+            "{\"name\":\"Alex\",\"name\":\"Benson\"}",
+            "{\"mapOfIntegerToString\":{\"1\":\"First\",\"1\":\"Second\"}}",
+            "{\"unknown\":{\"name\":\"Alex\",\"name\":\"Benson\"}}",
+            "{\"name\":\"Alex\",\"na\\u006de\":\"Benson\"}"
+        };
+        Path filePath = testFolder.resolve("duplicate-keys.json");
+        for (String json : invalidJsonValues) {
+            Files.writeString(filePath, json);
+
+            assertThrows(DataLoadingException.class, () ->
+                JsonUtil.readJsonFile(filePath, SerializableTestClass.class));
+
+            assertEquals(json, Files.readString(filePath));
+        }
+    }
+
+    @Test
+    public void fromJsonString_sameKeysInSeparateObjects_returnsObjects() throws Exception {
+        String json = "[{\"name\":\"Alex\"},{\"name\":\"Benson\"}]";
+
+        SerializableTestClass[] result = JsonUtil.fromJsonString(json, SerializableTestClass[].class);
+
+        assertEquals(2, result.length);
+        assertEquals("Alex", result[0].getName());
+        assertEquals("Benson", result[1].getName());
     }
 
     //TODO: @Test jsonUtil_readJsonStringToObjectInstance_correctObject()

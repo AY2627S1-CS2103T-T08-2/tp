@@ -36,30 +36,30 @@ import seedu.address.testutil.ProjectBuilder;
 public class SetRoleCommandTest {
 
     private final Project project = new Project(new ProjectName("CS2103T Team Project"),
-            new Deadline(LocalDate.of(2026, 11, 13)), Description.EMPTY);
+        new Deadline(LocalDate.of(2026, 11, 13)), Description.EMPTY);
 
     @Test
     public void constructor_nullContactIndex_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new SetRoleCommand(null,
-                Index.fromOneBased(1), new Role("Implement parser")));
+            Index.fromOneBased(1), new Role("Implement parser")));
     }
 
     @Test
     public void constructor_nullProjectIndex_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new SetRoleCommand(Index.fromOneBased(1), null,
-                new Role("Implement parser")));
+            new Role("Implement parser")));
     }
 
     @Test
     public void constructor_nullRole_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new SetRoleCommand(Index.fromOneBased(1),
-                Index.fromOneBased(1), null));
+            Index.fromOneBased(1), null));
     }
 
     @Test
     public void execute_nullModel_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new SetRoleCommand(Index.fromOneBased(1),
-                Index.fromOneBased(1), new Role("Implement parser")).execute(null));
+            Index.fromOneBased(1), new Role("Implement parser")).execute(null));
     }
 
     @Test
@@ -71,11 +71,15 @@ public class SetRoleCommandTest {
         model.addProjectMembership(membership);
 
         CommandResult result = new SetRoleCommand(Index.fromOneBased(1), Index.fromOneBased(1),
-                new Role("Implement parser")).execute(model);
+            new Role("Implement parser")).execute(model);
 
-        assertEquals(new Role("Implement parser"), model.getAddressBook().getProjectMembershipList().get(0).getRole());
+        assertEquals(new Role("Implement parser"), model
+            .getAddressBook()
+            .getProjectMembershipList()
+            .get(0)
+            .getRole());
         assertEquals("Set role for \"Alice Pauline\" in project \"CS2103T Team Project\": Implement parser",
-                result.getFeedbackToUser());
+            result.getFeedbackToUser());
     }
 
     @Test
@@ -88,9 +92,12 @@ public class SetRoleCommandTest {
         new ListMembersCommand(project.getName()).execute(model);
 
         new SetRoleCommand(Index.fromOneBased(1), Index.fromOneBased(1), new Role("Implement parser"))
-                .execute(model);
+            .execute(model);
 
-        ProjectMembership updatedMembership = model.getAddressBook().getProjectMembershipList().get(0);
+        ProjectMembership updatedMembership = model
+            .getAddressBook()
+            .getProjectMembershipList()
+            .get(0);
         assertEquals(BENSON.getPersonId(), updatedMembership.getPersonId());
         assertEquals(new Role("Implement parser"), updatedMembership.getRole());
     }
@@ -102,17 +109,17 @@ public class SetRoleCommandTest {
         model.addProject(project);
 
         assertThrows(CommandException.class, () -> new SetRoleCommand(Index.fromOneBased(1), Index.fromOneBased(1),
-                new Role("Implement parser")).execute(model));
+            new Role("Implement parser")).execute(model));
     }
 
     @Test
     public void execute_invalidContactIndex_throwsCommandException() {
         Model model = new ModelManager();
         SetRoleCommand command = new SetRoleCommand(Index.fromOneBased(1), Index.fromOneBased(1),
-                new Role("Implement parser"));
+            new Role("Implement parser"));
 
         assertThrows(CommandException.class, Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX, () ->
-                command.execute(model));
+            command.execute(model));
     }
 
     @Test
@@ -120,40 +127,46 @@ public class SetRoleCommandTest {
         Model model = new ModelManager();
         model.addPerson(ALICE);
         SetRoleCommand command = new SetRoleCommand(Index.fromOneBased(1), Index.fromOneBased(1),
-                new Role("Implement parser"));
+            new Role("Implement parser"));
 
         assertThrows(CommandException.class, Messages.MESSAGE_INVALID_PROJECT_DISPLAYED_INDEX, () ->
-                command.execute(model));
+            command.execute(model));
     }
 
     @Test
     public void equals_differentValues_returnsFalse() {
         SetRoleCommand command = new SetRoleCommand(Index.fromOneBased(1), Index.fromOneBased(1),
-                new Role("Implement parser"));
+            new Role("Implement parser"));
 
         assertTrue(command.equals(command));
         assertTrue(command.equals(new SetRoleCommand(Index.fromOneBased(1), Index.fromOneBased(1),
-                new Role("Implement parser"))));
+            new Role("Implement parser"))));
         assertFalse(command.equals(null));
         assertFalse(command.equals(new Object()));
         assertFalse(command.equals(new SetRoleCommand(Index.fromOneBased(2), Index.fromOneBased(1),
-                new Role("Implement parser"))));
+            new Role("Implement parser"))));
         assertFalse(command.equals(new SetRoleCommand(Index.fromOneBased(1), Index.fromOneBased(2),
-                new Role("Implement parser"))));
+            new Role("Implement parser"))));
         assertFalse(command.equals(new SetRoleCommand(Index.fromOneBased(1), Index.fromOneBased(1),
-                new Role("Write tests"))));
+            new Role("Write tests"))));
     }
 
     @Test
     public void toString_containsCommandFields() {
         SetRoleCommand command = new SetRoleCommand(Index.fromOneBased(1), Index.fromOneBased(2),
-                new Role("Implement parser"));
+            new Role("Implement parser"));
 
-        assertTrue(command.toString().contains(
+        assertTrue(command
+            .toString()
+            .contains(
                 "contactIndex=seedu.address.commons.core.index.Index{zeroBasedIndex=0}"));
-        assertTrue(command.toString().contains(
+        assertTrue(command
+            .toString()
+            .contains(
                 "projectIndex=seedu.address.commons.core.index.Index{zeroBasedIndex=1}"));
-        assertTrue(command.toString().contains("role=Implement parser"));
+        assertTrue(command
+            .toString()
+            .contains("role=Implement parser"));
     }
 
     @Test
@@ -163,10 +176,14 @@ public class SetRoleCommandTest {
         CommandResult result = new SetRoleCommand(
             Index.fromOneBased(1), Index.fromOneBased(1), Role.EMPTY).execute(model);
 
-        List<ProjectMembership> memberships = model.getAddressBook().getProjectMembershipList();
+        List<ProjectMembership> memberships = model
+            .getAddressBook()
+            .getProjectMembershipList();
         assertEquals(1, memberships.size());
         assertEquals(new ProjectMembership(ALICE.getPersonId(), project.getProjectId()), memberships.getFirst());
-        assertEquals(Role.EMPTY, memberships.getFirst().getRole());
+        assertEquals(Role.EMPTY, memberships
+            .getFirst()
+            .getRole());
         assertEquals(List.of(project), model.getPersonProjects(ALICE));
         assertEquals(String.format(SetRoleCommand.MESSAGE_CLEAR_SUCCESS, ALICE.getName(), project.getName()),
             result.getFeedbackToUser());
@@ -181,15 +198,24 @@ public class SetRoleCommandTest {
         command.execute(model);
         command.execute(model);
 
-        assertEquals(1, model.getAddressBook().getProjectMembershipList().size());
-        assertEquals(Role.EMPTY, model.getAddressBook().getProjectMembershipList().getFirst().getRole());
+        assertEquals(1, model
+            .getAddressBook()
+            .getProjectMembershipList()
+            .size());
+        assertEquals(Role.EMPTY, model
+            .getAddressBook()
+            .getProjectMembershipList()
+            .getFirst()
+            .getRole());
         assertEquals(List.of(project), model.getPersonProjects(ALICE));
     }
 
     @Test
     public void execute_clearFilteredMembership_preservesOtherRoleAndFilters() throws Exception {
         Model model = new ModelManager();
-        Project otherProject = new ProjectBuilder().withName("Other Project").build();
+        Project otherProject = new ProjectBuilder()
+            .withName("Other Project")
+            .build();
         Role otherRole = new Role("Other task");
         ProjectMembership other = new ProjectMembership(ALICE.getPersonId(), otherProject.getProjectId(), otherRole);
         ProjectMembership target = new ProjectMembership(
@@ -201,14 +227,23 @@ public class SetRoleCommandTest {
         model.addProject(project);
         model.addProjectMembership(other);
         model.addProjectMembership(target);
-        model.updateFilteredPersonList(person -> person.getPersonId().equals(BENSON.getPersonId()));
-        model.updateFilteredProjectList(value -> value.getProjectId().equals(project.getProjectId()));
+        model.updateFilteredPersonList(person -> person
+            .getPersonId()
+            .equals(BENSON.getPersonId()));
+        model.updateFilteredProjectList(value -> value
+            .getProjectId()
+            .equals(project.getProjectId()));
 
         new SetRoleCommand(Index.fromOneBased(1), Index.fromOneBased(1), Role.EMPTY).execute(model);
 
-        List<ProjectMembership> memberships = model.getAddressBook().getProjectMembershipList();
+        List<ProjectMembership> memberships = model
+            .getAddressBook()
+            .getProjectMembershipList();
         assertEquals(List.of(other, target), memberships);
-        assertEquals(List.of(otherRole, Role.EMPTY), memberships.stream().map(ProjectMembership::getRole).toList());
+        assertEquals(List.of(otherRole, Role.EMPTY), memberships
+            .stream()
+            .map(ProjectMembership::getRole)
+            .toList());
         assertEquals(List.of(BENSON), model.getFilteredPersonList());
         assertEquals(List.of(project), model.getFilteredProjectList());
     }
@@ -224,7 +259,10 @@ public class SetRoleCommandTest {
                 new SetRoleCommand(Index.fromOneBased(1), Index.fromOneBased(1), Role.EMPTY).execute(model);
             });
 
-        assertTrue(model.getAddressBook().getProjectMembershipList().isEmpty());
+        assertTrue(model
+            .getAddressBook()
+            .getProjectMembershipList()
+            .isEmpty());
     }
 
     @Test
@@ -236,11 +274,20 @@ public class SetRoleCommandTest {
 
         logic.execute("setrole c/1 pr/1 r/");
 
-        ReadOnlyAddressBook restored = storage.readAddressBook().orElseThrow();
-        assertEquals(1, restored.getProjectMembershipList().size());
+        ReadOnlyAddressBook restored = storage
+            .readAddressBook()
+            .orElseThrow();
+        assertEquals(1, restored
+            .getProjectMembershipList()
+            .size());
         assertEquals(new ProjectMembership(ALICE.getPersonId(), project.getProjectId()),
-            restored.getProjectMembershipList().getFirst());
-        assertEquals(Role.EMPTY, restored.getProjectMembershipList().getFirst().getRole());
+            restored
+                .getProjectMembershipList()
+                .getFirst());
+        assertEquals(Role.EMPTY, restored
+            .getProjectMembershipList()
+            .getFirst()
+            .getRole());
         assertEquals(List.of(ALICE), restored.getPersonList());
         assertEquals(List.of(project), restored.getProjectList());
     }

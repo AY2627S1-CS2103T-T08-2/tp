@@ -20,29 +20,33 @@ public class JsonAdaptedProjectMembershipTest {
     private static final String VALID_PROJECT_ID = "00000000-0000-4000-8000-000000000001";
     private static final String INVALID_ID = "not-a-uuid";
     private static final ProjectMembership MEMBERSHIP = new ProjectMembership(
-            ALICE_ID, ProjectId.fromString(VALID_PROJECT_ID));
+        ALICE_ID, ProjectId.fromString(VALID_PROJECT_ID));
 
     @Test
     public void toModelType_validMembership_returnsMembership() throws Exception {
         JsonAdaptedProjectMembership membership = new JsonAdaptedProjectMembership(MEMBERSHIP);
 
         assertEquals(MEMBERSHIP, membership.toModelType());
-        assertEquals(Role.EMPTY, membership.toModelType().getRole());
+        assertEquals(Role.EMPTY, membership
+            .toModelType()
+            .getRole());
     }
 
     @Test
     public void toModelType_legacyMembershipWithoutRole_usesEmptyRole() throws Exception {
         JsonAdaptedProjectMembership membership = new JsonAdaptedProjectMembership(
-                VALID_PERSON_ID, VALID_PROJECT_ID, null);
+            VALID_PERSON_ID, VALID_PROJECT_ID, null);
 
-        assertEquals(Role.EMPTY, membership.toModelType().getRole());
+        assertEquals(Role.EMPTY, membership
+            .toModelType()
+            .getRole());
     }
 
     @Test
     public void jsonRoundTrip_validMembership_preservesIds() throws Exception {
         String json = JsonUtil.toJsonString(new JsonAdaptedProjectMembership(MEMBERSHIP));
         JsonAdaptedProjectMembership membership = JsonUtil.fromJsonString(
-                json, JsonAdaptedProjectMembership.class);
+            json, JsonAdaptedProjectMembership.class);
 
         assertEquals(MEMBERSHIP, membership.toModelType());
     }
@@ -52,10 +56,12 @@ public class JsonAdaptedProjectMembershipTest {
         ProjectMembership membershipWithRole = MEMBERSHIP.withRole(new Role("Implement parser"));
         String json = JsonUtil.toJsonString(new JsonAdaptedProjectMembership(membershipWithRole));
         JsonAdaptedProjectMembership adaptedMembership = JsonUtil.fromJsonString(
-                json, JsonAdaptedProjectMembership.class);
+            json, JsonAdaptedProjectMembership.class);
 
         assertEquals(membershipWithRole, adaptedMembership.toModelType());
-        assertEquals(new Role("Implement parser"), adaptedMembership.toModelType().getRole());
+        assertEquals(new Role("Implement parser"), adaptedMembership
+            .toModelType()
+            .getRole());
     }
 
     @Test
@@ -91,7 +97,7 @@ public class JsonAdaptedProjectMembershipTest {
     @Test
     public void toModelType_invalidRole_throwsIllegalValueException() {
         JsonAdaptedProjectMembership membership = new JsonAdaptedProjectMembership(
-                VALID_PERSON_ID, VALID_PROJECT_ID, "line one\nline two");
+            VALID_PERSON_ID, VALID_PROJECT_ID, "line one\nline two");
 
         assertThrows(IllegalValueException.class, Role.MESSAGE_CONSTRAINTS, membership::toModelType);
     }

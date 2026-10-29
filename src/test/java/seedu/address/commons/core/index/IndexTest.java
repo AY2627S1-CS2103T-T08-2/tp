@@ -15,12 +15,20 @@ public class IndexTest {
         assertThrows(IndexOutOfBoundsException.class, () -> Index.fromOneBased(0));
 
         // check equality using the same base
-        assertEquals(1, Index.fromOneBased(1).getOneBased());
-        assertEquals(5, Index.fromOneBased(5).getOneBased());
+        assertEquals(1, Index
+            .fromOneBased(1)
+            .getOneBased());
+        assertEquals(5, Index
+            .fromOneBased(5)
+            .getOneBased());
 
         // convert from one-based index to zero-based index
-        assertEquals(0, Index.fromOneBased(1).getZeroBased());
-        assertEquals(4, Index.fromOneBased(5).getZeroBased());
+        assertEquals(0, Index
+            .fromOneBased(1)
+            .getZeroBased());
+        assertEquals(4, Index
+            .fromOneBased(5)
+            .getZeroBased());
     }
 
     @Test
@@ -29,12 +37,20 @@ public class IndexTest {
         assertThrows(IndexOutOfBoundsException.class, () -> Index.fromZeroBased(-1));
 
         // check equality using the same base
-        assertEquals(0, Index.fromZeroBased(0).getZeroBased());
-        assertEquals(5, Index.fromZeroBased(5).getZeroBased());
+        assertEquals(0, Index
+            .fromZeroBased(0)
+            .getZeroBased());
+        assertEquals(5, Index
+            .fromZeroBased(5)
+            .getZeroBased());
 
         // convert from zero-based index to one-based index
-        assertEquals(1, Index.fromZeroBased(0).getOneBased());
-        assertEquals(6, Index.fromZeroBased(5).getOneBased());
+        assertEquals(1, Index
+            .fromZeroBased(0)
+            .getOneBased());
+        assertEquals(6, Index
+            .fromZeroBased(5)
+            .getOneBased());
     }
 
     @Test

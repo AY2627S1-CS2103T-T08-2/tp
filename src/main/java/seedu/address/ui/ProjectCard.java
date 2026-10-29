@@ -2,6 +2,7 @@ package seedu.address.ui;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import seedu.address.model.project.Description;
@@ -37,6 +38,7 @@ public class ProjectCard extends UiPart<Region> {
         this.project = project;
         this.displayedIndex.setText(displayedIndex + ". ");
         name.setText(project.getName().toString());
+        name.setTooltip(new Tooltip(project.getName().toString()));
         projectId.setText("ID: " + project.getProjectId());
         deadline.setText("Deadline: " + project.getDeadline());
 

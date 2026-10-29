@@ -290,7 +290,7 @@ public class ParserUtilTest {
 
     @Test
     public void parseDescription_lineBreaks_throwsParseException() {
-        String[] lineBreaks = {"\r", "\n", "\u0085", "\u2028", "\u2029"};
+        String[] lineBreaks = {"\r", "\n", String.valueOf((char) 11), "\f", "\u0085", "\u2028", "\u2029"};
 
         for (String lineBreak : lineBreaks) {
             assertThrows(ParseException.class, () -> ParserUtil.parseDescription("First" + lineBreak + "Second"));
@@ -337,10 +337,17 @@ public class ParserUtilTest {
 
     @Test
     public void parseRole_lineBreaks_throwsParseException() {
-        for (String lineBreak : new String[] {"\r", "\n", "\u0085", "\u2028", "\u2029"}) {
+        String[] lineBreaks = {"\r", "\n", String.valueOf((char) 11), "\f", "\u0085", "\u2028", "\u2029"};
+        for (String lineBreak : lineBreaks) {
             assertThrows(ParseException.class, Role.MESSAGE_CONSTRAINTS, () -> ParserUtil.parseRole(lineBreak));
             assertThrows(ParseException.class, Role.MESSAGE_CONSTRAINTS, () -> {
                 ParserUtil.parseRole("First" + lineBreak + "Second");
+            });
+            assertThrows(ParseException.class, Role.MESSAGE_CONSTRAINTS, () -> {
+                ParserUtil.parseRole(lineBreak + "Role");
+            });
+            assertThrows(ParseException.class, Role.MESSAGE_CONSTRAINTS, () -> {
+                ParserUtil.parseRole("Role" + lineBreak);
             });
         }
     }

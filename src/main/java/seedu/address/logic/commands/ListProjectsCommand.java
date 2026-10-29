@@ -63,6 +63,7 @@ public class ListProjectsCommand extends Command {
                 CommandResult.ListViewTarget.PROJECTS);
     }
 
+    /** Reports all memberships without changing either filtered view. */
     private CommandResult executeForContact(Model model, Index index) throws CommandException {
         List<Person> displayedContacts = model.getFilteredPersonList();
         if (index.getZeroBased() >= displayedContacts.size()) {
@@ -71,8 +72,6 @@ public class ListProjectsCommand extends Command {
 
         Person contact = displayedContacts.get(index.getZeroBased());
 
-        // Restore all projects so reported indices match the Projects tab
-        model.updateFilteredProjectList(Model.PREDICATE_SHOW_ALL_PROJECTS);
         List<Project> projects = model.getPersonProjects(contact);
         if (projects.isEmpty()) {
             return new CommandResult(
@@ -80,9 +79,9 @@ public class ListProjectsCommand extends Command {
             );
         }
 
-        List<Project> allProjects = model.getAddressBook().getProjectList();
+        List<Project> displayedProjects = model.getFilteredProjectList();
         String projectDetails = projects.stream()
-            .map(project -> formatProject(project, allProjects.indexOf(project) + 1))
+            .map(project -> formatProject(project, displayedProjects.indexOf(project) + 1))
             .collect(Collectors.joining("\n"));
 
         return new CommandResult(String.format(
@@ -93,12 +92,15 @@ public class ListProjectsCommand extends Command {
         );
     }
 
+    /** Formats a visible index, or marks a hidden project when {@code displayedIndex} is zero. */
     private static String formatProject(Project project, int displayedIndex) {
         String description = project.getDescription().equals(Description.EMPTY)
                 ? "No description provided"
                 : project.getDescription().toString();
-        return String.format("%1$d. %2$s | Deadline: %3$s | Description: %4$s",
-                displayedIndex, project.getName(), project.getDeadline(), description);
+        // A contact can belong to a project hidden by the current project search.
+        String prefix = displayedIndex == 0 ? "[not displayed] " : displayedIndex + ". ";
+        return String.format("%1$s%2$s | Deadline: %3$s | Description: %4$s",
+                prefix, project.getName(), project.getDeadline(), description);
     }
 
     @Override

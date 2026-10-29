@@ -19,6 +19,8 @@ public class RoleTest {
 
     @Test
     public void isValidRole_invalidDescription_returnsFalse() {
+        assertFalse(Role.isValidRole("Team" + (char) 11 + "Leader"));
+        assertFalse(Role.isValidRole("Team\fLeader"));
         assertFalse(Role.isValidRole("line one\nline two"));
         assertFalse(Role.isValidRole("line one\rline two"));
         assertFalse(Role.isValidRole("line one" + Character.toString((char) 0x0085) + "line two"));
@@ -34,6 +36,8 @@ public class RoleTest {
 
     @Test
     public void constructor_invalidRole_throwsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> new Role("Team" + (char) 11 + "Leader"));
+        assertThrows(IllegalArgumentException.class, () -> new Role("Team\fLeader"));
         assertThrows(IllegalArgumentException.class, () -> new Role("x".repeat(201)));
     }
 

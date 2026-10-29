@@ -26,6 +26,21 @@ public class EmailTest {
     }
 
     @Test
+    public void isValidEmail_longInputs_validateWithoutStackOverflow() {
+        String longDomain = "a@" + "ab.".repeat(5000) + "com";
+        String longLocalPart = "ab.".repeat(5000) + "ab@example.com";
+        String longHyphenatedDomain = "a@" + "ab-".repeat(5000) + "cd";
+        for (String valid : new String[] {longDomain, longLocalPart, longHyphenatedDomain}) {
+            assertTrue(Email.isValidEmail(valid));
+            new Email(valid);
+            assertFalse(Email.isValidEmail(valid + "!"));
+            assertThrows(IllegalArgumentException.class, () -> new Email(valid + "!"));
+        }
+        assertTrue(Email.isValidEmail("a@" + "a".repeat(20000)));
+        assertFalse(Email.isValidEmail("a@" + "a".repeat(20000) + "!"));
+    }
+
+    @Test
     public void constructor_null_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new Email(null));
     }

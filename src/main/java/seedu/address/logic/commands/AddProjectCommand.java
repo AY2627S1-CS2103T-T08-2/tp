@@ -16,11 +16,11 @@ public class AddProjectCommand extends Command {
     public static final String COMMAND_WORD = "addproject";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
-            + ": Adds a project to UniTeam. "
-            + "Parameters: n/PROJECT_NAME d/DEADLINE [desc/DESCRIPTION]\n"
-            + "Example: " + COMMAND_WORD
-            + " n/CS2103T Team Project d/2026-11-13"
-            + " desc/Build a contact management application";
+        + ": Adds a project to UniTeam. "
+        + "Parameters: n/PROJECT_NAME d/DEADLINE [desc/DESCRIPTION]\n"
+        + "Example: " + COMMAND_WORD
+        + " n/CS2103T Team Project d/2026-11-13"
+        + " desc/Build a contact management application";
 
     public static final String MESSAGE_SUCCESS = "New project added:\n%1$s\nDeadline: %2$s\nDescription: %3$s";
     public static final String MESSAGE_DUPLICATE_PROJECT = "A project with the name \"%1$s\" already exists.";
@@ -40,22 +40,28 @@ public class AddProjectCommand extends Command {
         requireNonNull(model);
 
         if (model.hasProject(toAdd)
-                || model.findProject(toAdd.getName()).isPresent()) {
+            || model
+            .findProject(toAdd.getName())
+            .isPresent()) {
             throw new CommandException(
-                    String.format(MESSAGE_DUPLICATE_PROJECT, toAdd.getName()));
+                String.format(MESSAGE_DUPLICATE_PROJECT, toAdd.getName()));
         }
 
         model.addProject(toAdd);
 
-        String description = toAdd.getDescription().equals(Description.EMPTY)
-                ? "No description provided"
-                : toAdd.getDescription().toString();
+        String description = toAdd
+            .getDescription()
+            .equals(Description.EMPTY)
+            ? "No description provided"
+            : toAdd
+            .getDescription()
+            .toString();
 
         return new CommandResult(String.format(
-                MESSAGE_SUCCESS,
-                toAdd.getName(),
-                toAdd.getDeadline(),
-                description
+            MESSAGE_SUCCESS,
+            toAdd.getName(),
+            toAdd.getDeadline(),
+            description
         ));
     }
 
@@ -76,7 +82,7 @@ public class AddProjectCommand extends Command {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .add("toAdd", toAdd)
-                .toString();
+            .add("toAdd", toAdd)
+            .toString();
     }
 }

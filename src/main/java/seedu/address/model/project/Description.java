@@ -12,7 +12,7 @@ public class Description {
     public static final Description EMPTY = new Description("");
 
     public static final String MESSAGE_CONSTRAINTS =
-            "Descriptions must be at most 200 characters long and must not contain line breaks";
+        "Descriptions must be at most 200 characters long and must not contain line breaks";
 
     public static final String VALIDATION_REGEX = "[^\\r\\n\\x0B\\f\\u0085\\u2028\\u2029]*";
 
@@ -34,7 +34,7 @@ public class Description {
      */
     public static boolean isValidDescription(String test) {
         return test.codePointCount(0, test.length()) <= 200
-                && test.matches(VALIDATION_REGEX);
+            && test.matches(VALIDATION_REGEX);
     }
 
     @Override

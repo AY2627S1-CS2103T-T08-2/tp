@@ -16,7 +16,7 @@ import seedu.address.model.person.exceptions.PersonNotFoundException;
  * Each person must have a unique identifier and identity as defined by {@code Person#isSamePerson(Person)}. However,
  * the removal of a person uses {@code Person#equals(Object)} to ensure that the person with exactly the same fields
  * will be removed.
- *
+ * <p>
  * Supports a minimal set of list operations.
  *
  * @see Person#isSamePerson(Person)
@@ -25,14 +25,16 @@ public class UniquePersonList implements Iterable<Person> {
 
     private final ObservableList<Person> internalList = FXCollections.observableArrayList();
     private final ObservableList<Person> internalUnmodifiableList =
-            FXCollections.unmodifiableObservableList(internalList);
+        FXCollections.unmodifiableObservableList(internalList);
 
     /**
      * Returns true if the list contains an equivalent person as the given argument.
      */
     public boolean contains(Person toCheck) {
         requireNonNull(toCheck);
-        return internalList.stream().anyMatch(toCheck::isSamePerson);
+        return internalList
+            .stream()
+            .anyMatch(toCheck::isSamePerson);
     }
 
     /**
@@ -40,7 +42,11 @@ public class UniquePersonList implements Iterable<Person> {
      */
     public boolean containsId(PersonId personId) {
         requireNonNull(personId);
-        return internalList.stream().anyMatch(person -> person.getPersonId().equals(personId));
+        return internalList
+            .stream()
+            .anyMatch(person -> person
+                .getPersonId()
+                .equals(personId));
     }
 
     /**
@@ -69,7 +75,9 @@ public class UniquePersonList implements Iterable<Person> {
         }
 
         Person storedPerson = internalList.get(index);
-        if (!storedPerson.getPersonId().equals(editedPerson.getPersonId())) {
+        if (!storedPerson
+            .getPersonId()
+            .equals(editedPerson.getPersonId())) {
             throw new IllegalArgumentException("A person's identifier cannot be changed.");
         }
 
@@ -157,7 +165,9 @@ public class UniquePersonList implements Iterable<Person> {
                 Person second = persons.get(j);
 
                 if (first.isSamePerson(second)
-                        || first.getPersonId().equals(second.getPersonId())) {
+                    || first
+                    .getPersonId()
+                    .equals(second.getPersonId())) {
                     return false;
                 }
             }

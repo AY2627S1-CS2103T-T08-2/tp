@@ -7,18 +7,26 @@ import seedu.address.logic.commands.ListMembersCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.project.ProjectName;
 
-/** Parses arguments for the {@code listmembers} command. */
+/**
+ * Parses arguments for the {@code listmembers} command.
+ */
 public class ListMembersCommandParser implements Parser<ListMembersCommand> {
 
     @Override
     public ListMembersCommand parse(String args) throws ParseException {
         ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(args, PREFIX_PROJECT);
-        if (argMultimap.getValue(PREFIX_PROJECT).isEmpty() || !argMultimap.getPreamble().isEmpty()) {
+        if (argMultimap
+            .getValue(PREFIX_PROJECT)
+            .isEmpty() || !argMultimap
+            .getPreamble()
+            .isEmpty()) {
             throw new ParseException(String.format(
-                    MESSAGE_INVALID_COMMAND_FORMAT, ListMembersCommand.MESSAGE_USAGE));
+                MESSAGE_INVALID_COMMAND_FORMAT, ListMembersCommand.MESSAGE_USAGE));
         }
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_PROJECT);
-        ProjectName projectName = ParserUtil.parseProjectName(argMultimap.getValue(PREFIX_PROJECT).get());
+        ProjectName projectName = ParserUtil.parseProjectName(argMultimap
+            .getValue(PREFIX_PROJECT)
+            .get());
         return new ListMembersCommand(projectName);
     }
 }

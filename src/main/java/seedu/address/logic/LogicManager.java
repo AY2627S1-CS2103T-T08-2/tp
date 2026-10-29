@@ -28,7 +28,7 @@ public class LogicManager implements Logic {
     public static final String FILE_OPS_ERROR_FORMAT = "Could not save data due to the following error: %s";
 
     public static final String FILE_OPS_PERMISSION_ERROR_FORMAT =
-            "Could not save data to file %s due to insufficient permissions to write to the file or the folder.";
+        "Could not save data to file %s due to insufficient permissions to write to the file or the folder.";
 
     private final Logger logger = LogsCenter.getLogger(LogicManager.class);
 
@@ -58,33 +58,33 @@ public class LogicManager implements Logic {
 
         if (storage.isAddressBookSavingBlocked()) {
             return new CommandResult(
-                    commandResult.getFeedbackToUser()
-                            + "\nSaving is disabled because the data file could not be loaded."
-                            + " Changes in this session will be lost.",
-                    commandResult.isShowHelp(),
-                    commandResult.isExit(), commandResult.getListViewTarget());
+                commandResult.getFeedbackToUser()
+                    + "\nSaving is disabled because the data file could not be loaded."
+                    + " Changes in this session will be lost.",
+                commandResult.isShowHelp(),
+                commandResult.isExit(), commandResult.getListViewTarget());
         }
 
         try {
             storage.saveAddressBook(model.getAddressBook());
         } catch (IOException e) {
             String errorMessage = String.format(
-                    e instanceof AccessDeniedException ? FILE_OPS_PERMISSION_ERROR_FORMAT : FILE_OPS_ERROR_FORMAT,
-                    e.getMessage());
+                e instanceof AccessDeniedException ? FILE_OPS_PERMISSION_ERROR_FORMAT : FILE_OPS_ERROR_FORMAT,
+                e.getMessage());
             logger.warning(errorMessage);
 
             if (hasSameStoredData(beforeCommand, model.getAddressBook())) {
                 return new CommandResult(commandResult.getFeedbackToUser() + "\nWarning: " + errorMessage,
-                        commandResult.isShowHelp(), commandResult.isExit(), commandResult.getListViewTarget());
+                    commandResult.isShowHelp(), commandResult.isExit(), commandResult.getListViewTarget());
             }
 
             model.setAddressBook(beforeCommand);
             model.updateFilteredPersonList(previousFilter == null
-                    ? Model.PREDICATE_SHOW_ALL_PERSONS : previousFilter::test);
+                ? Model.PREDICATE_SHOW_ALL_PERSONS : previousFilter::test);
             model.updateFilteredProjectList(previousProjectFilter == null
-                    ? Model.PREDICATE_SHOW_ALL_PROJECTS : previousProjectFilter::test);
+                ? Model.PREDICATE_SHOW_ALL_PROJECTS : previousProjectFilter::test);
             throw new CommandException(errorMessage
-                    + "\nThe command was not applied. Fix the save problem and try again.", e);
+                + "\nThe command was not applied. Fix the save problem and try again.", e);
         }
 
         return commandResult;
@@ -114,20 +114,50 @@ public class LogicManager implements Logic {
      * Compares all stored data, including fields ignored by the model's equality methods.
      */
     private boolean hasSameStoredData(ReadOnlyAddressBook first, ReadOnlyAddressBook second) {
-        if (!first.getPersonList().equals(second.getPersonList())
-            || !first.getProjectList().equals(second.getProjectList())
-            || !first.getProjectMembershipList().equals(second.getProjectMembershipList())
+        if (!first
+            .getPersonList()
+            .equals(second.getPersonList())
+            || !first
+            .getProjectList()
+            .equals(second.getProjectList())
+            || !first
+            .getProjectMembershipList()
+            .equals(second.getProjectMembershipList())
         ) {
             return false;
         }
 
         return (
-            first.getPersonList().stream().map(Person::getPersonId).toList()
-                .equals(second.getPersonList().stream().map(Person::getPersonId).toList())
-            && first.getProjectList().stream().map(project -> project.getName().projectName).toList()
-                .equals(second.getProjectList().stream().map(project -> project.getName().projectName).toList())
-            && first.getProjectMembershipList().stream().map(ProjectMembership::getRole).toList()
-                .equals(second.getProjectMembershipList().stream().map(ProjectMembership::getRole).toList())
+            first
+                .getPersonList()
+                .stream()
+                .map(Person::getPersonId)
+                .toList()
+                .equals(second
+                    .getPersonList()
+                    .stream()
+                    .map(Person::getPersonId)
+                    .toList())
+                && first
+                .getProjectList()
+                .stream()
+                .map(project -> project.getName().projectName)
+                .toList()
+                .equals(second
+                    .getProjectList()
+                    .stream()
+                    .map(project -> project.getName().projectName)
+                    .toList())
+                && first
+                .getProjectMembershipList()
+                .stream()
+                .map(ProjectMembership::getRole)
+                .toList()
+                .equals(second
+                    .getProjectMembershipList()
+                    .stream()
+                    .map(ProjectMembership::getRole)
+                    .toList())
             );
     }
 }

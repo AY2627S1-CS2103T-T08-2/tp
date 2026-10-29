@@ -67,7 +67,7 @@ public class Project {
         }
 
         return otherProject != null
-                && projectId.equals(otherProject.projectId);
+            && projectId.equals(otherProject.projectId);
     }
 
     /**
@@ -86,9 +86,9 @@ public class Project {
         }
 
         return projectId.equals(otherProject.projectId)
-                && name.equals(otherProject.name)
-                && deadline.equals(otherProject.deadline)
-                && description.equals(otherProject.description);
+            && name.equals(otherProject.name)
+            && deadline.equals(otherProject.deadline)
+            && description.equals(otherProject.description);
     }
 
     @Override
@@ -100,10 +100,10 @@ public class Project {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .add("projectId", projectId)
-                .add("name", name)
-                .add("deadline", deadline)
-                .add("description", description)
-                .toString();
+            .add("projectId", projectId)
+            .add("name", name)
+            .add("deadline", deadline)
+            .add("description", description)
+            .toString();
     }
 }

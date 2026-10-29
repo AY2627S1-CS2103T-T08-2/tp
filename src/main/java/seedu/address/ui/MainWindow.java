@@ -30,16 +30,16 @@ public class MainWindow extends UiPart<Stage> {
 
     private final Logger logger = LogsCenter.getLogger(getClass());
 
-    private Stage primaryStage;
-    private Logic logic;
-    private Path dataFilePath;
+    private final Stage primaryStage;
+    private final Logic logic;
+    private final Path dataFilePath;
     private final boolean savingDisabled;
 
     // Independent Ui parts residing in this Ui container
     private PersonListPanel personListPanel;
     private ProjectListPanel projectListPanel;
     private ResultDisplay resultDisplay;
-    private HelpWindow helpWindow;
+    private final HelpWindow helpWindow;
 
     @FXML
     private StackPane commandBoxPlaceholder;
@@ -98,6 +98,7 @@ public class MainWindow extends UiPart<Stage> {
 
     /**
      * Sets the accelerator of a MenuItem.
+     *
      * @param keyCombination the KeyCombination value of the accelerator
      */
     private void setAccelerator(MenuItem menuItem, KeyCombination keyCombination) {
@@ -120,7 +121,9 @@ public class MainWindow extends UiPart<Stage> {
          */
         getRoot().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
             if (event.getTarget() instanceof TextInputControl && keyCombination.match(event)) {
-                menuItem.getOnAction().handle(new ActionEvent());
+                menuItem
+                    .getOnAction()
+                    .handle(new ActionEvent());
                 event.consume();
             }
         });
@@ -131,19 +134,29 @@ public class MainWindow extends UiPart<Stage> {
      */
     void fillInnerParts() {
         personListPanel = new PersonListPanel(logic.getFilteredPersonList());
-        personListPanelPlaceholder.getChildren().add(personListPanel.getRoot());
+        personListPanelPlaceholder
+            .getChildren()
+            .add(personListPanel.getRoot());
 
         projectListPanel = new ProjectListPanel(logic.getFilteredProjectList());
-        projectListPanelPlaceholder.getChildren().add(projectListPanel.getRoot());
+        projectListPanelPlaceholder
+            .getChildren()
+            .add(projectListPanel.getRoot());
 
         resultDisplay = new ResultDisplay();
-        resultDisplayPlaceholder.getChildren().add(resultDisplay.getRoot());
+        resultDisplayPlaceholder
+            .getChildren()
+            .add(resultDisplay.getRoot());
 
         StatusBarFooter statusBarFooter = new StatusBarFooter(dataFilePath, savingDisabled);
-        statusbarPlaceholder.getChildren().add(statusBarFooter.getRoot());
+        statusbarPlaceholder
+            .getChildren()
+            .add(statusBarFooter.getRoot());
 
         CommandBox commandBox = new CommandBox(this::executeCommand);
-        commandBoxPlaceholder.getChildren().add(commandBox.getRoot());
+        commandBoxPlaceholder
+            .getChildren()
+            .add(commandBox.getRoot());
     }
 
     /**
@@ -153,8 +166,12 @@ public class MainWindow extends UiPart<Stage> {
         primaryStage.setHeight(guiSettings.getWindowHeight());
         primaryStage.setWidth(guiSettings.getWindowWidth());
         if (guiSettings.getWindowCoordinates() != null) {
-            primaryStage.setX(guiSettings.getWindowCoordinates().getX());
-            primaryStage.setY(guiSettings.getWindowCoordinates().getY());
+            primaryStage.setX(guiSettings
+                .getWindowCoordinates()
+                .getX());
+            primaryStage.setY(guiSettings
+                .getWindowCoordinates()
+                .getY());
         }
     }
 
@@ -180,7 +197,7 @@ public class MainWindow extends UiPart<Stage> {
     @FXML
     private void handleExit() {
         GuiSettings guiSettings = new GuiSettings(primaryStage.getWidth(), primaryStage.getHeight(),
-                (int) primaryStage.getX(), (int) primaryStage.getY());
+            (int) primaryStage.getX(), (int) primaryStage.getY());
         logic.setGuiSettings(guiSettings);
         helpWindow.hide();
         primaryStage.hide();
@@ -202,9 +219,14 @@ public class MainWindow extends UiPart<Stage> {
             resultDisplay.setFeedbackToUser(commandResult.getFeedbackToUser());
 
             switch (commandResult.getListViewTarget()) {
-                case CONTACTS -> listTabs.getSelectionModel().select(contactsTab);
-                case PROJECTS -> listTabs.getSelectionModel().select(projectsTab);
-                default -> { }
+                case CONTACTS -> listTabs
+                    .getSelectionModel()
+                    .select(contactsTab);
+                case PROJECTS -> listTabs
+                    .getSelectionModel()
+                    .select(projectsTab);
+                default -> {
+                }
             }
 
             if (commandResult.isShowHelp()) {

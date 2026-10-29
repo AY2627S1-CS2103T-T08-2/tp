@@ -23,8 +23,8 @@ public class UiManager implements Ui {
     private static final Logger logger = LogsCenter.getLogger(UiManager.class);
     private static final String ICON_APPLICATION = "/images/address_book_32.png";
 
-    private Logic logic;
-    private Path dataFilePath;
+    private final Logic logic;
+    private final Path dataFilePath;
     private final boolean savingDisabled;
     private MainWindow mainWindow;
 
@@ -42,7 +42,9 @@ public class UiManager implements Ui {
         logger.info("Starting UI...");
 
         //Set the application icon.
-        primaryStage.getIcons().add(getImage(ICON_APPLICATION));
+        primaryStage
+            .getIcons()
+            .add(getImage(ICON_APPLICATION));
 
         try {
             mainWindow = new MainWindow(primaryStage, logic, dataFilePath, savingDisabled);
@@ -51,12 +53,14 @@ public class UiManager implements Ui {
 
             if (savingDisabled) {
                 showAlertDialogAndWait(AlertType.ERROR, "Data loading failed",
-                        "Your saved data could not be loaded. Saving is disabled.",
-                        "Affected file: " + dataFilePath.toAbsolutePath().normalize()
-                                + "\n\nYour original file has been preserved."
-                                + " Close UniTeam, copy the file somewhere safe,"
-                                + " then repair it or restore a valid backup and restart."
-                                + "\n\nChanges in this session will be lost.");
+                    "Your saved data could not be loaded. Saving is disabled.",
+                    "Affected file: " + dataFilePath
+                        .toAbsolutePath()
+                        .normalize()
+                        + "\n\nYour original file has been preserved."
+                        + " Close UniTeam, copy the file somewhere safe,"
+                        + " then repair it or restore a valid backup and restart."
+                        + "\n\nChanges in this session will be lost.");
             }
 
         } catch (Throwable e) {
@@ -80,12 +84,17 @@ public class UiManager implements Ui {
     private static void showAlertDialogAndWait(Stage owner, AlertType type, String title, String headerText,
                                                String contentText) {
         final Alert alert = new Alert(type);
-        alert.getDialogPane().getStylesheets().add("view/DarkTheme.css");
+        alert
+            .getDialogPane()
+            .getStylesheets()
+            .add("view/DarkTheme.css");
         alert.initOwner(owner);
         alert.setTitle(title);
         alert.setHeaderText(headerText);
         alert.setContentText(contentText);
-        alert.getDialogPane().setId(ALERT_DIALOG_PANE_FIELD_ID);
+        alert
+            .getDialogPane()
+            .setId(ALERT_DIALOG_PANE_FIELD_ID);
         alert.showAndWait();
     }
 

@@ -12,9 +12,9 @@ import java.util.Locale;
 public class ProjectName {
 
     public static final String MESSAGE_CONSTRAINTS =
-            "Project names must be 1–50 characters long, contain at least one letter or digit, "
-                    + "and contain only letters, digits, spaces, hyphens, apostrophes, "
-                    + "ampersands and parentheses";
+        "Project names must be 1–50 characters long, contain at least one letter or digit, "
+            + "and contain only letters, digits, spaces, hyphens, apostrophes, "
+            + "ampersands and parentheses";
 
     public static final String VALIDATION_REGEX = "[\\p{L}\\p{N} '&()\\-]+";
 
@@ -39,8 +39,10 @@ public class ProjectName {
         String normalised = normalise(test);
         int length = normalised.codePointCount(0, normalised.length());
         return length >= 1 && length <= 50
-                && normalised.matches(VALIDATION_REGEX)
-                && normalised.codePoints().anyMatch(Character::isLetterOrDigit);
+            && normalised.matches(VALIDATION_REGEX)
+            && normalised
+            .codePoints()
+            .anyMatch(Character::isLetterOrDigit);
     }
 
     @Override
@@ -68,7 +70,9 @@ public class ProjectName {
     }
 
     private static String normalise(String name) {
-        return name.strip().replaceAll("\\s+", " ");
+        return name
+            .strip()
+            .replaceAll("\\s+", " ");
     }
 
     private String comparisonKey() {

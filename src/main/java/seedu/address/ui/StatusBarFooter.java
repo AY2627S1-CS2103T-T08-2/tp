@@ -25,7 +25,10 @@ public class StatusBarFooter extends UiPart<Region> {
      */
     public StatusBarFooter(Path saveLocation, boolean savingDisabled) {
         super(FXML);
-        String absolutePath = saveLocation.toAbsolutePath().normalize().toString();
+        String absolutePath = saveLocation
+            .toAbsolutePath()
+            .normalize()
+            .toString();
         saveLocationStatus.setText(absolutePath);
         saveLocationStatus.setTooltip(new Tooltip(absolutePath));
         savingDisabledStatus.setVisible(savingDisabled);

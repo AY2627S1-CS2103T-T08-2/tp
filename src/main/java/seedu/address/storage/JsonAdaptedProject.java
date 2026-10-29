@@ -31,9 +31,9 @@ class JsonAdaptedProject {
      */
     @JsonCreator
     public JsonAdaptedProject(@JsonProperty("id") String id,
-            @JsonProperty("name") String name,
-            @JsonProperty("deadline") String deadline,
-            @JsonProperty("description") String description) {
+                              @JsonProperty("name") String name,
+                              @JsonProperty("deadline") String deadline,
+                              @JsonProperty("description") String description) {
         this.id = id;
         this.name = name;
         this.deadline = deadline;
@@ -44,10 +44,18 @@ class JsonAdaptedProject {
      * Converts a given {@code Project} into this class for Jackson use.
      */
     public JsonAdaptedProject(Project source) {
-        id = source.getProjectId().toString();
-        name = source.getName().toString();
-        deadline = source.getDeadline().toString();
-        description = source.getDescription().toString();
+        id = source
+            .getProjectId()
+            .toString();
+        name = source
+            .getName()
+            .toString();
+        deadline = source
+            .getDeadline()
+            .toString();
+        description = source
+            .getDescription()
+            .toString();
     }
 
     /**
@@ -58,7 +66,7 @@ class JsonAdaptedProject {
     public Project toModelType() throws IllegalValueException {
         if (id == null) {
             throw new IllegalValueException(String.format(
-                    MISSING_FIELD_MESSAGE_FORMAT, ProjectId.class.getSimpleName()));
+                MISSING_FIELD_MESSAGE_FORMAT, ProjectId.class.getSimpleName()));
         }
         final ProjectId modelProjectId;
         try {
@@ -69,7 +77,7 @@ class JsonAdaptedProject {
 
         if (name == null) {
             throw new IllegalValueException(String.format(
-                    MISSING_FIELD_MESSAGE_FORMAT, ProjectName.class.getSimpleName()));
+                MISSING_FIELD_MESSAGE_FORMAT, ProjectName.class.getSimpleName()));
         }
         if (!ProjectName.isValidName(name)) {
             throw new IllegalValueException(ProjectName.MESSAGE_CONSTRAINTS);
@@ -78,7 +86,7 @@ class JsonAdaptedProject {
 
         if (deadline == null) {
             throw new IllegalValueException(String.format(
-                    MISSING_FIELD_MESSAGE_FORMAT, Deadline.class.getSimpleName()));
+                MISSING_FIELD_MESSAGE_FORMAT, Deadline.class.getSimpleName()));
         }
         final Deadline modelDeadline;
         try {
@@ -89,7 +97,7 @@ class JsonAdaptedProject {
 
         if (description == null) {
             throw new IllegalValueException(String.format(
-                    MISSING_FIELD_MESSAGE_FORMAT, Description.class.getSimpleName()));
+                MISSING_FIELD_MESSAGE_FORMAT, Description.class.getSimpleName()));
         }
         if (!Description.isValidDescription(description)) {
             throw new IllegalValueException(Description.MESSAGE_CONSTRAINTS);

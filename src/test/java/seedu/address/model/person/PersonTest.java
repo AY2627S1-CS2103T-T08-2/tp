@@ -30,9 +30,9 @@ public class PersonTest {
     @Test
     public void constructor_withoutId_generatesDistinctNonNullIds() {
         Person person = new Person(ALICE.getName(), ALICE.getPhone(), ALICE.getEmail(),
-                ALICE.getAddress(), ALICE.getTags());
+            ALICE.getAddress(), ALICE.getTags());
         Person otherPerson = new Person(ALICE.getName(), ALICE.getPhone(), ALICE.getEmail(),
-                ALICE.getAddress(), ALICE.getTags());
+            ALICE.getAddress(), ALICE.getTags());
 
         assertNotNull(person.getPersonId());
         assertNotNull(otherPerson.getPersonId());
@@ -42,7 +42,7 @@ public class PersonTest {
     @Test
     public void constructor_withId_preservesSuppliedId() {
         Person person = new Person(PERSON_ID, ALICE.getName(), ALICE.getPhone(), ALICE.getEmail(),
-                ALICE.getAddress(), ALICE.getTags());
+            ALICE.getAddress(), ALICE.getTags());
 
         assertEquals(PERSON_ID, person.getPersonId());
         assertEquals(ALICE, person);
@@ -51,15 +51,15 @@ public class PersonTest {
     @Test
     public void constructor_nullId_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new Person(null, ALICE.getName(), ALICE.getPhone(),
-                ALICE.getEmail(), ALICE.getAddress(), ALICE.getTags()));
+            ALICE.getEmail(), ALICE.getAddress(), ALICE.getTags()));
     }
 
     @Test
     public void constructor_nullTagSet_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> new Person(ALICE.getName(), ALICE.getPhone(),
-                ALICE.getEmail(), ALICE.getAddress(), null));
+            ALICE.getEmail(), ALICE.getAddress(), null));
         assertThrows(NullPointerException.class, () -> new Person(PERSON_ID, ALICE.getName(), ALICE.getPhone(),
-                ALICE.getEmail(), ALICE.getAddress(), null));
+            ALICE.getEmail(), ALICE.getAddress(), null));
     }
 
     @Test
@@ -70,31 +70,35 @@ public class PersonTest {
         mixedTags.add(null);
 
         assertThrows(NullPointerException.class, () -> new Person(ALICE.getName(), ALICE.getPhone(),
-                ALICE.getEmail(), ALICE.getAddress(), allNullTags));
+            ALICE.getEmail(), ALICE.getAddress(), allNullTags));
         assertThrows(NullPointerException.class, () -> new Person(ALICE.getName(), ALICE.getPhone(),
-                ALICE.getEmail(), ALICE.getAddress(), mixedTags));
+            ALICE.getEmail(), ALICE.getAddress(), mixedTags));
         assertThrows(NullPointerException.class, () -> new Person(PERSON_ID, ALICE.getName(), ALICE.getPhone(),
-                ALICE.getEmail(), ALICE.getAddress(), allNullTags));
+            ALICE.getEmail(), ALICE.getAddress(), allNullTags));
         assertThrows(NullPointerException.class, () -> new Person(PERSON_ID, ALICE.getName(), ALICE.getPhone(),
-                ALICE.getEmail(), ALICE.getAddress(), mixedTags));
+            ALICE.getEmail(), ALICE.getAddress(), mixedTags));
     }
 
     @Test
     public void constructor_emptyTags_isAccepted() {
         Person person = new Person(ALICE.getName(), ALICE.getPhone(), ALICE.getEmail(),
-                ALICE.getAddress(), Set.of());
+            ALICE.getAddress(), Set.of());
         Person personWithId = new Person(PERSON_ID, ALICE.getName(), ALICE.getPhone(), ALICE.getEmail(),
-                ALICE.getAddress(), Set.of());
+            ALICE.getAddress(), Set.of());
 
-        assertTrue(person.getTags().isEmpty());
-        assertTrue(personWithId.getTags().isEmpty());
+        assertTrue(person
+            .getTags()
+            .isEmpty());
+        assertTrue(personWithId
+            .getTags()
+            .isEmpty());
     }
 
     @Test
     public void constructor_mutatingSuppliedTags_doesNotChangePersonTags() {
         Set<Tag> suppliedTags = new HashSet<>(ALICE.getTags());
         Person person = new Person(ALICE.getName(), ALICE.getPhone(), ALICE.getEmail(),
-                ALICE.getAddress(), suppliedTags);
+            ALICE.getAddress(), suppliedTags);
 
         suppliedTags.add(new Tag("newtag"));
 
@@ -104,7 +108,9 @@ public class PersonTest {
     @Test
     public void asObservableList_modifyList_throwsUnsupportedOperationException() {
         Person person = new PersonBuilder().build();
-        assertThrows(UnsupportedOperationException.class, () -> person.getTags().remove(0));
+        assertThrows(UnsupportedOperationException.class, () -> person
+            .getTags()
+            .remove(0));
     }
 
     @Test
@@ -116,29 +122,45 @@ public class PersonTest {
         assertFalse(ALICE.isSamePerson(null));
 
         // same name, all other attributes different -> returns false
-        Person editedAlice = new PersonBuilder(ALICE).withPhone(VALID_PHONE_BOB).withEmail(VALID_EMAIL_BOB)
-                .withAddress(VALID_ADDRESS_BOB).withTags(VALID_TAG_HUSBAND).build();
+        Person editedAlice = new PersonBuilder(ALICE)
+            .withPhone(VALID_PHONE_BOB)
+            .withEmail(VALID_EMAIL_BOB)
+            .withAddress(VALID_ADDRESS_BOB)
+            .withTags(VALID_TAG_HUSBAND)
+            .build();
         assertFalse(ALICE.isSamePerson(editedAlice));
 
         // different name, all other attributes same -> returns false
-        editedAlice = new PersonBuilder(ALICE).withName(VALID_NAME_BOB).build();
+        editedAlice = new PersonBuilder(ALICE)
+            .withName(VALID_NAME_BOB)
+            .build();
         assertFalse(ALICE.isSamePerson(editedAlice));
 
         // name differs in case, all other attributes same -> returns false
-        Person editedBob = new PersonBuilder(BOB).withName(VALID_NAME_BOB.toLowerCase()).build();
+        Person editedBob = new PersonBuilder(BOB)
+            .withName(VALID_NAME_BOB.toLowerCase())
+            .build();
         assertFalse(BOB.isSamePerson(editedBob));
 
         // name has trailing spaces, all other attributes same -> returns false
         String nameWithTrailingSpaces = VALID_NAME_BOB + " ";
-        editedBob = new PersonBuilder(BOB).withName(nameWithTrailingSpaces).build();
+        editedBob = new PersonBuilder(BOB)
+            .withName(nameWithTrailingSpaces)
+            .build();
         assertFalse(BOB.isSamePerson(editedBob));
     }
 
     @Test
     public void isSamePerson_ignoresIds_comparesContactDetails() {
-        Person person = new PersonBuilder(ALICE).withPersonId(PERSON_ID).build();
-        Person editedAlice = new PersonBuilder(person).withPersonId(OTHER_PERSON_ID).build();
-        Person renamedAlice = new PersonBuilder(person).withName(VALID_NAME_BOB).build();
+        Person person = new PersonBuilder(ALICE)
+            .withPersonId(PERSON_ID)
+            .build();
+        Person editedAlice = new PersonBuilder(person)
+            .withPersonId(OTHER_PERSON_ID)
+            .build();
+        Person renamedAlice = new PersonBuilder(person)
+            .withName(VALID_NAME_BOB)
+            .build();
 
         assertNotEquals(person.getPersonId(), editedAlice.getPersonId());
         assertTrue(person.isSamePerson(editedAlice));
@@ -148,18 +170,32 @@ public class PersonTest {
 
     @Test
     public void isSamePerson_oneFieldDiffers_returnsFalse() {
-        assertFalse(ALICE.isSamePerson(new PersonBuilder(ALICE).withName(VALID_NAME_BOB).build()));
-        assertFalse(ALICE.isSamePerson(new PersonBuilder(ALICE).withPhone(VALID_PHONE_BOB).build()));
-        assertFalse(ALICE.isSamePerson(new PersonBuilder(ALICE).withEmail(VALID_EMAIL_BOB).build()));
-        assertFalse(ALICE.isSamePerson(new PersonBuilder(ALICE).withAddress(VALID_ADDRESS_BOB).build()));
-        assertFalse(ALICE.isSamePerson(new PersonBuilder(ALICE).withTags(VALID_TAG_HUSBAND).build()));
+        assertFalse(ALICE.isSamePerson(new PersonBuilder(ALICE)
+            .withName(VALID_NAME_BOB)
+            .build()));
+        assertFalse(ALICE.isSamePerson(new PersonBuilder(ALICE)
+            .withPhone(VALID_PHONE_BOB)
+            .build()));
+        assertFalse(ALICE.isSamePerson(new PersonBuilder(ALICE)
+            .withEmail(VALID_EMAIL_BOB)
+            .build()));
+        assertFalse(ALICE.isSamePerson(new PersonBuilder(ALICE)
+            .withAddress(VALID_ADDRESS_BOB)
+            .build()));
+        assertFalse(ALICE.isSamePerson(new PersonBuilder(ALICE)
+            .withTags(VALID_TAG_HUSBAND)
+            .build()));
     }
 
     @Test
     public void isSamePerson_tagsInDifferentOrder_returnsTrue() {
-        Person person = new PersonBuilder(ALICE).withTags("friends", "classmates").build();
-        Person otherPerson = new PersonBuilder(person).withPersonId(OTHER_PERSON_ID)
-                .withTags("classmates", "friends").build();
+        Person person = new PersonBuilder(ALICE)
+            .withTags("friends", "classmates")
+            .build();
+        Person otherPerson = new PersonBuilder(person)
+            .withPersonId(OTHER_PERSON_ID)
+            .withTags("classmates", "friends")
+            .build();
 
         assertTrue(person.isSamePerson(otherPerson));
         assertTrue(otherPerson.isSamePerson(person));
@@ -184,30 +220,44 @@ public class PersonTest {
         assertFalse(ALICE.equals(BOB));
 
         // different name -> returns false
-        Person editedAlice = new PersonBuilder(ALICE).withName(VALID_NAME_BOB).build();
+        Person editedAlice = new PersonBuilder(ALICE)
+            .withName(VALID_NAME_BOB)
+            .build();
         assertFalse(ALICE.equals(editedAlice));
 
         // different phone -> returns false
-        editedAlice = new PersonBuilder(ALICE).withPhone(VALID_PHONE_BOB).build();
+        editedAlice = new PersonBuilder(ALICE)
+            .withPhone(VALID_PHONE_BOB)
+            .build();
         assertFalse(ALICE.equals(editedAlice));
 
         // different email -> returns false
-        editedAlice = new PersonBuilder(ALICE).withEmail(VALID_EMAIL_BOB).build();
+        editedAlice = new PersonBuilder(ALICE)
+            .withEmail(VALID_EMAIL_BOB)
+            .build();
         assertFalse(ALICE.equals(editedAlice));
 
         // different address -> returns false
-        editedAlice = new PersonBuilder(ALICE).withAddress(VALID_ADDRESS_BOB).build();
+        editedAlice = new PersonBuilder(ALICE)
+            .withAddress(VALID_ADDRESS_BOB)
+            .build();
         assertFalse(ALICE.equals(editedAlice));
 
         // different tags -> returns false
-        editedAlice = new PersonBuilder(ALICE).withTags(VALID_TAG_HUSBAND).build();
+        editedAlice = new PersonBuilder(ALICE)
+            .withTags(VALID_TAG_HUSBAND)
+            .build();
         assertFalse(ALICE.equals(editedAlice));
     }
 
     @Test
     public void equals_differentIdsWithSameDetails_returnsTrueWithMatchingHashCodes() {
-        Person person = new PersonBuilder(ALICE).withPersonId(PERSON_ID).build();
-        Person aliceCopy = new PersonBuilder(person).withPersonId(OTHER_PERSON_ID).build();
+        Person person = new PersonBuilder(ALICE)
+            .withPersonId(PERSON_ID)
+            .build();
+        Person aliceCopy = new PersonBuilder(person)
+            .withPersonId(OTHER_PERSON_ID)
+            .build();
 
         assertNotEquals(person.getPersonId(), aliceCopy.getPersonId());
         assertEquals(person, aliceCopy);
@@ -218,9 +268,11 @@ public class PersonTest {
     @Test
     public void toStringMethod() {
         String expected = Person.class.getCanonicalName() + "{name=" + ALICE.getName() + ", phone=" + ALICE.getPhone()
-                + ", email=" + ALICE.getEmail() + ", address=" + ALICE.getAddress() + ", tags=" + ALICE.getTags() + "}";
+            + ", email=" + ALICE.getEmail() + ", address=" + ALICE.getAddress() + ", tags=" + ALICE.getTags() + "}";
         assertEquals(expected, ALICE.toString());
-        Person aliceCopy = new PersonBuilder(ALICE).withPersonId(OTHER_PERSON_ID).build();
+        Person aliceCopy = new PersonBuilder(ALICE)
+            .withPersonId(OTHER_PERSON_ID)
+            .build();
         assertEquals(expected, aliceCopy.toString());
     }
 }

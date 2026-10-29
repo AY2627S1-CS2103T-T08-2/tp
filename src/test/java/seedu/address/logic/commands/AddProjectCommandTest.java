@@ -27,8 +27,8 @@ public class AddProjectCommandTest {
         Project copy = new ProjectBuilder(project).build();
         Project otherProject = createProject("Orbital", Description.EMPTY);
         Project editedProject = new ProjectBuilder(project)
-                .withDescription("Different description")
-                .build();
+            .withDescription("Different description")
+            .build();
 
         AddProjectCommand command = new AddProjectCommand(project);
 
@@ -58,15 +58,15 @@ public class AddProjectCommandTest {
     public void execute_validProject_addSuccessful() throws Exception {
         Model model = new ModelManager();
         Project project = createProject(
-                "CS2103T", new Description("Build a contact manager"));
+            "CS2103T", new Description("Build a contact manager"));
 
         CommandResult result = new AddProjectCommand(project).execute(model);
 
         assertEquals(List.of(project), model.getFilteredProjectList());
         assertEquals(
-                "New project added:\nCS2103T\nDeadline: 2026-11-13\n"
-                        + "Description: Build a contact manager",
-                result.getFeedbackToUser());
+            "New project added:\nCS2103T\nDeadline: 2026-11-13\n"
+                + "Description: Build a contact manager",
+            result.getFeedbackToUser());
     }
 
     @Test
@@ -78,9 +78,9 @@ public class AddProjectCommandTest {
 
         assertEquals(List.of(project), model.getFilteredProjectList());
         assertEquals(
-                "New project added:\nCS2103T\nDeadline: 2026-11-13\n"
-                        + "Description: No description provided",
-                result.getFeedbackToUser());
+            "New project added:\nCS2103T\nDeadline: 2026-11-13\n"
+                + "Description: No description provided",
+            result.getFeedbackToUser());
     }
 
     @Test
@@ -104,10 +104,10 @@ public class AddProjectCommandTest {
         AddProjectCommand command = new AddProjectCommand(project);
 
         assertThrows(
-                CommandException.class,
-                String.format(
-                        AddProjectCommand.MESSAGE_DUPLICATE_PROJECT, project.getName()
-                ), () -> command.execute(model)
+            CommandException.class,
+            String.format(
+                AddProjectCommand.MESSAGE_DUPLICATE_PROJECT, project.getName()
+            ), () -> command.execute(model)
         );
 
         assertEquals(List.of(project), model.getFilteredProjectList());
@@ -120,17 +120,17 @@ public class AddProjectCommandTest {
         model.addProject(existingProject);
 
         Project duplicateProject = new Project(
-                new ProjectName("CS2103T"),
-                new Deadline(LocalDate.of(2027, 1, 1)),
-                new Description("Different description"));
+            new ProjectName("CS2103T"),
+            new Deadline(LocalDate.of(2027, 1, 1)),
+            new Description("Different description"));
 
         AddProjectCommand command = new AddProjectCommand(duplicateProject);
 
         assertThrows(
-                CommandException.class,
-                String.format(
-                        AddProjectCommand.MESSAGE_DUPLICATE_PROJECT, duplicateProject.getName()
-                ), () -> command.execute(model)
+            CommandException.class,
+            String.format(
+                AddProjectCommand.MESSAGE_DUPLICATE_PROJECT, duplicateProject.getName()
+            ), () -> command.execute(model)
         );
 
         assertEquals(List.of(existingProject), model.getFilteredProjectList());
@@ -143,14 +143,14 @@ public class AddProjectCommandTest {
         model.addProject(existingProject);
 
         Project duplicateProject = createProject(
-                "  cs2103t   team project  ", Description.EMPTY);
+            "  cs2103t   team project  ", Description.EMPTY);
         AddProjectCommand command = new AddProjectCommand(duplicateProject);
 
         assertThrows(
-                CommandException.class,
-                String.format(
-                        AddProjectCommand.MESSAGE_DUPLICATE_PROJECT, duplicateProject.getName()
-                ), () -> command.execute(model)
+            CommandException.class,
+            String.format(
+                AddProjectCommand.MESSAGE_DUPLICATE_PROJECT, duplicateProject.getName()
+            ), () -> command.execute(model)
         );
 
         assertEquals(List.of(existingProject), model.getFilteredProjectList());
@@ -158,8 +158,8 @@ public class AddProjectCommandTest {
 
     private static Project createProject(String name, Description description) {
         return new Project(
-                new ProjectName(name),
-                new Deadline(LocalDate.of(2026, 11, 13)),
-                description);
+            new ProjectName(name),
+            new Deadline(LocalDate.of(2026, 11, 13)),
+            description);
     }
 }

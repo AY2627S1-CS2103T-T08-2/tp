@@ -25,11 +25,13 @@ public class EditProjectCommandParser implements Parser<EditProjectCommand> {
     public EditProjectCommand parse(String args) throws ParseException {
         requireNonNull(args);
 
-        if (args.codePoints().anyMatch(codePoint -> codePoint == '\r'
-            || codePoint == '\n'
-            || codePoint == '\u0085'
-            || codePoint == '\u2028'
-            || codePoint == '\u2029')) {
+        if (args
+            .codePoints()
+            .anyMatch(codePoint -> codePoint == '\r'
+                || codePoint == '\n'
+                || codePoint == '\u0085'
+                || codePoint == '\u2028'
+                || codePoint == '\u2029')) {
             throw new ParseException(String.format(
                 MESSAGE_INVALID_COMMAND_FORMAT, EditProjectCommand.MESSAGE_USAGE));
         }
@@ -52,14 +54,26 @@ public class EditProjectCommandParser implements Parser<EditProjectCommand> {
 
         EditProjectCommand.EditProjectDescriptor editProjectDescriptor = new EditProjectCommand.EditProjectDescriptor();
 
-        if (argMultimap.getValue(PREFIX_NAME).isPresent()) {
-            editProjectDescriptor.setName(ParserUtil.parseProjectName(argMultimap.getValue(PREFIX_NAME).get()));
+        if (argMultimap
+            .getValue(PREFIX_NAME)
+            .isPresent()) {
+            editProjectDescriptor.setName(ParserUtil.parseProjectName(argMultimap
+                .getValue(PREFIX_NAME)
+                .get()));
         }
-        if (argMultimap.getValue(PREFIX_DEADLINE).isPresent()) {
-            editProjectDescriptor.setDeadline(ParserUtil.parseDeadline(argMultimap.getValue(PREFIX_DEADLINE).get()));
+        if (argMultimap
+            .getValue(PREFIX_DEADLINE)
+            .isPresent()) {
+            editProjectDescriptor.setDeadline(ParserUtil.parseDeadline(argMultimap
+                .getValue(PREFIX_DEADLINE)
+                .get()));
         }
-        if (argMultimap.getValue(PREFIX_DESCRIPTION).isPresent()) {
-            String description = argMultimap.getValue(PREFIX_DESCRIPTION).get();
+        if (argMultimap
+            .getValue(PREFIX_DESCRIPTION)
+            .isPresent()) {
+            String description = argMultimap
+                .getValue(PREFIX_DESCRIPTION)
+                .get();
             editProjectDescriptor.setDescription(description.isBlank()
                 ? Description.EMPTY
                 : ParserUtil.parseDescription(description));

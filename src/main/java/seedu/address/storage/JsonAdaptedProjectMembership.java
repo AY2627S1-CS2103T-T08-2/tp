@@ -25,7 +25,8 @@ class JsonAdaptedProjectMembership {
      */
     @JsonCreator
     public JsonAdaptedProjectMembership(@JsonProperty("personId") String personId,
-            @JsonProperty("projectId") String projectId, @JsonProperty("role") String role) {
+                                        @JsonProperty("projectId") String projectId,
+                                        @JsonProperty("role") String role) {
         this.personId = personId;
         this.projectId = projectId;
         this.role = role;
@@ -35,9 +36,15 @@ class JsonAdaptedProjectMembership {
      * Converts a given {@code ProjectMembership} into this class for Jackson use.
      */
     public JsonAdaptedProjectMembership(ProjectMembership source) {
-        personId = source.getPersonId().toString();
-        projectId = source.getProjectId().toString();
-        role = source.getRole().toString();
+        personId = source
+            .getPersonId()
+            .toString();
+        projectId = source
+            .getProjectId()
+            .toString();
+        role = source
+            .getRole()
+            .toString();
     }
 
     /**
@@ -48,7 +55,7 @@ class JsonAdaptedProjectMembership {
     public ProjectMembership toModelType() throws IllegalValueException {
         if (personId == null) {
             throw new IllegalValueException(String.format(
-                    MISSING_FIELD_MESSAGE_FORMAT, PersonId.class.getSimpleName()));
+                MISSING_FIELD_MESSAGE_FORMAT, PersonId.class.getSimpleName()));
         }
         final PersonId modelPersonId;
         try {
@@ -59,7 +66,7 @@ class JsonAdaptedProjectMembership {
 
         if (projectId == null) {
             throw new IllegalValueException(String.format(
-                    MISSING_FIELD_MESSAGE_FORMAT, ProjectId.class.getSimpleName()));
+                MISSING_FIELD_MESSAGE_FORMAT, ProjectId.class.getSimpleName()));
         }
         final ProjectId modelProjectId;
         try {

@@ -36,7 +36,9 @@ import seedu.address.storage.StorageManager;
 import seedu.address.testutil.JavaFxTestUtil;
 import seedu.address.testutil.ProjectBuilder;
 
-/** Exercises real JavaFX cards and command-driven tab selection when a display is available. */
+/**
+ * Exercises real JavaFX cards and command-driven tab selection when a display is available.
+ */
 public class ProjectMemberCardsUiTest {
 
     @TempDir
@@ -56,43 +58,85 @@ public class ProjectMemberCardsUiTest {
                 Model model = new ModelManager();
                 model.addPerson(ALICE);
                 model.addPerson(BENSON);
-                Project project = new ProjectBuilder().withName("CS2103T Team Project").build();
-                Project emptyProject = new ProjectBuilder().withName("Orbital").build();
+                Project project = new ProjectBuilder()
+                    .withName("CS2103T Team Project")
+                    .build();
+                Project emptyProject = new ProjectBuilder()
+                    .withName("Orbital")
+                    .build();
                 model.addProject(project);
                 model.addProject(emptyProject);
                 model.addProjectMembership(new ProjectMembership(BENSON.getPersonId(), project.getProjectId()));
                 Path dataPath = testFolder.resolve("addressbook.json");
                 StorageManager storage = new StorageManager(new JsonAddressBookStorage(dataPath),
-                        new JsonUserPrefsStorage(testFolder.resolve("preferences.json")));
+                    new JsonUserPrefsStorage(testFolder.resolve("preferences.json")));
                 MainWindow window = new MainWindow(stage, new LogicManager(model, storage), dataPath, false);
                 window.fillInnerParts();
                 stage.setWidth(1000);
                 stage.setHeight(760);
                 stage.show();
-                stage.getScene().getRoot().applyCss();
-                stage.getScene().getRoot().layout();
-                TabPane tabs = (TabPane) stage.getScene().lookup("#listTabs");
-                TextField input = (TextField) stage.getScene().lookup("#commandTextField");
+                stage
+                    .getScene()
+                    .getRoot()
+                    .applyCss();
+                stage
+                    .getScene()
+                    .getRoot()
+                    .layout();
+                TabPane tabs = (TabPane) stage
+                    .getScene()
+                    .lookup("#listTabs");
+                TextField input = (TextField) stage
+                    .getScene()
+                    .lookup("#commandTextField");
 
                 enterCommand(input, "listprojects");
-                assertEquals("Projects", tabs.getSelectionModel().getSelectedItem().getText());
+                assertEquals("Projects", tabs
+                    .getSelectionModel()
+                    .getSelectedItem()
+                    .getText());
                 enterCommand(input, "addproject n/UI Demo d/2026-11-13");
-                assertEquals("Projects", tabs.getSelectionModel().getSelectedItem().getText());
+                assertEquals("Projects", tabs
+                    .getSelectionModel()
+                    .getSelectedItem()
+                    .getText());
                 enterCommand(input, "listmembers pr/CS2103T Team Project");
-                assertEquals("Contacts", tabs.getSelectionModel().getSelectedItem().getText());
+                assertEquals("Contacts", tabs
+                    .getSelectionModel()
+                    .getSelectedItem()
+                    .getText());
                 assertEquals(List.of(BENSON), model.getFilteredPersonList());
-                stage.getScene().getRoot().applyCss();
-                stage.getScene().getRoot().layout();
-                assertFalse(stage.getScene().getRoot().lookupAll("#cardPane").isEmpty());
+                stage
+                    .getScene()
+                    .getRoot()
+                    .applyCss();
+                stage
+                    .getScene()
+                    .getRoot()
+                    .layout();
+                assertFalse(stage
+                    .getScene()
+                    .getRoot()
+                    .lookupAll("#cardPane")
+                    .isEmpty());
                 savePreview(stage);
 
                 enterCommand(input, "listmembers pr/Orbital");
-                assertTrue(model.getFilteredPersonList().isEmpty());
-                ListView<?> contacts = (ListView<?>) stage.getScene().lookup("#personListView");
-                assertEquals(0, contacts.getItems().size());
+                assertTrue(model
+                    .getFilteredPersonList()
+                    .isEmpty());
+                ListView<?> contacts = (ListView<?>) stage
+                    .getScene()
+                    .lookup("#personListView");
+                assertEquals(0, contacts
+                    .getItems()
+                    .size());
                 enterCommand(input, "list");
                 assertEquals(List.of(ALICE, BENSON), model.getFilteredPersonList());
-                assertEquals("Contacts", tabs.getSelectionModel().getSelectedItem().getText());
+                assertEquals("Contacts", tabs
+                    .getSelectionModel()
+                    .getSelectedItem()
+                    .getText());
                 finished.complete(null);
             } catch (Throwable error) {
                 finished.completeExceptionally(error);
@@ -103,21 +147,29 @@ public class ProjectMemberCardsUiTest {
         finished.get(30, TimeUnit.SECONDS);
     }
 
-    /** Sends a command through the same action handler used by the Enter key. */
+    /**
+     * Sends a command through the same action handler used by the Enter key.
+     */
     private static void enterCommand(TextField input, String command) {
         input.setText(command);
         input.fireEvent(new ActionEvent());
         assertEquals("", input.getText());
     }
 
-    /** Saves the rendered scene for local visual inspection alongside test reports. */
+    /**
+     * Saves the rendered scene for local visual inspection alongside test reports.
+     */
     private static void savePreview(Stage stage) throws Exception {
-        WritableImage snapshot = stage.getScene().snapshot(null);
+        WritableImage snapshot = stage
+            .getScene()
+            .snapshot(null);
         BufferedImage image = new BufferedImage((int) snapshot.getWidth(), (int) snapshot.getHeight(),
-                BufferedImage.TYPE_INT_ARGB);
+            BufferedImage.TYPE_INT_ARGB);
         for (int y = 0; y < image.getHeight(); y++) {
             for (int x = 0; x < image.getWidth(); x++) {
-                image.setRGB(x, y, snapshot.getPixelReader().getArgb(x, y));
+                image.setRGB(x, y, snapshot
+                    .getPixelReader()
+                    .getArgb(x, y));
             }
         }
         Path output = Path.of("build", "reports", "ui", "project-members.png");

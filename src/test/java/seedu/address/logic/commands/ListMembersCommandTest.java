@@ -28,7 +28,7 @@ import seedu.address.model.project.ProjectName;
 public class ListMembersCommandTest {
 
     private final Project project = new Project(new ProjectName("CS2103T Team Project"),
-            new Deadline(LocalDate.of(2026, 11, 13)), Description.EMPTY);
+        new Deadline(LocalDate.of(2026, 11, 13)), Description.EMPTY);
 
     @Test
     public void constructor_nullProjectName_throwsNullPointerException() {
@@ -146,8 +146,12 @@ public class ListMembersCommandTest {
 
         new DeleteCommand(Index.fromOneBased(1)).execute(model);
 
-        assertEquals(List.of(ALICE), model.getAddressBook().getPersonList());
-        assertTrue(model.getFilteredPersonList().isEmpty());
+        assertEquals(List.of(ALICE), model
+            .getAddressBook()
+            .getPersonList());
+        assertTrue(model
+            .getFilteredPersonList()
+            .isEmpty());
     }
 
     @Test
@@ -156,12 +160,12 @@ public class ListMembersCommandTest {
         model.addPerson(ALICE);
         model.addProject(project);
         model.addProjectMembership(new ProjectMembership(ALICE.getPersonId(), project.getProjectId(),
-                new Role("Implement parser")));
+            new Role("Implement parser")));
 
         CommandResult result = new ListMembersCommand(project.getName()).execute(model);
 
         assertEquals("Contacts in project \"CS2103T Team Project\" (1):\n1. Alice Pauline — Implement parser",
-                result.getFeedbackToUser());
+            result.getFeedbackToUser());
     }
 
     @Test
@@ -179,6 +183,8 @@ public class ListMembersCommandTest {
     public void toStringMethod() {
         ListMembersCommand command = new ListMembersCommand(project.getName());
 
-        assertTrue(command.toString().contains("projectName=CS2103T Team Project"));
+        assertTrue(command
+            .toString()
+            .contains("projectName=CS2103T Team Project"));
     }
 }

@@ -7,7 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
-/** Tests for {@link Role}. */
+/**
+ * Tests for {@link Role}.
+ */
 public class RoleTest {
 
     @Test
@@ -23,9 +25,9 @@ public class RoleTest {
         assertFalse(Role.isValidRole("Team\fLeader"));
         assertFalse(Role.isValidRole("line one\nline two"));
         assertFalse(Role.isValidRole("line one\rline two"));
-        assertFalse(Role.isValidRole("line one" + Character.toString((char) 0x0085) + "line two"));
-        assertFalse(Role.isValidRole("line one" + Character.toString((char) 0x2028) + "line two"));
-        assertFalse(Role.isValidRole("line one" + Character.toString((char) 0x2029) + "line two"));
+        assertFalse(Role.isValidRole("line one" + (char) 0x0085 + "line two"));
+        assertFalse(Role.isValidRole("line one" + (char) 0x2028 + "line two"));
+        assertFalse(Role.isValidRole("line one" + (char) 0x2029 + "line two"));
         assertFalse(Role.isValidRole("x".repeat(201)));
     }
 

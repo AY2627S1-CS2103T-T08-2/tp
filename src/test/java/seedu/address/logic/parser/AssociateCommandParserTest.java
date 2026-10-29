@@ -18,32 +18,32 @@ import seedu.address.logic.commands.AssociateCommand;
 public class AssociateCommandParserTest {
 
     private static final String USAGE_MESSAGE = String.format(
-            MESSAGE_INVALID_COMMAND_FORMAT, AssociateCommand.MESSAGE_USAGE);
+        MESSAGE_INVALID_COMMAND_FORMAT, AssociateCommand.MESSAGE_USAGE);
 
     private final AssociateCommandParser parser = new AssociateCommandParser();
 
     @Test
     public void parse_validArgs_returnsAssociateCommand() {
         assertParseSuccess(parser, " c/2 pr/1",
-                new AssociateCommand(Index.fromOneBased(2), Index.fromOneBased(1)));
+            new AssociateCommand(Index.fromOneBased(2), Index.fromOneBased(1)));
     }
 
     @Test
     public void parse_reversedPrefixOrder_success() {
         assertParseSuccess(parser, " pr/1 c/2",
-                new AssociateCommand(Index.fromOneBased(2), Index.fromOneBased(1)));
+            new AssociateCommand(Index.fromOneBased(2), Index.fromOneBased(1)));
     }
 
     @Test
     public void parse_extraWhitespace_success() {
         assertParseSuccess(parser, "   c/  2   pr/  1   ",
-                new AssociateCommand(Index.fromOneBased(2), Index.fromOneBased(1)));
+            new AssociateCommand(Index.fromOneBased(2), Index.fromOneBased(1)));
     }
 
     @Test
     public void parse_largeValidIndices_success() {
         assertParseSuccess(parser, " c/2147483647 pr/2147483647",
-                new AssociateCommand(Index.fromOneBased(Integer.MAX_VALUE), Index.fromOneBased(Integer.MAX_VALUE)));
+            new AssociateCommand(Index.fromOneBased(Integer.MAX_VALUE), Index.fromOneBased(Integer.MAX_VALUE)));
     }
 
     @Test
@@ -114,7 +114,7 @@ public class AssociateCommandParserTest {
     @Test
     public void parse_bothPrefixesRepeated_failure() {
         assertParseFailure(parser, " c/1 c/2 pr/1 pr/2",
-                Messages.getErrorMessageForDuplicatePrefixes(PREFIX_CONTACT, PREFIX_PROJECT));
+            Messages.getErrorMessageForDuplicatePrefixes(PREFIX_CONTACT, PREFIX_PROJECT));
     }
 
     @Test

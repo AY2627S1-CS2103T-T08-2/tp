@@ -11,7 +11,7 @@ import java.util.UUID;
 public class ProjectId {
 
     public static final String MESSAGE_CONSTRAINTS =
-            "Project IDs must use the standard UUID format.";
+        "Project IDs must use the standard UUID format.";
 
     public final UUID value;
 
@@ -32,13 +32,15 @@ public class ProjectId {
     /**
      * Constructs an identifier from its stored string representation.
      *
-     * @throws NullPointerException if {@code value} is null.
+     * @throws NullPointerException     if {@code value} is null.
      * @throws IllegalArgumentException if {@code value} cannot be parsed as a UUID.
      */
     public static ProjectId fromString(String value) {
         requireNonNull(value);
         UUID parsedValue = UUID.fromString(value);
-        if (!parsedValue.toString().equalsIgnoreCase(value)) {
+        if (!parsedValue
+            .toString()
+            .equalsIgnoreCase(value)) {
             throw new IllegalArgumentException(MESSAGE_CONSTRAINTS);
         }
         return new ProjectId(parsedValue);

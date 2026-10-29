@@ -17,6 +17,7 @@ hs_err_pid[0-9]*.log
 
 # Test sandbox files
 src/test/data/sandbox/
+/config/checkstyle/checkstyle - Copy.xml
 
 # MacOS custom attributes files created by Finder
 .DS_Store

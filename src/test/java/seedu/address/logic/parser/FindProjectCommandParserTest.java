@@ -14,7 +14,9 @@ import seedu.address.logic.commands.FindProjectCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 import seedu.address.model.project.ProjectNameContainsKeywordsPredicate;
 
-/** Tests keyword parsing and AddressBookParser routing for findproject. */
+/**
+ * Tests keyword parsing and AddressBookParser routing for findproject.
+ */
 public class FindProjectCommandParserTest {
 
     private static final String USAGE_MESSAGE = String.format(

@@ -22,7 +22,7 @@ public class UniqueProjectMembershipList implements Iterable<ProjectMembership> 
 
     private final ObservableList<ProjectMembership> internalList = FXCollections.observableArrayList();
     private final ObservableList<ProjectMembership> internalUnmodifiableList =
-            FXCollections.unmodifiableObservableList(internalList);
+        FXCollections.unmodifiableObservableList(internalList);
 
     /**
      * Returns true if the list contains the given membership.
@@ -55,7 +55,9 @@ public class UniqueProjectMembershipList implements Iterable<ProjectMembership> 
         }
     }
 
-    /** Replaces a membership matching the same person and project identifiers. */
+    /**
+     * Replaces a membership matching the same person and project identifiers.
+     */
     public void set(ProjectMembership membership) {
         requireNonNull(membership);
         int index = internalList.indexOf(membership);
@@ -94,7 +96,9 @@ public class UniqueProjectMembershipList implements Iterable<ProjectMembership> 
      */
     public void removeAllForPerson(PersonId personId) {
         requireNonNull(personId);
-        internalList.removeIf(membership -> membership.getPersonId().equals(personId));
+        internalList.removeIf(membership -> membership
+            .getPersonId()
+            .equals(personId));
     }
 
     /**
@@ -102,7 +106,9 @@ public class UniqueProjectMembershipList implements Iterable<ProjectMembership> 
      */
     public void removeAllForProject(ProjectId projectId) {
         requireNonNull(projectId);
-        internalList.removeIf(membership -> membership.getProjectId().equals(projectId));
+        internalList.removeIf(membership -> membership
+            .getProjectId()
+            .equals(projectId));
     }
 
     /**
@@ -145,6 +151,8 @@ public class UniqueProjectMembershipList implements Iterable<ProjectMembership> 
      */
     private boolean membershipsAreUnique(List<ProjectMembership> memberships) {
         Set<ProjectMembership> seen = new HashSet<>();
-        return memberships.stream().allMatch(seen::add);
+        return memberships
+            .stream()
+            .allMatch(seen::add);
     }
 }

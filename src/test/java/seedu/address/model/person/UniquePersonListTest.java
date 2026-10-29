@@ -206,7 +206,7 @@ public class UniquePersonListTest {
                     uniquePersonList.setPersons(people);
                     Person storedPerson = people.get(targetIndex);
                     Person target = new PersonBuilder(storedPerson).withPersonId(claimedIdOwner.getPersonId()).build();
-                    Person replacement = new PersonBuilder(target);
+                    PersonBuilder replacement = new PersonBuilder(target);
                     if (changeDetails) {
                         replacement.withAddress(VALID_ADDRESS_BOB);
                     }

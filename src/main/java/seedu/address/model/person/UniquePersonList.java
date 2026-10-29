@@ -68,11 +68,12 @@ public class UniquePersonList implements Iterable<Person> {
             throw new PersonNotFoundException();
         }
 
-        if (!target.getPersonId().equals(editedPerson.getPersonId())) {
+        Person storedPerson = internalList.get(index);
+        if (!storedPerson.getPersonId().equals(editedPerson.getPersonId())) {
             throw new IllegalArgumentException("A person's identifier cannot be changed.");
         }
 
-        if (!target.isSamePerson(editedPerson) && contains(editedPerson)) {
+        if (!storedPerson.isSamePerson(editedPerson) && contains(editedPerson)) {
             throw new DuplicatePersonException();
         }
 

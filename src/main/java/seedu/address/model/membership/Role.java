@@ -13,7 +13,7 @@ public final class Role {
     public static final Role EMPTY = new Role("");
     public static final String MESSAGE_CONSTRAINTS =
         "Roles must be at most 200 characters long and must not contain line breaks";
-    public static final String VALIDATION_REGEX = "[^\\r\\n\\u0085\\u2028\\u2029]*";
+    public static final String VALIDATION_REGEX = "[^\\r\\n\\x0B\\f\\u0085\\u2028\\u2029]*";
 
     private final String description;
 

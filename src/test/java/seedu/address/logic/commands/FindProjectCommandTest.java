@@ -269,24 +269,24 @@ public class FindProjectCommandTest {
     }
 
     @Test
-    public void execute_listContactProjectsAfterSearch_restoresCorrectProjectIndices() throws CommandException {
+    public void execute_listContactProjectsAfterSearch_preservesFilter() throws CommandException {
         command("Beta").execute(model);
 
         CommandResult result = new ListProjectsCommand(FIRST_INDEX).execute(model);
 
-        assertEquals(allProjects, model.getFilteredProjectList());
+        assertEquals(List.of(beta), model.getFilteredProjectList());
         assertEquals(String.format("Projects for contact \"%s\" (1):\n", ALICE.getName())
-                + "1. Alpha Project | Deadline: 2027-01-01 | Description: Test project",
+                + "[not displayed] Alpha Project | Deadline: 2027-01-01 | Description: Test project",
             result.getFeedbackToUser());
     }
 
     @Test
-    public void execute_listUnassociatedContactAfterSearch_stillClearsSearch() throws CommandException {
+    public void execute_listUnassociatedContactAfterSearch_preservesFilter() throws CommandException {
         command("Beta").execute(model);
 
         CommandResult result = new ListProjectsCommand(Index.fromOneBased(2)).execute(model);
 
-        assertEquals(allProjects, model.getFilteredProjectList());
+        assertEquals(List.of(beta), model.getFilteredProjectList());
         assertEquals(String.format(ListProjectsCommand.MESSAGE_NO_PROJECTS, BOB.getName()),
             result.getFeedbackToUser());
     }

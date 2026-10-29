@@ -3,10 +3,11 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.VBox?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17">
-    <ListView fx:id="projectListView" VBox.vgrow="ALWAYS">
-        <placeholder>
-            <Label text="No projects yet. Create one with addproject." styleClass="empty-list-label" wrapText="true"/>
-        </placeholder>
-    </ListView>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+  <ListView fx:id="projectListView" VBox.vgrow="ALWAYS">
+    <placeholder>
+      <Label text="No projects to show. Use listprojects to see all projects, or addproject to create one." styleClass="empty-list-label" wrapText="true" />
+    </placeholder>
+  </ListView>
 </VBox>

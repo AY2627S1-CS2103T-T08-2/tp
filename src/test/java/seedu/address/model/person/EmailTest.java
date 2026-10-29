@@ -1,5 +1,6 @@
 package seedu.address.model.person;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
@@ -7,6 +8,22 @@ import static seedu.address.testutil.Assert.assertThrows;
 import org.junit.jupiter.api.Test;
 
 public class EmailTest {
+
+    @Test
+    public void constructor_hyphenatedFinalDomainLabel_acceptsValidEmail() {
+        assertTrue(Email.isValidEmail("a@b-c"));
+        assertEquals("a@b-c", new Email("a@b-c").value);
+        assertTrue(Email.isValidEmail("a@x.b-c"));
+        assertEquals("a@x.b-c", new Email("a@x.b-c").value);
+    }
+
+    @Test
+    public void constructor_invalidFinalDomainLabel_rejectsEmail() {
+        assertFalse(Email.isValidEmail("a@b"));
+        assertThrows(IllegalArgumentException.class, () -> new Email("a@b"));
+        assertFalse(Email.isValidEmail("a@-bc"));
+        assertFalse(Email.isValidEmail("a@bc-"));
+    }
 
     @Test
     public void constructor_null_throwsNullPointerException() {

@@ -37,8 +37,12 @@ public class ProjectCard extends UiPart<Region> {
         super(FXML);
         this.project = project;
         this.displayedIndex.setText(displayedIndex + ". ");
-        name.setText(project.getName().toString());
-        name.setTooltip(new Tooltip(project.getName().toString()));
+        name.setText(project
+            .getName()
+            .toString());
+        name.setTooltip(new Tooltip(project
+            .getName()
+            .toString()));
         projectId.setText("ID: " + project.getProjectId());
         deadline.setText("Deadline: " + project.getDeadline());
 

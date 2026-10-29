@@ -137,9 +137,9 @@ public class ListProjectsCommandTest {
         CommandResult result = new ListProjectsCommand(Index.fromOneBased(1)).execute(model);
 
         assertEquals(String.format("Projects for contact \"%1$s\" (2):\n", ALICE.getName())
-                        + "[not displayed] Alpha | Deadline: 2026-11-13 | Description: No description provided\n"
-                        + "1. Beta | Deadline: 2026-11-13 | Description: No description provided",
-                result.getFeedbackToUser());
+                + "[not displayed] Alpha | Deadline: 2026-11-13 | Description: No description provided\n"
+                + "1. Beta | Deadline: 2026-11-13 | Description: No description provided",
+            result.getFeedbackToUser());
         assertEquals(CommandResult.ListViewTarget.NONE, result.getListViewTarget());
         assertEquals(List.of(visible), model.getFilteredProjectList());
         assertEquals(originalFilter, model.getFilteredProjectListPredicate());

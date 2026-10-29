@@ -106,7 +106,7 @@ public class JsonAdaptedProjectMembershipTest {
     public void toModelType_controlCharacterRole_throwsIllegalValueException() {
         for (char lineBreak : new char[] {11, '\f'}) {
             JsonAdaptedProjectMembership membership = new JsonAdaptedProjectMembership(
-                    VALID_PERSON_ID, VALID_PROJECT_ID, "Team" + lineBreak + "Leader");
+                VALID_PERSON_ID, VALID_PROJECT_ID, "Team" + lineBreak + "Leader");
             assertThrows(IllegalValueException.class, Role.MESSAGE_CONSTRAINTS, membership::toModelType);
         }
     }

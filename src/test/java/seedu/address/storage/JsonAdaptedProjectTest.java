@@ -113,7 +113,7 @@ public class JsonAdaptedProjectTest {
     public void toModelType_controlCharacterDescription_throwsIllegalValueException() {
         for (char lineBreak : new char[] {11, '\f'}) {
             JsonAdaptedProject project = new JsonAdaptedProject(
-                    VALID_ID, VALID_NAME, VALID_DEADLINE, "Research" + lineBreak + "Design");
+                VALID_ID, VALID_NAME, VALID_DEADLINE, "Research" + lineBreak + "Design");
             assertThrows(IllegalValueException.class, Description.MESSAGE_CONSTRAINTS, project::toModelType);
         }
     }

@@ -70,7 +70,9 @@ public class ListProjectsCommand extends Command {
             CommandResult.ListViewTarget.PROJECTS);
     }
 
-    /** Reports all memberships without changing either filtered view. */
+    /**
+     * Reports all memberships without changing either filtered view.
+     */
     private CommandResult executeForContact(Model model, Index index) throws CommandException {
         List<Person> displayedContacts = model.getFilteredPersonList();
         if (index.getZeroBased() >= displayedContacts.size()) {
@@ -87,7 +89,8 @@ public class ListProjectsCommand extends Command {
         }
 
         List<Project> displayedProjects = model.getFilteredProjectList();
-        String projectDetails = projects.stream()
+        String projectDetails = projects
+            .stream()
             .map(project -> formatProject(project, displayedProjects.indexOf(project) + 1))
             .collect(Collectors.joining("\n"));
 
@@ -99,15 +102,21 @@ public class ListProjectsCommand extends Command {
         );
     }
 
-    /** Formats a visible index, or marks a hidden project when {@code displayedIndex} is zero. */
+    /**
+     * Formats a visible index, or marks a hidden project when {@code displayedIndex} is zero.
+     */
     private static String formatProject(Project project, int displayedIndex) {
-        String description = project.getDescription().equals(Description.EMPTY)
-                ? "No description provided"
-                : project.getDescription().toString();
+        String description = project
+            .getDescription()
+            .equals(Description.EMPTY)
+            ? "No description provided"
+            : project
+            .getDescription()
+            .toString();
         // A contact can belong to a project hidden by the current project search.
         String prefix = displayedIndex == 0 ? "[not displayed] " : displayedIndex + ". ";
         return String.format("%1$s%2$s | Deadline: %3$s | Description: %4$s",
-                prefix, project.getName(), project.getDeadline(), description);
+            prefix, project.getName(), project.getDeadline(), description);
     }
 
     @Override

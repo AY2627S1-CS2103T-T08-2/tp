@@ -93,7 +93,8 @@ public class UniqueProjectList implements Iterable<Project> {
 
     public void setProjects(UniqueProjectList replacement) {
         requireNonNull(replacement);
-        internalList.setAll(replacement.internalList);
+        List<Project> replacementSnapshot = List.copyOf(replacement.internalList);
+        internalList.setAll(replacementSnapshot);
     }
 
     /**
@@ -102,11 +103,12 @@ public class UniqueProjectList implements Iterable<Project> {
      */
     public void setProjects(List<Project> projects) {
         requireAllNonNull(projects);
-        if (!projectsAreUnique(projects)) {
+        List<Project> replacementSnapshot = List.copyOf(projects);
+        if (!projectsAreUnique(replacementSnapshot)) {
             throw new DuplicateProjectException();
         }
 
-        internalList.setAll(projects);
+        internalList.setAll(replacementSnapshot);
     }
 
     /**

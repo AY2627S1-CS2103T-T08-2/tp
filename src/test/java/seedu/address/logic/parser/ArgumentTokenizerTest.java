@@ -116,6 +116,27 @@ public class ArgumentTokenizerTest {
     }
 
     @Test
+    public void tokenize_horizontalWhitespaceBeforePrefix_recognizesSpacesAndTabs() {
+        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize("p/first\t-tsecond", pSlash, dashT);
+
+        assertArgumentPresent(argMultimap, pSlash, "first");
+        assertArgumentPresent(argMultimap, dashT, "second");
+
+        argMultimap = ArgumentTokenizer.tokenize("p/first  -tsecond", pSlash, dashT);
+
+        assertArgumentPresent(argMultimap, pSlash, "first");
+        assertArgumentPresent(argMultimap, dashT, "second");
+    }
+
+    @Test
+    public void tokenize_nonHorizontalSeparatorBeforePrefix_doesNotRecognizePrefix() {
+        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize("p/first\n-tsecond", pSlash, dashT);
+
+        assertArgumentPresent(argMultimap, pSlash, "first\n-tsecond");
+        assertArgumentAbsent(argMultimap, dashT);
+    }
+
+    @Test
     public void tokenize_multipleArgumentsWithRepeats() {
         // Two arguments repeated, some have empty values
         String argsString = "SomePreambleString -t dashT-Value ^Q ^Q -t another dashT value p/ pSlash value -t";

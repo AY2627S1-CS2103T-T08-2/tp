@@ -39,7 +39,7 @@ public class JsonUtil {
     }
 
     static <T> T deserializeObjectFromJsonFile(Path jsonFile, Class<T> classOfObjectToDeserialize)
-        throws IOException {
+            throws IOException {
         return fromJsonString(FileUtil.readFromFile(jsonFile), classOfObjectToDeserialize);
     }
 
@@ -121,5 +121,4 @@ public class JsonUtil {
             .writerWithDefaultPrettyPrinter()
             .writeValueAsString(instance);
     }
-
 }

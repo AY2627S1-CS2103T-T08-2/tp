@@ -308,7 +308,7 @@ public class LogicManagerTest {
         Files.writeString(filePath, invalidJson);
         StorageManager storage = new StorageManager(new JsonAddressBookStorage(filePath),
             new JsonUserPrefsStorage(temporaryFolder.resolve("userPrefs.json")));
-        assertThrows(DataLoadingException.class, () -> storage.readAddressBook());
+        assertThrows(DataLoadingException.class, storage::readAddressBook);
         logic = new LogicManager(model, storage);
         Model expectedModel = new ModelManager();
         String addCommand = AddCommand.COMMAND_WORD + NAME_DESC_AMY + PHONE_DESC_AMY
@@ -571,19 +571,7 @@ public class LogicManagerTest {
      * @param expectedMessage the message expected inside exception thrown by the Logic component
      */
     private void assertCommandFailureForExceptionFromStorage(IOException e, String expectedMessage) {
-        Path prefPath = temporaryFolder.resolve("ExceptionUserPrefs.json");
-
-        // Inject LogicManager with a JsonAddressBookStorage that throws the IOException e when saving
-        JsonAddressBookStorage addressBookStorage = new JsonAddressBookStorage(prefPath) {
-            @Override
-            public void saveAddressBook(ReadOnlyAddressBook addressBook) throws IOException {
-                throw e;
-            }
-        };
-
-        JsonUserPrefsStorage userPrefsStorage =
-            new JsonUserPrefsStorage(temporaryFolder.resolve("ExceptionUserPrefs.json"));
-        StorageManager storage = new StorageManager(addressBookStorage, userPrefsStorage);
+        StorageManager storage = getStorage(e);
 
         logic = new LogicManager(model, storage);
 
@@ -597,6 +585,22 @@ public class LogicManagerTest {
             expectedMessage + "\nThe command was not applied. Fix the save problem and try again.",
             expectedModel
         );
+    }
+
+    private StorageManager getStorage(IOException e) {
+        Path prefPath = temporaryFolder.resolve("ExceptionUserPrefs.json");
+
+        // Inject LogicManager with a JsonAddressBookStorage that throws the IOException e when saving
+        JsonAddressBookStorage addressBookStorage = new JsonAddressBookStorage(prefPath) {
+            @Override
+            public void saveAddressBook(ReadOnlyAddressBook addressBook) throws IOException {
+                throw e;
+            }
+        };
+
+        JsonUserPrefsStorage userPrefsStorage =
+            new JsonUserPrefsStorage(temporaryFolder.resolve("ExceptionUserPrefs.json"));
+        return new StorageManager(addressBookStorage, userPrefsStorage);
     }
 
     /**

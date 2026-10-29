@@ -43,7 +43,7 @@ public class AddressBook implements ReadOnlyAddressBook {
         resetData(toBeCopied);
     }
 
-    //// list overwrite operations
+    // list overwrite operations
 
     /**
      * Replaces the contents of the person list with {@code persons}.
@@ -100,7 +100,7 @@ public class AddressBook implements ReadOnlyAddressBook {
         memberships.setMemberships(replacementMemberships);
     }
 
-    //// person-level operations
+    // person-level operations
 
     /**
      * Returns true if a person with the same identity as {@code person} exists in the address book.
@@ -144,7 +144,7 @@ public class AddressBook implements ReadOnlyAddressBook {
         memberships.removeAllForPerson(storedPerson.getPersonId());
     }
 
-    //// project-level operations
+    // project-level operations
 
     /**
      * Returns true if a project with the same identity as {@code project} exists in the address book.
@@ -182,7 +182,7 @@ public class AddressBook implements ReadOnlyAddressBook {
         memberships.removeAllForProject(key.getProjectId());
     }
 
-    //// project-membership-level operations
+    // project-membership-level operations
 
     /**
      * Returns true if {@code membership} exists in the address book.
@@ -351,10 +351,10 @@ public class AddressBook implements ReadOnlyAddressBook {
             if (!replacementPersons.containsId(membership.getPersonId())) {
                 throw new PersonNotFoundException();
             }
-            if (!replacementProjects
+            if (replacementProjects
                 .asUnmodifiableObservableList()
                 .stream()
-                .anyMatch(project -> project
+                .noneMatch(project -> project
                     .getProjectId()
                     .equals(membership.getProjectId()))) {
                 throw new ProjectNotFoundException();

@@ -158,6 +158,6 @@ public class LogicManager implements Logic {
                     .stream()
                     .map(ProjectMembership::getRole)
                     .toList())
-        );
+            );
     }
 }

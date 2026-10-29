@@ -211,8 +211,8 @@ public class UniquePersonListTest {
                         replacement.withAddress(VALID_ADDRESS_BOB);
                     }
 
-                    assertThrows(IllegalArgumentException.class,
-                            () -> uniquePersonList.setPerson(target, replacement.build()));
+                    assertThrows(IllegalArgumentException.class, () ->
+                        uniquePersonList.setPerson(target, replacement.build()));
 
                     assertEquals(people, uniquePersonList.asUnmodifiableObservableList());
                     assertEquals(people.stream().map(Person::getPersonId).toList(),

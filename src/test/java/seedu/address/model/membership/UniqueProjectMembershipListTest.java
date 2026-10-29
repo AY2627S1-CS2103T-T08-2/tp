@@ -160,6 +160,40 @@ public class UniqueProjectMembershipListTest {
     }
 
     @Test
+    public void setMemberships_selfOrOwnView_preservesMembershipsAndRoles() {
+        ProjectMembership designMembership = MEMBERSHIP.withRole(new Role("Design"));
+        List<List<ProjectMembership>> membershipCases = List.of(List.of(), List.of(designMembership),
+                List.of(designMembership, SAME_PERSON_OTHER_PROJECT.withRole(new Role("Testing")),
+                        OTHER_PERSON_SAME_PROJECT));
+
+        for (List<ProjectMembership> expectedMemberships : membershipCases) {
+            memberships.setMemberships(expectedMemberships);
+
+            memberships.setMemberships(memberships);
+
+            assertMembershipsUnchanged(expectedMemberships);
+
+            memberships.setMemberships(expectedMemberships);
+            memberships.setMemberships(memberships.asUnmodifiableObservableList());
+
+            assertMembershipsUnchanged(expectedMemberships);
+        }
+    }
+
+    private void assertMembershipsUnchanged(List<ProjectMembership> expectedMemberships) {
+        List<ProjectMembership> actualMemberships = memberships.asUnmodifiableObservableList();
+
+        assertEquals(expectedMemberships.size(), actualMemberships.size());
+        assertEquals(expectedMemberships, actualMemberships);
+        assertEquals(expectedMemberships.stream().map(ProjectMembership::getPersonId).toList(),
+                actualMemberships.stream().map(ProjectMembership::getPersonId).toList());
+        assertEquals(expectedMemberships.stream().map(ProjectMembership::getProjectId).toList(),
+                actualMemberships.stream().map(ProjectMembership::getProjectId).toList());
+        assertEquals(expectedMemberships.stream().map(ProjectMembership::getRole).toList(),
+                actualMemberships.stream().map(ProjectMembership::getRole).toList());
+    }
+
+    @Test
     public void removeAllForPerson_matchingMemberships_removesOnlyMatches() {
         memberships.setMemberships(List.of(MEMBERSHIP, SAME_PERSON_OTHER_PROJECT, OTHER_PERSON_SAME_PROJECT));
 

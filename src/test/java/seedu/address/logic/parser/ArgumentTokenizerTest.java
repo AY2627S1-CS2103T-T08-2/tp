@@ -127,12 +127,12 @@ public class ArgumentTokenizerTest {
 
     @Test
     public void tokenize_horizontalWhitespaceBeforePrefix_recognizesSpacesAndTabs() {
-        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize("p/first\t-tsecond", pSlash, dashT);
+        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(" p/first\t-tsecond", pSlash, dashT);
 
         assertArgumentPresent(argMultimap, pSlash, "first");
         assertArgumentPresent(argMultimap, dashT, "second");
 
-        argMultimap = ArgumentTokenizer.tokenize("p/first  -tsecond", pSlash, dashT);
+        argMultimap = ArgumentTokenizer.tokenize(" p/first  -tsecond", pSlash, dashT);
 
         assertArgumentPresent(argMultimap, pSlash, "first");
         assertArgumentPresent(argMultimap, dashT, "second");
@@ -140,7 +140,7 @@ public class ArgumentTokenizerTest {
 
     @Test
     public void tokenize_nonHorizontalSeparatorBeforePrefix_doesNotRecognizePrefix() {
-        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize("p/first\n-tsecond", pSlash, dashT);
+        ArgumentMultimap argMultimap = ArgumentTokenizer.tokenize(" p/first\n-tsecond", pSlash, dashT);
 
         assertArgumentPresent(argMultimap, pSlash, "first\n-tsecond");
         assertArgumentAbsent(argMultimap, dashT);
@@ -172,10 +172,9 @@ public class ArgumentTokenizerTest {
         Prefix aaa = new Prefix("aaa");
 
         assertEquals(aaa, aaa);
-        assertEquals(aaa, new Prefix("aaa"));
+        assertEquals(new Prefix("aaa"), aaa);
 
-        assertNotEquals(aaa, "aaa");
-        assertNotEquals(aaa, new Prefix("aab"));
+        assertNotEquals("aaa", aaa);
+        assertNotEquals(new Prefix("aab"), aaa);
     }
-
 }

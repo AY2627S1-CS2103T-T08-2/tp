@@ -24,14 +24,14 @@ public class DissociateCommand extends Command {
     public static final String COMMAND_WORD = "dissociate";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
-            + ": Dissociates a contact from a project using their list indices.\n"
-            + "Parameters: " + PREFIX_CONTACT + "CONTACT_INDEX " + PREFIX_PROJECT
-            + "PROJECT_INDEX (both must be positive integers)\n"
-            + "Example: " + COMMAND_WORD + " " + PREFIX_CONTACT + "2 " + PREFIX_PROJECT + "1";
+        + ": Dissociates a contact from a project using their list indices.\n"
+        + "Parameters: " + PREFIX_CONTACT + "CONTACT_INDEX " + PREFIX_PROJECT
+        + "PROJECT_INDEX (both must be positive integers)\n"
+        + "Example: " + COMMAND_WORD + " " + PREFIX_CONTACT + "2 " + PREFIX_PROJECT + "1";
 
     public static final String MESSAGE_SUCCESS = "Dissociated contact \"%1$s\" from project \"%2$s\".";
     public static final String MESSAGE_NOT_ASSOCIATED =
-            "Contact \"%1$s\" is not associated with project \"%2$s\".";
+        "Contact \"%1$s\" is not associated with project \"%2$s\".";
 
     private final Index contactIndex;
     private final Index projectIndex;
@@ -65,13 +65,13 @@ public class DissociateCommand extends Command {
 
         if (!model.hasProjectMembership(membership)) {
             throw new CommandException(String.format(
-                    MESSAGE_NOT_ASSOCIATED, contact.getName(), project.getName()));
+                MESSAGE_NOT_ASSOCIATED, contact.getName(), project.getName()));
         }
 
         model.removeProjectMembership(membership);
 
         return new CommandResult(String.format(
-                MESSAGE_SUCCESS, contact.getName(), project.getName()));
+            MESSAGE_SUCCESS, contact.getName(), project.getName()));
     }
 
     @Override
@@ -86,14 +86,14 @@ public class DissociateCommand extends Command {
         }
 
         return contactIndex.equals(otherDissociateCommand.contactIndex)
-                && projectIndex.equals(otherDissociateCommand.projectIndex);
+            && projectIndex.equals(otherDissociateCommand.projectIndex);
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .add("contactIndex", contactIndex)
-                .add("projectIndex", projectIndex)
-                .toString();
+            .add("contactIndex", contactIndex)
+            .add("projectIndex", projectIndex)
+            .toString();
     }
 }

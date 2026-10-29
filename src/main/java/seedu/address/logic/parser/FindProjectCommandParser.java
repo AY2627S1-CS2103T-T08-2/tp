@@ -16,6 +16,7 @@ public class FindProjectCommandParser implements Parser<FindProjectCommand> {
     /**
      * Parses the given {@code String} of arguments in the context of the FindProjectCommand
      * and returns a FindProjectCommand object for execution.
+     *
      * @throws ParseException if the user input does not conform to the expected format
      */
     public FindProjectCommand parse(String args) throws ParseException {

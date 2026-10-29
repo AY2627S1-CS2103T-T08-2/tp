@@ -74,12 +74,12 @@ public class MainApp extends Application {
             addressBookOptional = storage.readAddressBook();
             if (addressBookOptional.isEmpty()) {
                 logger.info("Creating a new data file " + storage.getAddressBookFilePath()
-                        + " populated with sample UniTeam data.");
+                    + " populated with sample UniTeam data.");
             }
             initialData = addressBookOptional.orElseGet(SampleDataUtil::getSampleAddressBook);
         } catch (DataLoadingException e) {
             logger.warning("Data file at " + storage.getAddressBookFilePath() + " could not be loaded."
-                    + " Will be starting with empty UniTeam data.");
+                + " Will be starting with empty UniTeam data.");
             initialData = new AddressBook();
         }
 
@@ -104,7 +104,7 @@ public class MainApp extends Application {
             initializedPrefs = prefsOptional.orElse(new UserPrefs());
         } catch (DataLoadingException e) {
             logger.warning("Preference file at " + prefsFilePath + " could not be loaded."
-                    + " Using default preferences.");
+                + " Using default preferences.");
             initializedPrefs = new UserPrefs();
         }
 

@@ -2,13 +2,10 @@ package seedu.address.model;
 
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
-import static seedu.address.model.Model.PREDICATE_SHOW_ALL_PROJECTS;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
-
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import seedu.address.commons.core.GuiSettings;
@@ -129,9 +126,13 @@ public class ModelManager implements Model {
     @Override
     public Optional<Project> findProject(ProjectName name) {
         requireNonNull(name);
-        return addressBook.getProjectList().stream()
-                .filter(project -> project.getName().equals(name))
-                .findFirst();
+        return addressBook
+            .getProjectList()
+            .stream()
+            .filter(project -> project
+                .getName()
+                .equals(name))
+            .findFirst();
     }
 
     @Override
@@ -172,7 +173,9 @@ public class ModelManager implements Model {
         refreshPersonFilter();
     }
 
-    /** Re-evaluates the current contact filter when membership changes without a person being edited. */
+    /**
+     * Re-evaluates the current contact filter when membership changes without a person being edited.
+     */
     private void refreshPersonFilter() {
         Predicate<? super Person> predicate = filteredPersons.getPredicate();
         if (predicate != null) {

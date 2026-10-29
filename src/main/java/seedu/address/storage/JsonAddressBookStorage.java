@@ -22,7 +22,7 @@ public class JsonAddressBookStorage {
 
     private static final Logger logger = LogsCenter.getLogger(JsonAddressBookStorage.class);
 
-    private Path filePath;
+    private final Path filePath;
 
     public JsonAddressBookStorage(Path filePath) {
         this.filePath = filePath;
@@ -52,13 +52,15 @@ public class JsonAddressBookStorage {
         requireNonNull(filePath);
 
         Optional<JsonSerializableAddressBook> jsonAddressBook = JsonUtil.readJsonFile(
-                filePath, JsonSerializableAddressBook.class);
+            filePath, JsonSerializableAddressBook.class);
         if (!jsonAddressBook.isPresent()) {
             return Optional.empty();
         }
 
         try {
-            return Optional.of(jsonAddressBook.get().toModelType());
+            return Optional.of(jsonAddressBook
+                .get()
+                .toModelType());
         } catch (IllegalValueException ive) {
             logger.info("Illegal values found in " + filePath + ": " + ive.getMessage());
             throw new DataLoadingException(ive);
@@ -67,6 +69,7 @@ public class JsonAddressBookStorage {
 
     /**
      * Saves the given {@link ReadOnlyAddressBook} to the storage.
+     *
      * @param addressBook cannot be null.
      * @throws IOException if there was any problem writing to the file.
      */
@@ -89,10 +92,10 @@ public class JsonAddressBookStorage {
         try {
             JsonUtil.saveJsonFile(new JsonSerializableAddressBook(addressBook), temporaryFile);
             Files.move(
-                    temporaryFile,
-                    target,
-                    StandardCopyOption.ATOMIC_MOVE,
-                    StandardCopyOption.REPLACE_EXISTING
+                temporaryFile,
+                target,
+                StandardCopyOption.ATOMIC_MOVE,
+                StandardCopyOption.REPLACE_EXISTING
             );
         } finally {
             try {

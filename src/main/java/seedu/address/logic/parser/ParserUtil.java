@@ -29,14 +29,15 @@ public class ParserUtil {
     public static final String MESSAGE_INVALID_INDEX = "Index must be a positive integer.";
 
     public static final String MESSAGE_INVALID_DEADLINE =
-            "Deadline must be a valid date in YYYY-MM-DD format.";
+        "Deadline must be a valid date in YYYY-MM-DD format.";
 
     public static final String MESSAGE_EMPTY_DESCRIPTION =
-            "DESCRIPTION cannot be empty when desc/ is specified.";
+        "DESCRIPTION cannot be empty when desc/ is specified.";
 
     /**
      * Parses {@code oneBasedIndex} into an {@code Index} and returns it. Leading and trailing whitespaces will be
      * trimmed.
+     *
      * @throws ParseException if the specified index is invalid (not a non-zero unsigned integer).
      */
     public static Index parseIndex(String oneBasedIndex) throws ParseException {
@@ -203,7 +204,9 @@ public class ParserUtil {
         return new Description(trimmedDescription);
     }
 
-    /** Parses a role description, returning {@code Role.EMPTY} when the trimmed description is empty. */
+    /**
+     * Parses a role description, returning {@code Role.EMPTY} when the trimmed description is empty.
+     */
     public static Role parseRole(String role) throws ParseException {
         requireNonNull(role);
         if (!role.matches(Role.VALIDATION_REGEX)) {

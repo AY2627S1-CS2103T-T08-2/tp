@@ -24,14 +24,14 @@ public class AssociateCommand extends Command {
     public static final String COMMAND_WORD = "associate";
 
     public static final String MESSAGE_USAGE = COMMAND_WORD
-            + ": Associates a contact with a project using their list indices.\n"
-            + "Parameters: " + PREFIX_CONTACT + "CONTACT_INDEX " + PREFIX_PROJECT
-            + "PROJECT_INDEX (both must be positive integers)\n"
-            + "Example: " + COMMAND_WORD + " " + PREFIX_CONTACT + "2 " + PREFIX_PROJECT + "1";
+        + ": Associates a contact with a project using their list indices.\n"
+        + "Parameters: " + PREFIX_CONTACT + "CONTACT_INDEX " + PREFIX_PROJECT
+        + "PROJECT_INDEX (both must be positive integers)\n"
+        + "Example: " + COMMAND_WORD + " " + PREFIX_CONTACT + "2 " + PREFIX_PROJECT + "1";
 
     public static final String MESSAGE_SUCCESS = "Associated contact \"%1$s\" with project \"%2$s\".";
     public static final String MESSAGE_DUPLICATE_ASSOCIATION =
-            "Contact \"%1$s\" is already associated with project \"%2$s\".";
+        "Contact \"%1$s\" is already associated with project \"%2$s\".";
 
     private final Index contactIndex;
     private final Index projectIndex;
@@ -65,13 +65,13 @@ public class AssociateCommand extends Command {
 
         if (model.hasProjectMembership(membership)) {
             throw new CommandException(String.format(
-                    MESSAGE_DUPLICATE_ASSOCIATION, contact.getName(), project.getName()));
+                MESSAGE_DUPLICATE_ASSOCIATION, contact.getName(), project.getName()));
         }
 
         model.addProjectMembership(membership);
 
         return new CommandResult(String.format(
-                MESSAGE_SUCCESS, contact.getName(), project.getName()));
+            MESSAGE_SUCCESS, contact.getName(), project.getName()));
     }
 
     @Override
@@ -86,14 +86,14 @@ public class AssociateCommand extends Command {
         }
 
         return contactIndex.equals(otherAssociateCommand.contactIndex)
-                && projectIndex.equals(otherAssociateCommand.projectIndex);
+            && projectIndex.equals(otherAssociateCommand.projectIndex);
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .add("contactIndex", contactIndex)
-                .add("projectIndex", projectIndex)
-                .toString();
+            .add("contactIndex", contactIndex)
+            .add("projectIndex", projectIndex)
+            .toString();
     }
 }

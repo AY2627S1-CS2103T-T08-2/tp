@@ -26,19 +26,20 @@ public class JsonUtil {
 
     private static final Logger logger = LogsCenter.getLogger(JsonUtil.class);
 
-    private static final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules()
-            .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(JsonParser.Feature.STRICT_DUPLICATE_DETECTION, true)
-            .setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE)
-            .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+    private static final ObjectMapper objectMapper = new ObjectMapper()
+        .findAndRegisterModules()
+        .configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .configure(JsonParser.Feature.STRICT_DUPLICATE_DETECTION, true)
+        .setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE)
+        .setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
 
     static <T> void serializeObjectToJsonFile(Path jsonFile, T objectToSerialize) throws IOException {
         FileUtil.writeToFile(jsonFile, toJsonString(objectToSerialize));
     }
 
     static <T> T deserializeObjectFromJsonFile(Path jsonFile, Class<T> classOfObjectToDeserialize)
-            throws IOException {
+        throws IOException {
         return fromJsonString(FileUtil.readFromFile(jsonFile), classOfObjectToDeserialize);
     }
 
@@ -51,7 +52,7 @@ public class JsonUtil {
      * @throws DataLoadingException if loading of the JSON file failed.
      */
     public static <T> Optional<T> readJsonFile(
-            Path filePath, Class<T> classOfObjectToDeserialize) throws DataLoadingException {
+        Path filePath, Class<T> classOfObjectToDeserialize) throws DataLoadingException {
         requireNonNull(filePath);
 
         if (Files.notExists(filePath)) {
@@ -97,7 +98,9 @@ public class JsonUtil {
      * @return The instance of T with the specified values in the JSON string
      */
     public static <T> T fromJsonString(String json, Class<T> instanceClass) throws IOException {
-        try (JsonParser parser = objectMapper.getFactory().createParser(json)) {
+        try (JsonParser parser = objectMapper
+            .getFactory()
+            .createParser(json)) {
             T result = objectMapper.readValue(parser, instanceClass);
             if (parser.nextToken() != null) {
                 throw new IOException("Unexpected content after JSON root value.");
@@ -114,7 +117,9 @@ public class JsonUtil {
      * @return JSON data representation of the given class instance, in string
      */
     public static <T> String toJsonString(T instance) throws JsonProcessingException {
-        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(instance);
+        return objectMapper
+            .writerWithDefaultPrettyPrinter()
+            .writeValueAsString(instance);
     }
 
 }

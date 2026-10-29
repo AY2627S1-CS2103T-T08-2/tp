@@ -31,15 +31,15 @@ class JsonSerializableAddressBook {
     public static final String MESSAGE_DUPLICATE_PROJECT = "Projects list contains duplicate project(s).";
     public static final String MESSAGE_DUPLICATE_PROJECT_ID = "Projects list contains duplicate project ID(s).";
     public static final String MESSAGE_DUPLICATE_PROJECT_MEMBERSHIP =
-            "Project memberships list contains duplicate membership(s).";
+        "Project memberships list contains duplicate membership(s).";
     public static final String MESSAGE_MEMBERSHIP_PERSON_NOT_FOUND =
-            "Project membership references a person that does not exist.";
+        "Project membership references a person that does not exist.";
     public static final String MESSAGE_MEMBERSHIP_PROJECT_NOT_FOUND =
-            "Project membership references a project that does not exist.";
+        "Project membership references a project that does not exist.";
     public static final String MESSAGE_NULL_PERSON = "Persons list contains a null entry.";
     public static final String MESSAGE_NULL_PROJECT = "Projects list contains a null entry.";
     public static final String MESSAGE_NULL_PROJECT_MEMBERSHIP =
-            "Project memberships list contains a null entry.";
+        "Project memberships list contains a null entry.";
 
     private final List<JsonAdaptedPerson> persons = new ArrayList<>();
     private final List<JsonAdaptedProject> projects = new ArrayList<>();
@@ -50,8 +50,8 @@ class JsonSerializableAddressBook {
      */
     @JsonCreator
     public JsonSerializableAddressBook(@JsonProperty("persons") List<JsonAdaptedPerson> persons,
-            @JsonProperty("projects") List<JsonAdaptedProject> projects,
-            @JsonProperty("memberships") List<JsonAdaptedProjectMembership> memberships) {
+                                       @JsonProperty("projects") List<JsonAdaptedProject> projects,
+                                       @JsonProperty("memberships") List<JsonAdaptedProjectMembership> memberships) {
         if (persons != null) {
             this.persons.addAll(persons);
         }
@@ -69,11 +69,21 @@ class JsonSerializableAddressBook {
      * @param source future changes to this will not affect the created {@code JsonSerializableAddressBook}.
      */
     public JsonSerializableAddressBook(ReadOnlyAddressBook source) {
-        persons.addAll(source.getPersonList().stream().map(JsonAdaptedPerson::new).collect(Collectors.toList()));
-        projects.addAll(source.getProjectList().stream().map(JsonAdaptedProject::new).collect(Collectors.toList()));
-        memberships.addAll(source.getProjectMembershipList().stream()
-                .map(JsonAdaptedProjectMembership::new)
-                .collect(Collectors.toList()));
+        persons.addAll(source
+            .getPersonList()
+            .stream()
+            .map(JsonAdaptedPerson::new)
+            .collect(Collectors.toList()));
+        projects.addAll(source
+            .getProjectList()
+            .stream()
+            .map(JsonAdaptedProject::new)
+            .collect(Collectors.toList()));
+        memberships.addAll(source
+            .getProjectMembershipList()
+            .stream()
+            .map(JsonAdaptedProjectMembership::new)
+            .collect(Collectors.toList()));
     }
 
     /**

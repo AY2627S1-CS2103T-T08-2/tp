@@ -31,7 +31,9 @@ public class FindProjectCommand extends Command {
         requireNonNull(model);
         model.updateFilteredProjectList(predicate);
         return new CommandResult(
-            String.format(Messages.MESSAGE_PROJECTS_LISTED_OVERVIEW, model.getFilteredProjectList().size()),
+            String.format(Messages.MESSAGE_PROJECTS_LISTED_OVERVIEW, model
+                .getFilteredProjectList()
+                .size()),
             CommandResult.ListViewTarget.PROJECTS);
     }
 

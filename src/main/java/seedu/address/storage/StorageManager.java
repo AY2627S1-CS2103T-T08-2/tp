@@ -17,8 +17,8 @@ import seedu.address.model.UserPrefs;
 public class StorageManager implements Storage {
 
     private static final Logger logger = LogsCenter.getLogger(StorageManager.class);
-    private JsonAddressBookStorage addressBookStorage;
-    private JsonUserPrefsStorage userPrefsStorage;
+    private final JsonAddressBookStorage addressBookStorage;
+    private final JsonUserPrefsStorage userPrefsStorage;
     private boolean addressBookSavingBlocked;
 
     /**
@@ -74,7 +74,7 @@ public class StorageManager implements Storage {
     public void saveAddressBook(ReadOnlyAddressBook addressBook) throws IOException {
         if (addressBookSavingBlocked) {
             throw new IOException("Saving is disabled because the data file could not be loaded: "
-                    + getAddressBookFilePath());
+                + getAddressBookFilePath());
         }
 
         logger.fine("Attempting to write to data file: " + addressBookStorage.getAddressBookFilePath());

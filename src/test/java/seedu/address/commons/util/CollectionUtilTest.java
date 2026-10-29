@@ -40,14 +40,14 @@ public class CollectionUtilTest {
         assertNullPointerExceptionThrown((Object[]) null);
 
         // confirms nulls inside lists in the argument list are not considered
-        List<Object> containingNull = Collections.singletonList((Object) null);
+        List<Object> containingNull = Collections.singletonList(null);
         assertNullPointerExceptionNotThrown(containingNull, new Object());
     }
 
     @Test
     public void requireAllNonNullCollection() {
         // lists containing nulls in the front
-        assertNullPointerExceptionThrown(Collections.singletonList((Object) null));
+        assertNullPointerExceptionThrown(Collections.singletonList(null));
         assertNullPointerExceptionThrown(Arrays.asList(null, new Object(), ""));
 
         // lists containing nulls in the middle
@@ -69,7 +69,7 @@ public class CollectionUtilTest {
         assertNullPointerExceptionNotThrown(List.of(new Object()));
 
         // confirms nulls inside nested lists are not considered
-        List<Object> containingNull = Collections.singletonList((Object) null);
+        List<Object> containingNull = Collections.singletonList(null);
         assertNullPointerExceptionNotThrown(Arrays.asList(containingNull, new Object()));
     }
 

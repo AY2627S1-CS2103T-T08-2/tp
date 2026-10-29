@@ -8,6 +8,7 @@ import static seedu.address.logic.commands.CommandTestUtil.VALID_TAG_HUSBAND;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 import static seedu.address.testutil.TypicalPersons.BOB;
+import static seedu.address.testutil.TypicalPersons.CARL;
 import static seedu.address.testutil.TypicalPersons.getTypicalAddressBook;
 
 import java.time.LocalDate;
@@ -128,6 +129,36 @@ public class AddressBookTest {
         assertEquals(List.of(otherAlice), addressBook.getPersonList());
         assertEquals(List.of(otherMembership), addressBook.getProjectMembershipList());
         assertEquals(List.of(otherAlice), addressBook.getProjectMembers(project));
+    }
+
+    @Test
+    public void removePerson_equivalentKeyWithDifferentId_cleansActualRemovedPersonMemberships() {
+        List<Person> people = List.of(ALICE, BOB, CARL);
+        for (int targetIndex = 0; targetIndex < people.size(); targetIndex++) {
+            for (Person claimedIdOwner : people) {
+                if (claimedIdOwner == people.get(targetIndex)) {
+                    continue;
+                }
+                assertRemovingEquivalentKeyCleansMemberships(people, targetIndex, claimedIdOwner.getPersonId());
+            }
+            assertRemovingEquivalentKeyCleansMemberships(people, targetIndex, PersonId.generate());
+        }
+    }
+
+    @Test
+    public void removePerson_equivalentKeyWithStoredId_removesContactAndMemberships() {
+        Project project = createProject("CS2103T");
+        addressBook.addPerson(ALICE);
+        addressBook.addProject(project);
+        ProjectMembership membership = new ProjectMembership(ALICE.getPersonId(), project.getProjectId(),
+                new Role("Design"));
+        addressBook.addProjectMembership(membership);
+        Person key = new PersonBuilder(ALICE).build();
+
+        addressBook.removePerson(key);
+
+        assertTrue(addressBook.getPersonList().isEmpty());
+        assertTrue(addressBook.getProjectMembershipList().isEmpty());
     }
 
     @Test
@@ -584,6 +615,38 @@ public class AddressBookTest {
                 new ProjectName(name),
                 new Deadline(LocalDate.of(2026, 11, 1)),
                 Description.EMPTY);
+    }
+
+    private void assertRemovingEquivalentKeyCleansMemberships(List<Person> people, int targetIndex,
+            PersonId claimedId) {
+        AddressBook book = new AddressBook();
+        Project firstProject = createProject("CS2103T");
+        Project secondProject = createProject("Orbital");
+        Project thirdProject = createProject("SoCialize");
+        book.setPersons(people);
+        book.setProjects(List.of(firstProject, secondProject, thirdProject));
+
+        List<ProjectMembership> memberships = List.of(
+                new ProjectMembership(BOB.getPersonId(), firstProject.getProjectId(), new Role("Testing")),
+                new ProjectMembership(CARL.getPersonId(), secondProject.getProjectId(), new Role("Design")),
+                new ProjectMembership(CARL.getPersonId(), thirdProject.getProjectId(), new Role("Review")));
+        book.setProjectMemberships(memberships);
+
+        Person storedPerson = people.get(targetIndex);
+        Person key = new PersonBuilder(storedPerson).withPersonId(claimedId).build();
+        book.removePerson(key);
+
+        List<Person> expectedPeople = people.stream().filter(person -> person != storedPerson).toList();
+        List<ProjectMembership> expectedMemberships = memberships.stream()
+                .filter(membership -> !membership.getPersonId().equals(storedPerson.getPersonId()))
+                .toList();
+        assertEquals(expectedPeople, book.getPersonList());
+        assertEquals(expectedPeople.stream().map(Person::getPersonId).toList(),
+                book.getPersonList().stream().map(Person::getPersonId).toList());
+        assertEquals(expectedMemberships, book.getProjectMembershipList());
+        assertEquals(expectedMemberships.stream().map(membership -> membership.getRole().getDescription()).toList(),
+                book.getProjectMembershipList().stream()
+                        .map(membership -> membership.getRole().getDescription()).toList());
     }
 
     private ProjectMembership addMembership(AddressBook addressBook, Person person, Project project) {

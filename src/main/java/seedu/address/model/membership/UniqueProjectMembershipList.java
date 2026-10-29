@@ -71,7 +71,8 @@ public class UniqueProjectMembershipList implements Iterable<ProjectMembership> 
     public void setMemberships(UniqueProjectMembershipList replacement) {
         requireNonNull(replacement);
         if (replacement != this) {
-            internalList.setAll(replacement.internalList);
+            List<ProjectMembership> replacementSnapshot = List.copyOf(replacement.internalList);
+            internalList.setAll(replacementSnapshot);
         }
     }
 
@@ -84,7 +85,8 @@ public class UniqueProjectMembershipList implements Iterable<ProjectMembership> 
         if (!membershipsAreUnique(memberships)) {
             throw new DuplicateProjectMembershipException();
         }
-        internalList.setAll(memberships);
+        List<ProjectMembership> replacementSnapshot = List.copyOf(memberships);
+        internalList.setAll(replacementSnapshot);
     }
 
     /**

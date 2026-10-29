@@ -286,6 +286,33 @@ public class UniquePersonListTest {
     }
 
     @Test
+    public void setPersons_selfOrOwnView_preservesContacts() {
+        List<List<Person>> contactCases = List.of(List.of(), List.of(ALICE), List.of(ALICE, BOB, CARL));
+
+        for (List<Person> expectedContacts : contactCases) {
+            uniquePersonList.setPersons(expectedContacts);
+
+            uniquePersonList.setPersons(uniquePersonList);
+
+            assertContactsUnchanged(expectedContacts);
+
+            uniquePersonList.setPersons(expectedContacts);
+            uniquePersonList.setPersons(uniquePersonList.asUnmodifiableObservableList());
+
+            assertContactsUnchanged(expectedContacts);
+        }
+    }
+
+    private void assertContactsUnchanged(List<Person> expectedContacts) {
+        List<Person> actualContacts = uniquePersonList.asUnmodifiableObservableList();
+
+        assertEquals(expectedContacts.size(), actualContacts.size());
+        assertEquals(expectedContacts, actualContacts);
+        assertEquals(expectedContacts.stream().map(Person::getPersonId).toList(),
+                actualContacts.stream().map(Person::getPersonId).toList());
+    }
+
+    @Test
     public void setPersons_nullList_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> uniquePersonList.setPersons((List<Person>) null));
     }

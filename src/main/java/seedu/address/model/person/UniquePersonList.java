@@ -93,7 +93,8 @@ public class UniquePersonList implements Iterable<Person> {
 
     public void setPersons(UniquePersonList replacement) {
         requireNonNull(replacement);
-        internalList.setAll(replacement.internalList);
+        List<Person> replacementSnapshot = List.copyOf(replacement.internalList);
+        internalList.setAll(replacementSnapshot);
     }
 
     /**
@@ -106,7 +107,8 @@ public class UniquePersonList implements Iterable<Person> {
             throw new DuplicatePersonException();
         }
 
-        internalList.setAll(persons);
+        List<Person> replacementSnapshot = List.copyOf(persons);
+        internalList.setAll(replacementSnapshot);
     }
 
     /**

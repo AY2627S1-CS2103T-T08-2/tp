@@ -65,9 +65,80 @@ public class AddressBookTest {
         // Matching contact details must be rejected even when identifiers differ.
         Person editedAlice = new PersonBuilder(ALICE).withPersonId(PersonId.generate()).build();
         List<Person> newPersons = List.of(ALICE, editedAlice);
-        AddressBookStub newData = new AddressBookStub(newPersons, List.of());
+        AddressBookStub newData = new AddressBookStub(newPersons, List.of(), List.of());
 
         assertThrows(DuplicatePersonException.class, () -> addressBook.resetData(newData));
+    }
+
+    @Test
+    public void resetData_withMissingMembershipReference_throwsWithoutChangingData() {
+        Project project = createProject("CS2103T");
+        ProjectMembership membership = addMembership(addressBook, ALICE, project);
+        AddressBook original = new AddressBook(addressBook);
+        AddressBookStub invalidData = new AddressBookStub(List.of(BOB), List.of(project), List.of(membership));
+
+        assertThrows(PersonNotFoundException.class, () -> addressBook.resetData(invalidData));
+
+        assertEquals(original, addressBook);
+    }
+
+    @Test
+    public void setPersons_emptyReplacementWithMembership_throwsWithoutChangingData() {
+        Project project = createProject("CS2103T");
+        addMembership(addressBook, ALICE, project);
+        AddressBook original = new AddressBook(addressBook);
+
+        assertThrows(PersonNotFoundException.class, () -> addressBook.setPersons(List.of()));
+
+        assertEquals(original, addressBook);
+    }
+
+    @Test
+    public void setPersons_replacementRetainsMembershipAndRole() {
+        Project project = createProject("CS2103T");
+        addressBook.addPerson(ALICE);
+        addressBook.addPerson(BOB);
+        addressBook.addProject(project);
+        ProjectMembership membership = new ProjectMembership(ALICE.getPersonId(), project.getProjectId(),
+                new Role("Lead"));
+        addressBook.addProjectMembership(membership);
+        Person editedAlice = new PersonBuilder(ALICE).withAddress(VALID_ADDRESS_BOB).build();
+
+        addressBook.setPersons(List.of(editedAlice));
+
+        assertEquals(List.of(editedAlice), addressBook.getPersonList());
+        assertEquals(List.of(membership), addressBook.getProjectMembershipList());
+        assertEquals(new Role("Lead"), addressBook.getProjectMembershipList().get(0).getRole());
+    }
+
+    @Test
+    public void setProjects_emptyReplacementWithMembership_throwsWithoutChangingData() {
+        Project project = createProject("CS2103T");
+        addMembership(addressBook, ALICE, project);
+        AddressBook original = new AddressBook(addressBook);
+
+        assertThrows(ProjectNotFoundException.class, () -> addressBook.setProjects(List.of()));
+
+        assertEquals(original, addressBook);
+    }
+
+    @Test
+    public void setProjects_replacementRetainsMembershipAndRole() {
+        Project project = createProject("CS2103T");
+        Project unreferencedProject = createProject("Orbital");
+        addressBook.addPerson(ALICE);
+        addressBook.addProject(project);
+        addressBook.addProject(unreferencedProject);
+        ProjectMembership membership = new ProjectMembership(ALICE.getPersonId(), project.getProjectId(),
+                new Role("Lead"));
+        addressBook.addProjectMembership(membership);
+        Project editedProject = new ProjectBuilder(project).withName("Renamed project").build();
+
+        addressBook.setProjects(List.of(editedProject));
+
+        assertEquals(List.of(editedProject), addressBook.getProjectList());
+        assertEquals(List.of(membership), addressBook.getProjectMembershipList());
+        assertEquals(new Role("Lead"), addressBook.getProjectMembershipList().get(0).getRole());
     }
 
     @Test
@@ -589,9 +660,11 @@ public class AddressBookTest {
         private final ObservableList<Project> projects = FXCollections.observableArrayList();
         private final ObservableList<ProjectMembership> memberships = FXCollections.observableArrayList();
 
-        AddressBookStub(Collection<Person> persons, Collection<Project> projects) {
+        AddressBookStub(Collection<Person> persons, Collection<Project> projects,
+                Collection<ProjectMembership> memberships) {
             this.persons.setAll(persons);
             this.projects.setAll(projects);
+            this.memberships.setAll(memberships);
         }
 
         @Override

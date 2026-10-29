@@ -18,6 +18,8 @@ public class DescriptionTest {
         String invalidDescription = "\n";
         assertThrows(IllegalArgumentException.class, () -> new Description(invalidDescription));
         assertThrows(IllegalArgumentException.class, () -> new Description("a".repeat(201)));
+        assertThrows(IllegalArgumentException.class, () -> new Description("Research" + (char) 11 + "Design"));
+        assertThrows(IllegalArgumentException.class, () -> new Description("Research\fDesign"));
     }
 
     @Test
@@ -28,6 +30,8 @@ public class DescriptionTest {
         // invalid description
         assertFalse(Description.isValidDescription("\n"));
         assertFalse(Description.isValidDescription("\r"));
+        assertFalse(Description.isValidDescription("Research" + (char) 11 + "Design"));
+        assertFalse(Description.isValidDescription("Research\fDesign"));
         assertFalse(Description.isValidDescription("\u0085"));
         assertFalse(Description.isValidDescription("\u2028"));
         assertFalse(Description.isValidDescription("\u2029"));

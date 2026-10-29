@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static seedu.address.testutil.Assert.assertThrows;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -12,8 +13,11 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import seedu.address.MainApp;
 import seedu.address.commons.core.GuiSettings;
 import seedu.address.commons.exceptions.DataLoadingException;
+import seedu.address.model.AddressBook;
+import seedu.address.model.ModelManager;
 import seedu.address.model.UserPrefs;
 
 public class JsonUserPrefsStorageTest {
@@ -45,8 +49,8 @@ public class JsonUserPrefsStorageTest {
 
     private Path addToTestDataPathIfNotNull(String userPrefsFileInTestDataFolder) {
         return userPrefsFileInTestDataFolder != null
-                ? TEST_DATA_FOLDER.resolve(userPrefsFileInTestDataFolder)
-                : null;
+            ? TEST_DATA_FOLDER.resolve(userPrefsFileInTestDataFolder)
+            : null;
     }
 
     @Test
@@ -92,7 +96,7 @@ public class JsonUserPrefsStorageTest {
     private void saveUserPrefs(UserPrefs userPrefs, String prefsFileInTestDataFolder) {
         try {
             new JsonUserPrefsStorage(addToTestDataPathIfNotNull(prefsFileInTestDataFolder))
-                    .saveUserPrefs(userPrefs);
+                .saveUserPrefs(userPrefs);
         } catch (IOException ioe) {
             throw new AssertionError("There should not be an error writing to the file", ioe);
         }
@@ -109,14 +113,49 @@ public class JsonUserPrefsStorageTest {
 
         //Try writing when the file doesn't exist
         jsonUserPrefsStorage.saveUserPrefs(original);
-        UserPrefs readBack = jsonUserPrefsStorage.readUserPrefs().get();
+        UserPrefs readBack = jsonUserPrefsStorage
+            .readUserPrefs()
+            .get();
         assertEquals(original, readBack);
 
         //Try saving when the file exists
         original.setGuiSettings(new GuiSettings(5, 5, 5, 5));
         jsonUserPrefsStorage.saveUserPrefs(original);
-        readBack = jsonUserPrefsStorage.readUserPrefs().get();
+        readBack = jsonUserPrefsStorage
+            .readUserPrefs()
+            .get();
         assertEquals(original, readBack);
     }
 
+    @Test
+    public void readUserPrefs_nullGuiSettings_throwsDataLoadingExceptionAndPreservesFile() throws Exception {
+        Path filePath = testFolder.resolve("null-settings.json");
+        String json = "{\"guiSettings\":null}";
+        Files.writeString(filePath, json);
+
+        assertThrows(DataLoadingException.class, () -> new JsonUserPrefsStorage(filePath).readUserPrefs());
+
+        assertEquals(json, Files.readString(filePath));
+    }
+
+    @Test
+    public void initPrefs_nullGuiSettings_usesDefaultsAndAllowsModelInitialization() throws Exception {
+        Path filePath = testFolder.resolve("null-settings.json");
+        Files.writeString(filePath, "{\"guiSettings\":null}");
+        JsonUserPrefsStorage storage = new JsonUserPrefsStorage(filePath);
+
+        UserPrefs prefs = new MainAppStub().readPrefs(storage);
+
+        assertEquals(new UserPrefs(), prefs);
+        assertEquals(new GuiSettings(), new ModelManager(new AddressBook(), prefs).getGuiSettings());
+        assertEquals(prefs, storage
+            .readUserPrefs()
+            .orElseThrow());
+    }
+
+    private static class MainAppStub extends MainApp {
+        UserPrefs readPrefs(JsonUserPrefsStorage storage) {
+            return initPrefs(storage);
+        }
+    }
 }

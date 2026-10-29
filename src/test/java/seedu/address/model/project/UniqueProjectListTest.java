@@ -75,8 +75,8 @@ public class UniqueProjectListTest {
     public void setProject_changedId_throwsIllegalArgumentException() {
         uniqueProjectList.add(PROJ0);
         Project changedId = new ProjectBuilder(PROJ0)
-                .withProjectId(PROJ1.getProjectId())
-                .build();
+            .withProjectId(PROJ1.getProjectId())
+            .build();
 
         assertThrows(IllegalArgumentException.class, () -> uniqueProjectList.setProject(PROJ0, changedId));
 
@@ -89,8 +89,10 @@ public class UniqueProjectListTest {
         uniqueProjectList.add(PROJ1);
 
         Project renamed = new ProjectBuilder(PROJ0)
-                .withName(PROJ1.getName().toString())
-                .build();
+            .withName(PROJ1
+                .getName()
+                .toString())
+            .build();
 
         assertThrows(DuplicateProjectException.class, () -> uniqueProjectList.setProject(PROJ0, renamed));
 
@@ -153,24 +155,28 @@ public class UniqueProjectListTest {
     @Test
     public void asUnmodifiableObservableList_modifyList_throwsUnsupportedOperationException() {
         assertThrows(UnsupportedOperationException.class, ()
-                -> uniqueProjectList.asUnmodifiableObservableList().remove(0));
+            -> uniqueProjectList
+            .asUnmodifiableObservableList()
+            .remove(0));
     }
 
     @Test
     public void toStringMethod() {
-        assertEquals(uniqueProjectList.asUnmodifiableObservableList().toString(), uniqueProjectList.toString());
+        assertEquals(uniqueProjectList
+            .asUnmodifiableObservableList()
+            .toString(), uniqueProjectList.toString());
     }
 
     @Test
     public void add_sameNameDifferentData_throwsDuplicateProjectException() {
         Project original = new Project(
-                new ProjectName("CS2103T Team"),
-                new Deadline(LocalDate.of(2026, 11, 1)),
-                new Description("Original"));
+            new ProjectName("CS2103T Team"),
+            new Deadline(LocalDate.of(2026, 11, 1)),
+            new Description("Original"));
         Project duplicate = new Project(
-                new ProjectName("CS2103T Team"),
-                new Deadline(LocalDate.of(2026, 12, 1)),
-                new Description("Updated"));
+            new ProjectName("CS2103T Team"),
+            new Deadline(LocalDate.of(2026, 12, 1)),
+            new Description("Updated"));
         uniqueProjectList.add(original);
 
         assertThrows(DuplicateProjectException.class, () -> uniqueProjectList.add(duplicate));
@@ -181,9 +187,9 @@ public class UniqueProjectListTest {
     public void add_nameWithDifferentCaseAndSpacing_throwsDuplicateProjectException() {
         Deadline deadline = new Deadline(LocalDate.of(2026, 11, 1));
         Project original = new Project(
-                new ProjectName("CS2103T Team"), deadline, Description.EMPTY);
+            new ProjectName("CS2103T Team"), deadline, Description.EMPTY);
         Project duplicate = new Project(
-                new ProjectName("  cs2103t   team  "), deadline, Description.EMPTY);
+            new ProjectName("  cs2103t   team  "), deadline, Description.EMPTY);
         uniqueProjectList.add(original);
 
         assertThrows(DuplicateProjectException.class, () -> uniqueProjectList.add(duplicate));
@@ -195,8 +201,8 @@ public class UniqueProjectListTest {
         uniqueProjectList.add(PROJ0);
 
         Project edited = new ProjectBuilder(PROJ0)
-                .withDescription("Updated description")
-                .build();
+            .withDescription("Updated description")
+            .build();
 
         uniqueProjectList.setProject(PROJ0, edited);
 
@@ -207,8 +213,8 @@ public class UniqueProjectListTest {
     public void setProject_sameIdNewName_success() {
         uniqueProjectList.add(PROJ0);
         Project renamed = new ProjectBuilder(PROJ0)
-                .withName("Renamed Project")
-                .build();
+            .withName("Renamed Project")
+            .build();
 
         uniqueProjectList.setProject(PROJ0, renamed);
 
@@ -218,7 +224,9 @@ public class UniqueProjectListTest {
     @Test
     public void contains_sameIdDifferentDetails_returnsTrue() {
         uniqueProjectList.add(PROJ0);
-        Project edited = new ProjectBuilder(PROJ0).withName("Different Name").build();
+        Project edited = new ProjectBuilder(PROJ0)
+            .withName("Different Name")
+            .build();
 
         assertTrue(uniqueProjectList.contains(edited));
     }
@@ -227,8 +235,8 @@ public class UniqueProjectListTest {
     public void contains_differentIdSameDetails_returnsFalse() {
         uniqueProjectList.add(PROJ0);
         Project other = new ProjectBuilder(PROJ0)
-                .withProjectId(PROJ1.getProjectId())
-                .build();
+            .withProjectId(PROJ1.getProjectId())
+            .build();
 
         assertFalse(uniqueProjectList.contains(other));
     }
@@ -240,7 +248,9 @@ public class UniqueProjectListTest {
 
     @Test
     public void containsName_normalisedName_returnsTrue() {
-        Project project = new ProjectBuilder().withName("CS2103T Team").build();
+        Project project = new ProjectBuilder()
+            .withName("CS2103T Team")
+            .build();
         uniqueProjectList.add(project);
 
         assertTrue(uniqueProjectList.containsName(new ProjectName("  cs2103t   team  ")));
@@ -256,7 +266,9 @@ public class UniqueProjectListTest {
     @Test
     public void add_sameIdDifferentName_throwsDuplicateProjectException() {
         uniqueProjectList.add(PROJ0);
-        Project duplicateId = new ProjectBuilder(PROJ0).withName("Different Name").build();
+        Project duplicateId = new ProjectBuilder(PROJ0)
+            .withName("Different Name")
+            .build();
 
         assertThrows(DuplicateProjectException.class, () -> uniqueProjectList.add(duplicateId));
 
@@ -266,7 +278,9 @@ public class UniqueProjectListTest {
     @Test
     public void setProjects_duplicateIds_throwsDuplicateProjectException() {
         uniqueProjectList.add(PROJ1);
-        Project duplicateId = new ProjectBuilder(PROJ0).withName("Different Name").build();
+        Project duplicateId = new ProjectBuilder(PROJ0)
+            .withName("Different Name")
+            .build();
 
         assertThrows(DuplicateProjectException.class, () -> uniqueProjectList.setProjects(List.of(PROJ0, duplicateId)));
 
@@ -277,11 +291,44 @@ public class UniqueProjectListTest {
     public void setProjects_duplicateNames_throwsDuplicateProjectException() {
         uniqueProjectList.add(PROJ1);
         Project duplicateName = new ProjectBuilder(PROJ0)
-                .withProjectId(PROJ1.getProjectId())
-                .build();
+            .withProjectId(PROJ1.getProjectId())
+            .build();
 
         assertThrows(DuplicateProjectException.class, ()
-                -> uniqueProjectList.setProjects(List.of(PROJ0, duplicateName)));
+            -> uniqueProjectList.setProjects(List.of(PROJ0, duplicateName)));
+
+        assertEquals(List.of(PROJ1), uniqueProjectList.asUnmodifiableObservableList());
+    }
+
+    @Test
+    public void setProjects_sameUniqueProjectList_preservesProjects() {
+        uniqueProjectList.add(PROJ0);
+        uniqueProjectList.add(PROJ1);
+
+        uniqueProjectList.setProjects(uniqueProjectList);
+
+        assertEquals(List.of(PROJ0, PROJ1), uniqueProjectList.asUnmodifiableObservableList());
+    }
+
+    @Test
+    public void setProjects_liveView_preservesProjects() {
+        uniqueProjectList.add(PROJ0);
+        uniqueProjectList.add(PROJ1);
+
+        uniqueProjectList.setProjects(uniqueProjectList.asUnmodifiableObservableList());
+
+        assertEquals(List.of(PROJ0, PROJ1), uniqueProjectList.asUnmodifiableObservableList());
+    }
+
+    @Test
+    public void setProjects_liveSubList_preservesSelectedProjects() {
+        uniqueProjectList.add(PROJ0);
+        uniqueProjectList.add(PROJ1);
+        List<Project> replacement = uniqueProjectList
+            .asUnmodifiableObservableList()
+            .subList(1, 2);
+
+        uniqueProjectList.setProjects(replacement);
 
         assertEquals(List.of(PROJ1), uniqueProjectList.asUnmodifiableObservableList());
     }

@@ -12,25 +12,31 @@ public final class Role {
 
     public static final Role EMPTY = new Role("");
     public static final String MESSAGE_CONSTRAINTS =
-            "Roles must be at most 200 characters long and must not contain line breaks";
-    public static final String VALIDATION_REGEX = "[^\\r\\n\\u0085\\u2028\\u2029]*";
+        "Roles must be at most 200 characters long and must not contain line breaks";
+    public static final String VALIDATION_REGEX = "[^\\r\\n\\x0B\\f\\u0085\\u2028\\u2029]*";
 
     private final String description;
 
-    /** Creates a role from a validated description. */
+    /**
+     * Creates a role from a validated description.
+     */
     public Role(String description) {
         requireNonNull(description);
         AppUtil.checkArgument(isValidRole(description), MESSAGE_CONSTRAINTS);
         this.description = description;
     }
 
-    /** Returns whether the description is a valid role. */
+    /**
+     * Returns whether the description is a valid role.
+     */
     public static boolean isValidRole(String description) {
         return description.codePointCount(0, description.length()) <= 200
-                && description.matches(VALIDATION_REGEX);
+            && description.matches(VALIDATION_REGEX);
     }
 
-    /** Returns the role description. */
+    /**
+     * Returns the role description.
+     */
     public String getDescription() {
         return description;
     }

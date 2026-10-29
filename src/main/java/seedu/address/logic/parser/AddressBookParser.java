@@ -65,18 +65,18 @@ public class AddressBookParser {
             case EditCommand.COMMAND_WORD -> new EditCommandParser().parse(arguments);
             case DeleteCommand.COMMAND_WORD -> new DeleteCommandParser().parse(arguments);
             case ClearCommand.COMMAND_WORD -> parseParameterFreeCommand(
-                    arguments, ClearCommand.MESSAGE_USAGE, new ClearCommand());
+                arguments, ClearCommand.MESSAGE_USAGE, new ClearCommand());
             case FindCommand.COMMAND_WORD -> new FindCommandParser().parse(arguments);
             case FindProjectCommand.COMMAND_WORD -> new FindProjectCommandParser().parse(arguments);
             case ListCommand.COMMAND_WORD -> parseParameterFreeCommand(
-                    arguments, ListCommand.MESSAGE_USAGE, new ListCommand());
+                arguments, ListCommand.MESSAGE_USAGE, new ListCommand());
             case ListProjectsCommand.COMMAND_WORD -> new ListProjectsCommandParser().parse(arguments);
             case ListMembersCommand.COMMAND_WORD -> new ListMembersCommandParser().parse(arguments);
             case SetRoleCommand.COMMAND_WORD -> new SetRoleCommandParser().parse(arguments);
             case ExitCommand.COMMAND_WORD -> parseParameterFreeCommand(
-                    arguments, ExitCommand.MESSAGE_USAGE, new ExitCommand());
+                arguments, ExitCommand.MESSAGE_USAGE, new ExitCommand());
             case HelpCommand.COMMAND_WORD -> parseParameterFreeCommand(
-                    arguments, HelpCommand.MESSAGE_USAGE, new HelpCommand());
+                arguments, HelpCommand.MESSAGE_USAGE, new HelpCommand());
             case AddProjectCommand.COMMAND_WORD -> new AddProjectCommandParser().parse(arguments);
             case AssociateCommand.COMMAND_WORD -> new AssociateCommandParser().parse(arguments);
             case DissociateCommand.COMMAND_WORD -> new DissociateCommandParser().parse(arguments);

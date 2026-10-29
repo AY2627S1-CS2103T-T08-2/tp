@@ -5,7 +5,9 @@
       "phone": "94351253",
       "email": "alice@example.com",
       "address": "123, Jurong West Ave 6, #08-111",
-      "tags": ["friends"]
+      "tags": [
+        "friends"
+      ]
     },
     {
       "id": null,
@@ -13,7 +15,10 @@
       "phone": "98765432",
       "email": "johnd@example.com",
       "address": "311, Clementi Ave 2, #02-25",
-      "tags": ["owesMoney", "friends"]
+      "tags": [
+        "owesMoney",
+        "friends"
+      ]
     }
   ]
 }

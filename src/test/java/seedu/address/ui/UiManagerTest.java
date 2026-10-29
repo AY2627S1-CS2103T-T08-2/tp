@@ -42,18 +42,31 @@ public class UiManagerTest {
             try {
                 ui.start(stage);
                 assertEquals(AlertType.ERROR, ui.alertType);
-                assertTrue(ui.alertContent.contains(testFolder.resolve("addressbook.json")
-                        .toAbsolutePath().normalize().toString()));
+                assertTrue(ui.alertContent.contains(testFolder
+                    .resolve("addressbook.json")
+                    .toAbsolutePath()
+                    .normalize()
+                    .toString()));
                 assertTrue(ui.alertContent.contains("Your original file has been preserved."));
                 assertTrue(ui.alertContent.contains("repair it or restore a valid backup and restart."));
-                Label warning = (Label) stage.getScene().lookup("#savingDisabledStatus");
+                Label warning = (Label) stage
+                    .getScene()
+                    .lookup("#savingDisabledStatus");
                 assertTrue(warning.isVisible());
                 assertTrue(warning.isManaged());
                 assertEquals("Saving disabled — session changes will be lost", warning.getText());
-                Label path = (Label) stage.getScene().lookup("#saveLocationStatus");
-                assertEquals(testFolder.resolve("addressbook.json").toAbsolutePath().normalize().toString(),
-                        path.getText());
-                assertEquals(path.getText(), path.getTooltip().getText());
+                Label path = (Label) stage
+                    .getScene()
+                    .lookup("#saveLocationStatus");
+                assertEquals(testFolder
+                        .resolve("addressbook.json")
+                        .toAbsolutePath()
+                        .normalize()
+                        .toString(),
+                    path.getText());
+                assertEquals(path.getText(), path
+                    .getTooltip()
+                    .getText());
             } finally {
                 stage.close();
             }
@@ -68,7 +81,9 @@ public class UiManagerTest {
             try {
                 ui.start(stage);
                 assertNull(ui.alertType);
-                Label warning = (Label) stage.getScene().lookup("#savingDisabledStatus");
+                Label warning = (Label) stage
+                    .getScene()
+                    .lookup("#savingDisabledStatus");
                 assertFalse(warning.isVisible());
                 assertFalse(warning.isManaged());
             } finally {
@@ -80,7 +95,7 @@ public class UiManagerTest {
     private RecordingUiManager createUiManager(boolean savingDisabled) {
         Path dataFilePath = testFolder.resolve("addressbook.json");
         StorageManager storage = new StorageManager(new JsonAddressBookStorage(dataFilePath),
-                new JsonUserPrefsStorage(testFolder.resolve("preferences.json")));
+            new JsonUserPrefsStorage(testFolder.resolve("preferences.json")));
         Logic logic = new LogicManager(new ModelManager(), storage);
         return new RecordingUiManager(logic, dataFilePath, savingDisabled);
     }

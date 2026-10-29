@@ -19,7 +19,7 @@ public class ListMembersCommandParserTest {
     @Test
     public void parseCommand_validProjectName_returnsListMembersCommand() throws Exception {
         ListMembersCommand command = (ListMembersCommand) parser.parseCommand(
-                "listmembers pr/CS2103T Team Project");
+            "listmembers pr/CS2103T Team Project");
 
         assertEquals(new ListMembersCommand(new ProjectName("CS2103T Team Project")), command);
     }

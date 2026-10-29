@@ -15,7 +15,9 @@ import seedu.address.model.membership.Role;
 import seedu.address.model.person.Person;
 import seedu.address.model.project.Project;
 
-/** Sets the task allotment for an existing project member. */
+/**
+ * Sets the task allotment for an existing project member.
+ */
 public class SetRoleCommand extends Command {
 
     public static final String COMMAND_WORD = "setrole";
@@ -33,7 +35,9 @@ public class SetRoleCommand extends Command {
     private final Index projectIndex;
     private final Role role;
 
-    /** Creates a command to update a membership role. */
+    /**
+     * Creates a command to update a membership role.
+     */
     public SetRoleCommand(Index contactIndex, Index projectIndex, Role role) {
         requireNonNull(contactIndex);
         requireNonNull(projectIndex);
@@ -72,14 +76,17 @@ public class SetRoleCommand extends Command {
     @Override
     public boolean equals(Object other) {
         return other == this || (other instanceof SetRoleCommand otherCommand
-                && contactIndex.equals(otherCommand.contactIndex)
-                && projectIndex.equals(otherCommand.projectIndex)
-                && role.equals(otherCommand.role));
+            && contactIndex.equals(otherCommand.contactIndex)
+            && projectIndex.equals(otherCommand.projectIndex)
+            && role.equals(otherCommand.role));
     }
 
     @Override
     public String toString() {
-        return new ToStringBuilder(this).add("contactIndex", contactIndex)
-                .add("projectIndex", projectIndex).add("role", role).toString();
+        return new ToStringBuilder(this)
+            .add("contactIndex", contactIndex)
+            .add("projectIndex", projectIndex)
+            .add("role", role)
+            .toString();
     }
 }

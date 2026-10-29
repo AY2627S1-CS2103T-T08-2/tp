@@ -11,17 +11,15 @@ import seedu.address.commons.util.ToStringBuilder;
  */
 public class CommandResult {
 
-    /** The list the UI should reveal after a successful command. NONE preserves the current tab. */
-    public enum ListViewTarget { NONE, CONTACTS, PROJECTS }
-
     private final String feedbackToUser;
-
-    /** Help information should be shown to the user. */
+    /**
+     * Help information should be shown to the user.
+     */
     private final boolean showHelp;
-
-    /** The application should exit. */
+    /**
+     * The application should exit.
+     */
     private final boolean exit;
-
     private final ListViewTarget listViewTarget;
 
     /**
@@ -31,7 +29,9 @@ public class CommandResult {
         this(feedbackToUser, showHelp, exit, ListViewTarget.NONE);
     }
 
-    /** Constructs a result with an explicit list to reveal in the UI. */
+    /**
+     * Constructs a result with an explicit list to reveal in the UI.
+     */
     public CommandResult(String feedbackToUser, boolean showHelp, boolean exit, ListViewTarget listViewTarget) {
         this.feedbackToUser = requireNonNull(feedbackToUser);
         this.showHelp = showHelp;
@@ -39,7 +39,9 @@ public class CommandResult {
         this.listViewTarget = requireNonNull(listViewTarget);
     }
 
-    /** Constructs feedback that also reveals the requested list. */
+    /**
+     * Constructs feedback that also reveals the requested list.
+     */
     public CommandResult(String feedbackToUser, ListViewTarget listViewTarget) {
         this(feedbackToUser, false, false, listViewTarget);
     }
@@ -52,7 +54,9 @@ public class CommandResult {
         this(feedbackToUser, false, false);
     }
 
-    /** Returns the list to reveal, or NONE to keep the current tab selected. */
+    /**
+     * Returns the list to reveal, or NONE to keep the current tab selected.
+     */
     public ListViewTarget getListViewTarget() {
         return listViewTarget;
     }
@@ -81,9 +85,9 @@ public class CommandResult {
         }
 
         return feedbackToUser.equals(otherCommandResult.feedbackToUser)
-                && showHelp == otherCommandResult.showHelp
-                && exit == otherCommandResult.exit
-                && listViewTarget == otherCommandResult.listViewTarget;
+            && showHelp == otherCommandResult.showHelp
+            && exit == otherCommandResult.exit
+            && listViewTarget == otherCommandResult.listViewTarget;
     }
 
     @Override
@@ -94,11 +98,16 @@ public class CommandResult {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .add("feedbackToUser", feedbackToUser)
-                .add("showHelp", showHelp)
-                .add("exit", exit)
-                .add("listViewTarget", listViewTarget)
-                .toString();
+            .add("feedbackToUser", feedbackToUser)
+            .add("showHelp", showHelp)
+            .add("exit", exit)
+            .add("listViewTarget", listViewTarget)
+            .toString();
     }
+
+    /**
+     * The list the UI should reveal after a successful command. NONE preserves the current tab.
+     */
+    public enum ListViewTarget { NONE, CONTACTS, PROJECTS }
 
 }

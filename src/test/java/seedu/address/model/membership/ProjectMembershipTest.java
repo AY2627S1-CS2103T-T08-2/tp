@@ -13,13 +13,13 @@ import seedu.address.model.project.ProjectId;
 public class ProjectMembershipTest {
 
     private static final PersonId PERSON_ID =
-            PersonId.fromString("550e8400-e29b-41d4-a716-446655440001");
+        PersonId.fromString("550e8400-e29b-41d4-a716-446655440001");
     private static final PersonId OTHER_PERSON_ID =
-            PersonId.fromString("550e8400-e29b-41d4-a716-446655440002");
+        PersonId.fromString("550e8400-e29b-41d4-a716-446655440002");
     private static final ProjectId PROJECT_ID =
-            ProjectId.fromString("00000000-0000-4000-8000-000000000001");
+        ProjectId.fromString("00000000-0000-4000-8000-000000000001");
     private static final ProjectId OTHER_PROJECT_ID =
-            ProjectId.fromString("00000000-0000-4000-8000-000000000002");
+        ProjectId.fromString("00000000-0000-4000-8000-000000000002");
 
     @Test
     public void constructor_nullPersonId_throwsNullPointerException() {
@@ -83,7 +83,7 @@ public class ProjectMembershipTest {
     public void equals_differentPersonId_returnsFalse() {
         ProjectMembership membership = new ProjectMembership(PERSON_ID, PROJECT_ID);
         ProjectMembership membershipWithDifferentPerson =
-                new ProjectMembership(OTHER_PERSON_ID, PROJECT_ID);
+            new ProjectMembership(OTHER_PERSON_ID, PROJECT_ID);
 
         assertNotEquals(membership, membershipWithDifferentPerson);
     }
@@ -92,7 +92,7 @@ public class ProjectMembershipTest {
     public void equals_differentProjectId_returnsFalse() {
         ProjectMembership membership = new ProjectMembership(PERSON_ID, PROJECT_ID);
         ProjectMembership membershipWithDifferentProject =
-                new ProjectMembership(PERSON_ID, OTHER_PROJECT_ID);
+            new ProjectMembership(PERSON_ID, OTHER_PROJECT_ID);
 
         assertNotEquals(membership, membershipWithDifferentProject);
     }

@@ -128,9 +128,13 @@ public class ModelManager implements Model {
     @Override
     public Optional<Project> findProject(ProjectName name) {
         requireNonNull(name);
-        return addressBook.getProjectList().stream()
-                .filter(project -> project.getName().equals(name))
-                .findFirst();
+        return addressBook
+            .getProjectList()
+            .stream()
+            .filter(project -> project
+                .getName()
+                .equals(name))
+            .findFirst();
     }
 
     @Override
@@ -171,7 +175,9 @@ public class ModelManager implements Model {
         refreshPersonFilter();
     }
 
-    /** Re-evaluates the current contact filter when membership changes without a person being edited. */
+    /**
+     * Re-evaluates the current contact filter when membership changes without a person being edited.
+     */
     private void refreshPersonFilter() {
         Predicate<? super Person> predicate = filteredPersons.getPredicate();
         if (predicate != null) {

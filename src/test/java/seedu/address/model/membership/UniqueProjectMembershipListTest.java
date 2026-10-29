@@ -18,18 +18,18 @@ import seedu.address.model.project.ProjectId;
 public class UniqueProjectMembershipListTest {
 
     private static final PersonId PERSON_ID =
-            PersonId.fromString("550e8400-e29b-41d4-a716-446655440001");
+        PersonId.fromString("550e8400-e29b-41d4-a716-446655440001");
     private static final PersonId OTHER_PERSON_ID =
-            PersonId.fromString("550e8400-e29b-41d4-a716-446655440002");
+        PersonId.fromString("550e8400-e29b-41d4-a716-446655440002");
     private static final ProjectId PROJECT_ID =
-            ProjectId.fromString("00000000-0000-4000-8000-000000000001");
+        ProjectId.fromString("00000000-0000-4000-8000-000000000001");
     private static final ProjectId OTHER_PROJECT_ID =
-            ProjectId.fromString("00000000-0000-4000-8000-000000000002");
+        ProjectId.fromString("00000000-0000-4000-8000-000000000002");
     private static final ProjectMembership MEMBERSHIP = new ProjectMembership(PERSON_ID, PROJECT_ID);
     private static final ProjectMembership SAME_PERSON_OTHER_PROJECT =
-            new ProjectMembership(PERSON_ID, OTHER_PROJECT_ID);
+        new ProjectMembership(PERSON_ID, OTHER_PROJECT_ID);
     private static final ProjectMembership OTHER_PERSON_SAME_PROJECT =
-            new ProjectMembership(OTHER_PERSON_ID, PROJECT_ID);
+        new ProjectMembership(OTHER_PERSON_ID, PROJECT_ID);
 
     private final UniqueProjectMembershipList memberships = new UniqueProjectMembershipList();
 
@@ -70,7 +70,7 @@ public class UniqueProjectMembershipListTest {
         memberships.add(OTHER_PERSON_SAME_PROJECT);
 
         assertEquals(List.of(MEMBERSHIP, SAME_PERSON_OTHER_PROJECT, OTHER_PERSON_SAME_PROJECT),
-                memberships.asUnmodifiableObservableList());
+            memberships.asUnmodifiableObservableList());
     }
 
     @Test
@@ -89,7 +89,9 @@ public class UniqueProjectMembershipListTest {
 
         memberships.remove(new ProjectMembership(PERSON_ID, PROJECT_ID));
 
-        assertTrue(memberships.asUnmodifiableObservableList().isEmpty());
+        assertTrue(memberships
+            .asUnmodifiableObservableList()
+            .isEmpty());
     }
 
     @Test
@@ -136,7 +138,9 @@ public class UniqueProjectMembershipListTest {
         assertThrows(DuplicateProjectMembershipException.class, () -> {
             memberships.setMemberships(List.of(firstRole, secondRole));
         });
-        assertTrue(memberships.asUnmodifiableObservableList().isEmpty());
+        assertTrue(memberships
+            .asUnmodifiableObservableList()
+            .isEmpty());
     }
 
     @Test
@@ -146,7 +150,7 @@ public class UniqueProjectMembershipListTest {
         memberships.setMemberships(List.of(SAME_PERSON_OTHER_PROJECT, OTHER_PERSON_SAME_PROJECT));
 
         assertEquals(List.of(SAME_PERSON_OTHER_PROJECT, OTHER_PERSON_SAME_PROJECT),
-                memberships.asUnmodifiableObservableList());
+            memberships.asUnmodifiableObservableList());
     }
 
     @Test
@@ -157,6 +161,58 @@ public class UniqueProjectMembershipListTest {
         memberships.setMemberships(memberships);
 
         assertEquals(List.of(MEMBERSHIP, SAME_PERSON_OTHER_PROJECT), memberships.asUnmodifiableObservableList());
+    }
+
+    @Test
+    public void setMemberships_selfOrOwnView_preservesMembershipsAndRoles() {
+        ProjectMembership designMembership = MEMBERSHIP.withRole(new Role("Design"));
+        List<List<ProjectMembership>> membershipCases = List.of(List.of(), List.of(designMembership),
+            List.of(designMembership, SAME_PERSON_OTHER_PROJECT.withRole(new Role("Testing")),
+                OTHER_PERSON_SAME_PROJECT));
+
+        for (List<ProjectMembership> expectedMemberships : membershipCases) {
+            memberships.setMemberships(expectedMemberships);
+
+            memberships.setMemberships(memberships);
+
+            assertMembershipsUnchanged(expectedMemberships);
+
+            memberships.setMemberships(expectedMemberships);
+            memberships.setMemberships(memberships.asUnmodifiableObservableList());
+
+            assertMembershipsUnchanged(expectedMemberships);
+        }
+    }
+
+    private void assertMembershipsUnchanged(List<ProjectMembership> expectedMemberships) {
+        List<ProjectMembership> actualMemberships = memberships.asUnmodifiableObservableList();
+
+        assertEquals(expectedMemberships.size(), actualMemberships.size());
+        assertEquals(expectedMemberships, actualMemberships);
+        assertEquals(expectedMemberships
+                .stream()
+                .map(ProjectMembership::getPersonId)
+                .toList(),
+            actualMemberships
+                .stream()
+                .map(ProjectMembership::getPersonId)
+                .toList());
+        assertEquals(expectedMemberships
+                .stream()
+                .map(ProjectMembership::getProjectId)
+                .toList(),
+            actualMemberships
+                .stream()
+                .map(ProjectMembership::getProjectId)
+                .toList());
+        assertEquals(expectedMemberships
+                .stream()
+                .map(ProjectMembership::getRole)
+                .toList(),
+            actualMemberships
+                .stream()
+                .map(ProjectMembership::getRole)
+                .toList());
     }
 
     @Test

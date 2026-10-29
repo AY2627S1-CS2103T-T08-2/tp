@@ -78,10 +78,10 @@ public class ProjectTest {
     @Test
     public void isSameProject_sameIdDifferentData_returnsTrue() {
         Project updated = new ProjectBuilder(PROJ0)
-                .withName("Renamed Project")
-                .withDeadline(LocalDate.of(2027, 1, 1))
-                .withDescription("Updated description")
-                .build();
+            .withName("Renamed Project")
+            .withDeadline(LocalDate.of(2027, 1, 1))
+            .withDescription("Updated description")
+            .build();
 
         assertTrue(PROJ0.isSameProject(updated));
         assertTrue(updated.isSameProject(PROJ0));
@@ -90,8 +90,8 @@ public class ProjectTest {
     @Test
     public void isSameProject_differentIdSameData_returnsFalse() {
         Project other = new ProjectBuilder(PROJ0)
-                .withProjectId(PROJ1.getProjectId())
-                .build();
+            .withProjectId(PROJ1.getProjectId())
+            .build();
 
         assertFalse(PROJ0.isSameProject(other));
     }
@@ -99,8 +99,8 @@ public class ProjectTest {
     @Test
     public void equals_onlyDeadlineDiffers_returnsFalse() {
         Project updated = new ProjectBuilder(PROJ0)
-                .withDeadline(PROJ0.getDeadline().value.plusDays(1))
-                .build();
+            .withDeadline(PROJ0.getDeadline().value.plusDays(1))
+            .build();
 
         assertFalse(PROJ0.equals(updated));
     }
@@ -108,8 +108,8 @@ public class ProjectTest {
     @Test
     public void equals_onlyDescriptionDiffers_returnsFalse() {
         Project updated = new ProjectBuilder(PROJ0)
-                .withDescription("Updated description")
-                .build();
+            .withDescription("Updated description")
+            .build();
 
         assertFalse(PROJ0.equals(updated));
     }
@@ -117,8 +117,8 @@ public class ProjectTest {
     @Test
     public void equals_onlyIdDiffers_returnsFalse() {
         Project other = new ProjectBuilder(PROJ0)
-                .withProjectId(PROJ1.getProjectId())
-                .build();
+            .withProjectId(PROJ1.getProjectId())
+            .build();
 
         assertFalse(PROJ0.equals(other));
     }
@@ -126,8 +126,8 @@ public class ProjectTest {
     @Test
     public void equals_onlyNameDiffers_returnsFalse() {
         Project renamed = new ProjectBuilder(PROJ0)
-                .withName("Renamed Project")
-                .build();
+            .withName("Renamed Project")
+            .build();
 
         assertFalse(PROJ0.equals(renamed));
     }

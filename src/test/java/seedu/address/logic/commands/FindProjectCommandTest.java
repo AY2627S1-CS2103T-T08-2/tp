@@ -38,7 +38,9 @@ import seedu.address.storage.JsonUserPrefsStorage;
 import seedu.address.storage.StorageManager;
 import seedu.address.testutil.ProjectBuilder;
 
-/** Tests project search and its interactions with displayed project indices. */
+/**
+ * Tests project search and its interactions with displayed project indices.
+ */
 public class FindProjectCommandTest {
 
 
@@ -74,7 +76,9 @@ public class FindProjectCommandTest {
     public void execute_noMatches_showsEmptyProjectResults() {
         CommandResult result = command("Missing").execute(model);
 
-        assertTrue(model.getFilteredProjectList().isEmpty());
+        assertTrue(model
+            .getFilteredProjectList()
+            .isEmpty());
         assertEquals("0 project(s) listed!", result.getFeedbackToUser());
         assertEquals(CommandResult.ListViewTarget.PROJECTS, result.getListViewTarget());
     }
@@ -100,7 +104,9 @@ public class FindProjectCommandTest {
 
     @Test
     public void execute_contactFilterActive_preservesFilterAndStoredData() {
-        model.updateFilteredPersonList(person -> person.getPersonId().equals(BOB.getPersonId()));
+        model.updateFilteredPersonList(person -> person
+            .getPersonId()
+            .equals(BOB.getPersonId()));
         Predicate<? super Person> contactFilter = model.getFilteredPersonListPredicate();
         AddressBook beforeSearch = new AddressBook(model.getAddressBook());
 
@@ -110,7 +116,11 @@ public class FindProjectCommandTest {
         assertEquals(List.of(BOB), model.getFilteredPersonList());
         assertSame(contactFilter, model.getFilteredPersonListPredicate());
         assertEquals(beforeSearch, model.getAddressBook());
-        assertEquals(originalRole, model.getAddressBook().getProjectMembershipList().getFirst().getRole());
+        assertEquals(originalRole, model
+            .getAddressBook()
+            .getProjectMembershipList()
+            .getFirst()
+            .getRole());
     }
 
     @Test
@@ -118,12 +128,16 @@ public class FindProjectCommandTest {
         command("Beta").execute(model);
         Project duplicate = createProject("Alpha Project");
 
-        assertEquals(alpha, model.findProject(new ProjectName("Alpha Project")).orElseThrow());
+        assertEquals(alpha, model
+            .findProject(new ProjectName("Alpha Project"))
+            .orElseThrow());
         assertThrows(CommandException.class,
             String.format(AddProjectCommand.MESSAGE_DUPLICATE_PROJECT, duplicate.getName()), () -> {
                 new AddProjectCommand(duplicate).execute(model);
             });
-        assertEquals(allProjects, model.getAddressBook().getProjectList());
+        assertEquals(allProjects, model
+            .getAddressBook()
+            .getProjectList());
         assertEquals(List.of(beta), model.getFilteredProjectList());
     }
 
@@ -133,8 +147,12 @@ public class FindProjectCommandTest {
 
         new DeleteProjectCommand(FIRST_INDEX).execute(model);
 
-        assertEquals(List.of(alpha, gamma), model.getAddressBook().getProjectList());
-        assertTrue(model.getFilteredProjectList().isEmpty());
+        assertEquals(List.of(alpha, gamma), model
+            .getAddressBook()
+            .getProjectList());
+        assertTrue(model
+            .getFilteredProjectList()
+            .isEmpty());
     }
 
     @Test
@@ -145,7 +163,9 @@ public class FindProjectCommandTest {
             new DeleteProjectCommand(Index.fromOneBased(2)).execute(model);
         });
 
-        assertEquals(allProjects, model.getAddressBook().getProjectList());
+        assertEquals(allProjects, model
+            .getAddressBook()
+            .getProjectList());
         assertEquals(List.of(beta), model.getFilteredProjectList());
     }
 
@@ -157,11 +177,24 @@ public class FindProjectCommandTest {
 
         new EditProjectCommand(FIRST_INDEX, descriptor).execute(model);
 
-        assertEquals(3, model.getFilteredProjectList().size());
-        assertEquals(alpha, model.getFilteredProjectList().get(0));
-        assertEquals(beta.getProjectId(), model.getFilteredProjectList().get(1).getProjectId());
-        assertEquals("Delta Project", model.getFilteredProjectList().get(1).getName().toString());
-        assertEquals(gamma, model.getFilteredProjectList().get(2));
+        assertEquals(3, model
+            .getFilteredProjectList()
+            .size());
+        assertEquals(alpha, model
+            .getFilteredProjectList()
+            .get(0));
+        assertEquals(beta.getProjectId(), model
+            .getFilteredProjectList()
+            .get(1)
+            .getProjectId());
+        assertEquals("Delta Project", model
+            .getFilteredProjectList()
+            .get(1)
+            .getName()
+            .toString());
+        assertEquals(gamma, model
+            .getFilteredProjectList()
+            .get(2));
     }
 
     @Test
@@ -184,7 +217,11 @@ public class FindProjectCommandTest {
 
         assertFalse(model.hasProjectMembership(betaMembership));
         assertEquals(List.of(alpha), model.getPersonProjects(ALICE));
-        assertEquals(originalRole, model.getAddressBook().getProjectMembershipList().getFirst().getRole());
+        assertEquals(originalRole, model
+            .getAddressBook()
+            .getProjectMembershipList()
+            .getFirst()
+            .getRole());
     }
 
     @Test
@@ -196,10 +233,16 @@ public class FindProjectCommandTest {
 
         new SetRoleCommand(FIRST_INDEX, FIRST_INDEX, updatedRole).execute(model);
 
-        List<ProjectMembership> memberships = model.getAddressBook().getProjectMembershipList();
-        assertEquals(originalRole, memberships.get(0).getRole());
+        List<ProjectMembership> memberships = model
+            .getAddressBook()
+            .getProjectMembershipList();
+        assertEquals(originalRole, memberships
+            .get(0)
+            .getRole());
         assertEquals(betaMembership, memberships.get(1));
-        assertEquals(updatedRole, memberships.get(1).getRole());
+        assertEquals(updatedRole, memberships
+            .get(1)
+            .getRole());
     }
 
     @Test
@@ -220,28 +263,30 @@ public class FindProjectCommandTest {
 
         assertEquals(allProjects, model.getFilteredProjectList());
         assertEquals(CommandResult.ListViewTarget.PROJECTS, result.getListViewTarget());
-        assertTrue(result.getFeedbackToUser().startsWith("Listed 3 project(s):\n"));
+        assertTrue(result
+            .getFeedbackToUser()
+            .startsWith("Listed 3 project(s):\n"));
     }
 
     @Test
-    public void execute_listContactProjectsAfterSearch_restoresCorrectProjectIndices() throws CommandException {
+    public void execute_listContactProjectsAfterSearch_preservesFilter() throws CommandException {
         command("Beta").execute(model);
 
         CommandResult result = new ListProjectsCommand(FIRST_INDEX).execute(model);
 
-        assertEquals(allProjects, model.getFilteredProjectList());
+        assertEquals(List.of(beta), model.getFilteredProjectList());
         assertEquals(String.format("Projects for contact \"%s\" (1):\n", ALICE.getName())
-                + "1. Alpha Project | Deadline: 2027-01-01 | Description: Test project",
+                + "[not displayed] Alpha Project | Deadline: 2027-01-01 | Description: Test project",
             result.getFeedbackToUser());
     }
 
     @Test
-    public void execute_listUnassociatedContactAfterSearch_stillClearsSearch() throws CommandException {
+    public void execute_listUnassociatedContactAfterSearch_preservesFilter() throws CommandException {
         command("Beta").execute(model);
 
         CommandResult result = new ListProjectsCommand(Index.fromOneBased(2)).execute(model);
 
-        assertEquals(allProjects, model.getFilteredProjectList());
+        assertEquals(List.of(beta), model.getFilteredProjectList());
         assertEquals(String.format(ListProjectsCommand.MESSAGE_NO_PROJECTS, BOB.getName()),
             result.getFeedbackToUser());
     }
@@ -264,13 +309,18 @@ public class FindProjectCommandTest {
 
         storage.saveAddressBook(model.getAddressBook());
 
-        assertEquals(allProjects, storage.readAddressBook().orElseThrow().getProjectList());
+        assertEquals(allProjects, storage
+            .readAddressBook()
+            .orElseThrow()
+            .getProjectList());
     }
 
     @Test
     public void execute_failedSaveAfterEdit_restoresProjectAndBothFilters() throws Exception {
         command("Beta").execute(model);
-        model.updateFilteredPersonList(person -> person.getPersonId().equals(ALICE.getPersonId()));
+        model.updateFilteredPersonList(person -> person
+            .getPersonId()
+            .equals(ALICE.getPersonId()));
         JsonAddressBookStorage failingStorage = new JsonAddressBookStorage(temporaryFolder.resolve("failed.json")) {
             @Override
             public void saveAddressBook(ReadOnlyAddressBook addressBook) throws IOException {
@@ -282,10 +332,16 @@ public class FindProjectCommandTest {
 
         assertThrows(CommandException.class, () -> logic.execute("editproject 1 n/Delta Project"));
 
-        assertEquals(allProjects, model.getAddressBook().getProjectList());
+        assertEquals(allProjects, model
+            .getAddressBook()
+            .getProjectList());
         assertEquals(List.of(beta), model.getFilteredProjectList());
         assertEquals(List.of(ALICE), model.getFilteredPersonList());
-        assertEquals(originalRole, model.getAddressBook().getProjectMembershipList().getFirst().getRole());
+        assertEquals(originalRole, model
+            .getAddressBook()
+            .getProjectMembershipList()
+            .getFirst()
+            .getRole());
     }
 
     @Test
@@ -304,7 +360,10 @@ public class FindProjectCommandTest {
     }
 
     private static Project createProject(String name) {
-        return new ProjectBuilder().withName(name)
-            .withDeadline(LocalDate.of(2027, 1, 1)).withDescription("Test project").build();
+        return new ProjectBuilder()
+            .withName(name)
+            .withDeadline(LocalDate.of(2027, 1, 1))
+            .withDescription("Test project")
+            .build();
     }
 }

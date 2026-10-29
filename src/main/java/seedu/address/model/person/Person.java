@@ -38,13 +38,16 @@ public class Person {
      * Every argument must be present and not null.
      */
     public Person(PersonId personId, Name name, Phone phone, Email email,
-            Address address, Set<Tag> tags) {
+                  Address address, Set<Tag> tags) {
         requireAllNonNull(personId, name, phone, email, address, tags);
         this.personId = personId;
         this.name = name;
         this.phone = phone;
         this.email = email;
         this.address = address;
+        for (Tag tag : tags) {
+            Objects.requireNonNull(tag);
+        }
         this.tags.addAll(tags);
     }
 
@@ -98,10 +101,10 @@ public class Person {
         }
 
         return name.equals(otherPerson.name)
-                && phone.equals(otherPerson.phone)
-                && email.equals(otherPerson.email)
-                && address.equals(otherPerson.address)
-                && tags.equals(otherPerson.tags);
+            && phone.equals(otherPerson.phone)
+            && email.equals(otherPerson.email)
+            && address.equals(otherPerson.address)
+            && tags.equals(otherPerson.tags);
     }
 
     @Override
@@ -113,12 +116,12 @@ public class Person {
     @Override
     public String toString() {
         return new ToStringBuilder(this)
-                .add("name", name)
-                .add("phone", phone)
-                .add("email", email)
-                .add("address", address)
-                .add("tags", tags)
-                .toString();
+            .add("name", name)
+            .add("phone", phone)
+            .add("email", email)
+            .add("address", address)
+            .add("tags", tags)
+            .toString();
     }
 
 }

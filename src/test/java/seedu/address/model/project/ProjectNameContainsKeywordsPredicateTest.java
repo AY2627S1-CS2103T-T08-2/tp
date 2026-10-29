@@ -9,7 +9,9 @@ import org.junit.jupiter.api.Test;
 
 import seedu.address.testutil.ProjectBuilder;
 
-/** Tests whole-word matching against project names. */
+/**
+ * Tests whole-word matching against project names.
+ */
 public class ProjectNameContainsKeywordsPredicateTest {
 
     private final Project project = new ProjectBuilder()

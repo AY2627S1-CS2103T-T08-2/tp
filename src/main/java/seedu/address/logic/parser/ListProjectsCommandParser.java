@@ -7,7 +7,9 @@ import seedu.address.commons.core.index.Index;
 import seedu.address.logic.commands.ListProjectsCommand;
 import seedu.address.logic.parser.exceptions.ParseException;
 
-/** Parses arguments for listing all projects or a displayed contact's projects. */
+/**
+ * Parses arguments for listing all projects or a displayed contact's projects.
+ */
 public class ListProjectsCommandParser implements Parser<ListProjectsCommand> {
 
     /**
@@ -25,13 +27,19 @@ public class ListProjectsCommandParser implements Parser<ListProjectsCommand> {
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_CONTACT);
 
         String usageMessage = String.format(
-                MESSAGE_INVALID_COMMAND_FORMAT, ListProjectsCommand.MESSAGE_USAGE);
-        if (argMultimap.getValue(PREFIX_CONTACT).isEmpty() || !argMultimap.getPreamble().isEmpty()) {
+            MESSAGE_INVALID_COMMAND_FORMAT, ListProjectsCommand.MESSAGE_USAGE);
+        if (argMultimap
+            .getValue(PREFIX_CONTACT)
+            .isEmpty() || !argMultimap
+            .getPreamble()
+            .isEmpty()) {
             throw new ParseException(usageMessage);
         }
 
         try {
-            Index contactIndex = ParserUtil.parseIndex(argMultimap.getValue(PREFIX_CONTACT).get());
+            Index contactIndex = ParserUtil.parseIndex(argMultimap
+                .getValue(PREFIX_CONTACT)
+                .get());
             return new ListProjectsCommand(contactIndex);
         } catch (ParseException pe) {
             throw new ParseException(usageMessage, pe);

@@ -11,7 +11,7 @@ import java.util.UUID;
 public class PersonId {
 
     public static final String MESSAGE_CONSTRAINTS =
-            "Person IDs must use the standard UUID format.";
+        "Person IDs must use the standard UUID format.";
 
     private final UUID id;
 
@@ -35,13 +35,15 @@ public class PersonId {
     /**
      * Returns a person identifier parsed from the given UUID string.
      *
-     * @throws NullPointerException if {@code text} is null.
+     * @throws NullPointerException     if {@code text} is null.
      * @throws IllegalArgumentException if {@code text} is not a standard UUID.
      */
     public static PersonId fromString(String text) {
         requireNonNull(text);
         UUID parsedId = UUID.fromString(text);
-        if (!parsedId.toString().equalsIgnoreCase(text)) {
+        if (!parsedId
+            .toString()
+            .equalsIgnoreCase(text)) {
             throw new IllegalArgumentException(MESSAGE_CONSTRAINTS);
         }
         return new PersonId(parsedId);

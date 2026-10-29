@@ -129,11 +129,12 @@ Format: `listprojects [c/CONTACT_INDEX]`
 * Without `c/`, lists all projects. If no projects exist, UniTeam reports that there are no projects to list.
 * With `c/`, lists only projects associated with the selected contact and identifies the contact in the result.
   `CONTACT_INDEX` must be a positive integer referring to the currently displayed Contacts list, including after `find`.
-* Project numbers retain their original indices from the full Projects list. For example, if the contact belongs to
-  projects 2 and 5, the results are numbered 2 and 5. These numbers remain valid for `associate` and `dissociate`.
+* Project numbers match the currently displayed Projects list, so they remain valid for `associate` and `dissociate`.
+  Associated projects hidden by a project search are still listed in the feedback, marked `[not displayed]` without
+  a number. Use `listprojects` to restore all projects before selecting a hidden project by index.
 * A contact with no associated projects produces an informational message.
 * Missing or invalid contact indices, out-of-range indices, duplicate `c/` prefixes, and unsupported arguments are rejected.
-* Results appear in the command feedback area. The Contacts and Projects tabs and the current contact filter remain
+* Contact-specific results appear in the command feedback area. The selected tab and both list filters remain
   unchanged. Contacts, projects, and their associations are also unchanged.
 
 Examples:

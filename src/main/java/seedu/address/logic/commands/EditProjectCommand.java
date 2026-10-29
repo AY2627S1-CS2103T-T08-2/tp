@@ -70,7 +70,8 @@ public class EditProjectCommand extends Command {
         Project projectToEdit = lastShownList.get(index.getZeroBased());
         Project editedProject = createEditedProject(projectToEdit, editProjectDescriptor);
 
-        boolean hasDuplicateName = model.findProject(editedProject.getName())
+        boolean hasDuplicateName = model
+            .findProject(editedProject.getName())
             .filter(project -> !project.isSameProject(projectToEdit))
             .isPresent();
 
@@ -90,9 +91,15 @@ public class EditProjectCommand extends Command {
     private static Project createEditedProject(Project projectToEdit, EditProjectDescriptor editProjectDescriptor) {
         assert projectToEdit != null;
 
-        ProjectName updatedName = editProjectDescriptor.getName().orElse(projectToEdit.getName());
-        Deadline updatedDeadline = editProjectDescriptor.getDeadline().orElse(projectToEdit.getDeadline());
-        Description updatedDescription = editProjectDescriptor.getDescription().orElse(projectToEdit.getDescription());
+        ProjectName updatedName = editProjectDescriptor
+            .getName()
+            .orElse(projectToEdit.getName());
+        Deadline updatedDeadline = editProjectDescriptor
+            .getDeadline()
+            .orElse(projectToEdit.getDeadline());
+        Description updatedDescription = editProjectDescriptor
+            .getDescription()
+            .orElse(projectToEdit.getDescription());
 
         return new Project(projectToEdit.getProjectId(), updatedName,
             updatedDeadline, updatedDescription);

@@ -28,7 +28,9 @@ public class ArgumentTokenizerTest {
     }
 
     private void assertPreambleEmpty(ArgumentMultimap argMultimap) {
-        assertTrue(argMultimap.getPreamble().isEmpty());
+        assertTrue(argMultimap
+            .getPreamble()
+            .isEmpty());
     }
 
     /**
@@ -38,19 +40,27 @@ public class ArgumentTokenizerTest {
     private void assertArgumentPresent(ArgumentMultimap argMultimap, Prefix prefix, String... expectedValues) {
 
         // Verify the last value is returned
-        assertEquals(expectedValues[expectedValues.length - 1], argMultimap.getValue(prefix).get());
+        assertEquals(expectedValues[expectedValues.length - 1], argMultimap
+            .getValue(prefix)
+            .get());
 
         // Verify the number of values returned is as expected
-        assertEquals(expectedValues.length, argMultimap.getAllValues(prefix).size());
+        assertEquals(expectedValues.length, argMultimap
+            .getAllValues(prefix)
+            .size());
 
         // Verify all values returned are as expected and in order
         for (int i = 0; i < expectedValues.length; i++) {
-            assertEquals(expectedValues[i], argMultimap.getAllValues(prefix).get(i));
+            assertEquals(expectedValues[i], argMultimap
+                .getAllValues(prefix)
+                .get(i));
         }
     }
 
     private void assertArgumentAbsent(ArgumentMultimap argMultimap, Prefix prefix) {
-        assertFalse(argMultimap.getValue(prefix).isPresent());
+        assertFalse(argMultimap
+            .getValue(prefix)
+            .isPresent());
     }
 
     @Test

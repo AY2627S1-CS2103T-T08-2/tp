@@ -41,16 +41,23 @@ public class AddCommandTest {
         AddressBook addressBook = new AddressBook();
         addressBook.addPerson(ALICE);
         Model model = new ModelManager(addressBook, new UserPrefs());
-        Person otherAlice = new PersonBuilder(ALICE).withPersonId(PersonId.generate())
-                .withPhone("91234567").build();
+        Person otherAlice = new PersonBuilder(ALICE)
+            .withPersonId(PersonId.generate())
+            .withPhone("91234567")
+            .build();
         AddressBook expectedAddressBook = new AddressBook(addressBook);
         expectedAddressBook.addPerson(otherAlice);
         Model expectedModel = new ModelManager(expectedAddressBook, new UserPrefs());
 
         assertCommandSuccess(new AddCommand(otherAlice), model,
-                String.format(AddCommand.MESSAGE_SUCCESS, Messages.format(otherAlice)), expectedModel);
+            String.format(AddCommand.MESSAGE_SUCCESS, Messages.format(otherAlice)), expectedModel);
         assertEquals(List.of(ALICE.getPersonId(), otherAlice.getPersonId()),
-                model.getAddressBook().getPersonList().stream().map(Person::getPersonId).toList());
+            model
+                .getAddressBook()
+                .getPersonList()
+                .stream()
+                .map(Person::getPersonId)
+                .toList());
     }
 
     @Test
@@ -58,11 +65,18 @@ public class AddCommandTest {
         AddressBook addressBook = new AddressBook();
         addressBook.addPerson(ALICE);
         Model model = new ModelManager(addressBook, new UserPrefs());
-        Person duplicate = new PersonBuilder(ALICE).withPersonId(PersonId.generate()).build();
+        Person duplicate = new PersonBuilder(ALICE)
+            .withPersonId(PersonId.generate())
+            .build();
 
         assertCommandFailure(new AddCommand(duplicate), model, AddCommand.MESSAGE_DUPLICATE_PERSON);
         assertEquals(List.of(ALICE.getPersonId()),
-                model.getAddressBook().getPersonList().stream().map(Person::getPersonId).toList());
+            model
+                .getAddressBook()
+                .getPersonList()
+                .stream()
+                .map(Person::getPersonId)
+                .toList());
     }
 
     @Test
@@ -71,13 +85,22 @@ public class AddCommandTest {
         addressBook.addPerson(ALICE);
         addressBook.addPerson(BOB);
         Model model = new ModelManager(addressBook, new UserPrefs());
-        model.updateFilteredPersonList(person -> person.getPersonId().equals(BOB.getPersonId()));
+        model.updateFilteredPersonList(person -> person
+            .getPersonId()
+            .equals(BOB.getPersonId()));
         assertEquals(List.of(BOB), model.getFilteredPersonList());
-        Person duplicate = new PersonBuilder(ALICE).withPersonId(PersonId.generate()).build();
+        Person duplicate = new PersonBuilder(ALICE)
+            .withPersonId(PersonId.generate())
+            .build();
 
         assertCommandFailure(new AddCommand(duplicate), model, AddCommand.MESSAGE_DUPLICATE_PERSON);
         assertEquals(List.of(ALICE.getPersonId(), BOB.getPersonId()),
-                model.getAddressBook().getPersonList().stream().map(Person::getPersonId).toList());
+            model
+                .getAddressBook()
+                .getPersonList()
+                .stream()
+                .map(Person::getPersonId)
+                .toList());
     }
 
     @Test
@@ -93,7 +116,7 @@ public class AddCommandTest {
         CommandResult commandResult = new AddCommand(validPerson).execute(modelStub);
 
         assertEquals(String.format(AddCommand.MESSAGE_SUCCESS, Messages.format(validPerson)),
-                commandResult.getFeedbackToUser());
+            commandResult.getFeedbackToUser());
         assertEquals(List.of(validPerson), modelStub.personsAdded);
     }
 
@@ -108,8 +131,12 @@ public class AddCommandTest {
 
     @Test
     public void equals() {
-        Person alice = new PersonBuilder().withName("Alice").build();
-        Person bob = new PersonBuilder().withName("Bob").build();
+        Person alice = new PersonBuilder()
+            .withName("Alice")
+            .build();
+        Person bob = new PersonBuilder()
+            .withName("Bob")
+            .build();
         AddCommand addAliceCommand = new AddCommand(alice);
         AddCommand addBobCommand = new AddCommand(bob);
 
@@ -299,7 +326,9 @@ public class AddCommandTest {
         @Override
         public boolean hasPerson(Person person) {
             requireNonNull(person);
-            return personsAdded.stream().anyMatch(person::isSamePerson);
+            return personsAdded
+                .stream()
+                .anyMatch(person::isSamePerson);
         }
 
         @Override

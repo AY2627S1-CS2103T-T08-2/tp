@@ -63,10 +63,16 @@ public class EditProjectDescriptorTest {
         original.setDeadline(new Deadline(NEW_DEADLINE.plusDays(1)));
         original.setDescription(Description.EMPTY);
 
-        assertEquals(new ProjectName("Original Name"), copy.getName().orElseThrow());
-        assertEquals(new Deadline(NEW_DEADLINE), copy.getDeadline().orElseThrow());
+        assertEquals(new ProjectName("Original Name"), copy
+            .getName()
+            .orElseThrow());
+        assertEquals(new Deadline(NEW_DEADLINE), copy
+            .getDeadline()
+            .orElseThrow());
         assertEquals(new Description("Original description"),
-            copy.getDescription().orElseThrow());
+            copy
+                .getDescription()
+                .orElseThrow());
     }
 
     @Test
@@ -76,16 +82,26 @@ public class EditProjectDescriptorTest {
         cleared.setDescription(Description.EMPTY);
 
         assertFalse(omitted.isAnyFieldEdited());
-        assertTrue(omitted.getName().isEmpty());
-        assertTrue(omitted.getDeadline().isEmpty());
-        assertTrue(omitted.getDescription().isEmpty());
+        assertTrue(omitted
+            .getName()
+            .isEmpty());
+        assertTrue(omitted
+            .getDeadline()
+            .isEmpty());
+        assertTrue(omitted
+            .getDescription()
+            .isEmpty());
 
         assertTrue(cleared.isAnyFieldEdited());
-        assertEquals(Description.EMPTY, cleared.getDescription().orElseThrow());
+        assertEquals(Description.EMPTY, cleared
+            .getDescription()
+            .orElseThrow());
         assertNotEquals(omitted, cleared);
 
         EditProjectDescriptor copiedClear = new EditProjectDescriptor(cleared);
         assertTrue(copiedClear.isAnyFieldEdited());
-        assertEquals(Description.EMPTY, copiedClear.getDescription().orElseThrow());
+        assertEquals(Description.EMPTY, copiedClear
+            .getDescription()
+            .orElseThrow());
     }
 }

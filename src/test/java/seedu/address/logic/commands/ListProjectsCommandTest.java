@@ -52,9 +52,9 @@ public class ListProjectsCommandTest {
         CommandResult result = new ListProjectsCommand().execute(model);
 
         assertEquals("Listed 2 project(s):\n"
-                        + "1. CS2103T | Deadline: 2026-11-13 | Description: No description provided\n"
-                        + "2. Orbital | Deadline: 2026-11-13 | Description: Build an app",
-                result.getFeedbackToUser());
+                + "1. CS2103T | Deadline: 2026-11-13 | Description: No description provided\n"
+                + "2. Orbital | Deadline: 2026-11-13 | Description: Build an app",
+            result.getFeedbackToUser());
     }
 
     @Test
@@ -68,8 +68,8 @@ public class ListProjectsCommandTest {
         model.addPerson(ALICE);
 
         assertThrows(CommandException.class,
-                Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX, () -> new ListProjectsCommand(
-                        Index.fromOneBased(2)).execute(model));
+            Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX, () -> new ListProjectsCommand(
+                Index.fromOneBased(2)).execute(model));
     }
 
     @Test
@@ -80,7 +80,7 @@ public class ListProjectsCommandTest {
         CommandResult result = new ListProjectsCommand(Index.fromOneBased(1)).execute(model);
 
         assertEquals(String.format(ListProjectsCommand.MESSAGE_NO_PROJECTS, ALICE.getName()),
-                result.getFeedbackToUser());
+            result.getFeedbackToUser());
     }
 
     @Test
@@ -97,16 +97,18 @@ public class ListProjectsCommandTest {
         model.addProjectMembership(new ProjectMembership(ALICE.getPersonId(), first.getProjectId()));
         model.addProjectMembership(new ProjectMembership(BOB.getPersonId(), third.getProjectId()));
         model.addProjectMembership(new ProjectMembership(BOB.getPersonId(), second.getProjectId()));
-        model.updateFilteredPersonList(person -> person.getPersonId().equals(BOB.getPersonId()));
+        model.updateFilteredPersonList(person -> person
+            .getPersonId()
+            .equals(BOB.getPersonId()));
         AddressBook originalAddressBook = new AddressBook(model.getAddressBook());
         Predicate<? super Person> originalFilter = model.getFilteredPersonListPredicate();
 
         CommandResult result = new ListProjectsCommand(Index.fromOneBased(1)).execute(model);
 
         assertEquals(String.format("Projects for contact \"%1$s\" (2):\n", BOB.getName())
-                        + "2. CS2103T | Deadline: 2026-11-13 | Description: No description provided\n"
-                        + "3. Orbital | Deadline: 2026-11-13 | Description: Build an app",
-                result.getFeedbackToUser());
+                + "2. CS2103T | Deadline: 2026-11-13 | Description: No description provided\n"
+                + "3. Orbital | Deadline: 2026-11-13 | Description: Build an app",
+            result.getFeedbackToUser());
         assertEquals(originalAddressBook, model.getAddressBook());
         assertEquals(originalFilter, model.getFilteredPersonListPredicate());
         assertEquals(List.of(BOB), model.getFilteredPersonList());
@@ -114,6 +116,41 @@ public class ListProjectsCommandTest {
 
     private Project createProject(String name, Description description) {
         return new Project(new ProjectName(name),
-                new Deadline(LocalDate.of(2026, 11, 13)), description);
+            new Deadline(LocalDate.of(2026, 11, 13)), description);
+    }
+
+    @Test
+    public void execute_contactQuery_preservesProjectFilterAndUsesVisibleIndices() throws CommandException {
+        Model model = new ModelManager();
+        model.addPerson(ALICE);
+        model.addPerson(BOB);
+        Project hidden = createProject("Alpha", Description.EMPTY);
+        Project visible = createProject("Beta", Description.EMPTY);
+        model.addProject(hidden);
+        model.addProject(visible);
+        model.addProjectMembership(new ProjectMembership(ALICE.getPersonId(), hidden.getProjectId()));
+        model.addProjectMembership(new ProjectMembership(ALICE.getPersonId(), visible.getProjectId()));
+        model.updateFilteredProjectList(project -> project.equals(visible));
+        Predicate<? super Project> originalFilter = model.getFilteredProjectListPredicate();
+        AddressBook originalAddressBook = new AddressBook(model.getAddressBook());
+
+        CommandResult result = new ListProjectsCommand(Index.fromOneBased(1)).execute(model);
+
+        assertEquals(String.format("Projects for contact \"%1$s\" (2):\n", ALICE.getName())
+                + "[not displayed] Alpha | Deadline: 2026-11-13 | Description: No description provided\n"
+                + "1. Beta | Deadline: 2026-11-13 | Description: No description provided",
+            result.getFeedbackToUser());
+        assertEquals(CommandResult.ListViewTarget.NONE, result.getListViewTarget());
+        assertEquals(List.of(visible), model.getFilteredProjectList());
+        assertEquals(originalFilter, model.getFilteredProjectListPredicate());
+
+        new ListProjectsCommand(Index.fromOneBased(2)).execute(model);
+        assertEquals(List.of(visible), model.getFilteredProjectList());
+        assertEquals(originalFilter, model.getFilteredProjectListPredicate());
+        assertEquals(originalAddressBook, model.getAddressBook());
+
+        model.updateFilteredProjectList(project -> false);
+        new ListProjectsCommand(Index.fromOneBased(1)).execute(model);
+        assertEquals(List.of(), model.getFilteredProjectList());
     }
 }

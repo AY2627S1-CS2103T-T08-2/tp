@@ -22,14 +22,16 @@ public class UniqueProjectList implements Iterable<Project> {
 
     private final ObservableList<Project> internalList = FXCollections.observableArrayList();
     private final ObservableList<Project> internalUnmodifiableList =
-            FXCollections.unmodifiableObservableList(internalList);
+        FXCollections.unmodifiableObservableList(internalList);
 
     /**
      * Returns true if the list contains an equivalent project as the given argument.
      */
     public boolean contains(Project toCheck) {
         requireNonNull(toCheck);
-        return internalList.stream().anyMatch(toCheck::isSameProject);
+        return internalList
+            .stream()
+            .anyMatch(toCheck::isSameProject);
     }
 
     /**
@@ -37,8 +39,11 @@ public class UniqueProjectList implements Iterable<Project> {
      */
     public boolean containsName(ProjectName name) {
         requireNonNull(name);
-        return internalList.stream()
-                .anyMatch(project -> project.getName().equals(name));
+        return internalList
+            .stream()
+            .anyMatch(project -> project
+                .getName()
+                .equals(name));
     }
 
     /**
@@ -72,7 +77,10 @@ public class UniqueProjectList implements Iterable<Project> {
 
         for (int i = 0; i < internalList.size(); i++) {
             if (i != index
-                    && internalList.get(i).getName().equals(editedProject.getName())) {
+                && internalList
+                .get(i)
+                .getName()
+                .equals(editedProject.getName())) {
                 throw new DuplicateProjectException();
             }
         }
@@ -93,7 +101,8 @@ public class UniqueProjectList implements Iterable<Project> {
 
     public void setProjects(UniqueProjectList replacement) {
         requireNonNull(replacement);
-        internalList.setAll(replacement.internalList);
+        List<Project> replacementSnapshot = List.copyOf(replacement.internalList);
+        internalList.setAll(replacementSnapshot);
     }
 
     /**
@@ -102,11 +111,12 @@ public class UniqueProjectList implements Iterable<Project> {
      */
     public void setProjects(List<Project> projects) {
         requireAllNonNull(projects);
-        if (!projectsAreUnique(projects)) {
+        List<Project> replacementSnapshot = List.copyOf(projects);
+        if (!projectsAreUnique(replacementSnapshot)) {
             throw new DuplicateProjectException();
         }
 
-        internalList.setAll(projects);
+        internalList.setAll(replacementSnapshot);
     }
 
     /**
@@ -155,7 +165,9 @@ public class UniqueProjectList implements Iterable<Project> {
                 Project second = projects.get(j);
 
                 if (first.isSameProject(second)
-                        || first.getName().equals(second.getName())) {
+                    || first
+                    .getName()
+                    .equals(second.getName())) {
                     return false;
                 }
             }

@@ -27,31 +27,43 @@ public class AddProjectCommandParser implements Parser<AddProjectCommand> {
      */
     @Override
     public AddProjectCommand parse(String args) throws ParseException {
-        if (args.codePoints().anyMatch(codePoint -> codePoint == '\r'
+        if (args
+            .codePoints()
+            .anyMatch(codePoint -> codePoint == '\r'
                 || codePoint == '\n'
                 || codePoint == '\u0085'
                 || codePoint == '\u2028'
                 || codePoint == '\u2029')) {
             throw new ParseException(String.format(
-                    MESSAGE_INVALID_COMMAND_FORMAT, AddProjectCommand.MESSAGE_USAGE));
+                MESSAGE_INVALID_COMMAND_FORMAT, AddProjectCommand.MESSAGE_USAGE));
         }
 
         ArgumentMultimap argMultimap =
-                ArgumentTokenizer.tokenize(args, PREFIX_NAME, PREFIX_DEADLINE, PREFIX_DESCRIPTION);
+            ArgumentTokenizer.tokenize(args, PREFIX_NAME, PREFIX_DEADLINE, PREFIX_DESCRIPTION);
 
         if (!arePrefixesPresent(argMultimap, PREFIX_NAME, PREFIX_DEADLINE)
-                || !argMultimap.getPreamble().isEmpty()) {
+            || !argMultimap
+            .getPreamble()
+            .isEmpty()) {
             throw new ParseException(String.format(MESSAGE_INVALID_COMMAND_FORMAT, AddProjectCommand.MESSAGE_USAGE));
         }
 
         argMultimap.verifyNoDuplicatePrefixesFor(PREFIX_NAME, PREFIX_DEADLINE, PREFIX_DESCRIPTION);
 
-        ProjectName name = ParserUtil.parseProjectName(argMultimap.getValue(PREFIX_NAME).get());
-        Deadline deadline = ParserUtil.parseDeadline(argMultimap.getValue(PREFIX_DEADLINE).get());
+        ProjectName name = ParserUtil.parseProjectName(argMultimap
+            .getValue(PREFIX_NAME)
+            .get());
+        Deadline deadline = ParserUtil.parseDeadline(argMultimap
+            .getValue(PREFIX_DEADLINE)
+            .get());
         Description description = Description.EMPTY;
 
-        if (argMultimap.getValue(PREFIX_DESCRIPTION).isPresent()) {
-            description = ParserUtil.parseDescription(argMultimap.getValue(PREFIX_DESCRIPTION).get());
+        if (argMultimap
+            .getValue(PREFIX_DESCRIPTION)
+            .isPresent()) {
+            description = ParserUtil.parseDescription(argMultimap
+                .getValue(PREFIX_DESCRIPTION)
+                .get());
         }
 
         Project project = new Project(name, deadline, description);
@@ -64,6 +76,10 @@ public class AddProjectCommandParser implements Parser<AddProjectCommand> {
      * {@code ArgumentMultimap}.
      */
     private static boolean arePrefixesPresent(ArgumentMultimap argumentMultimap, Prefix... prefixes) {
-        return Stream.of(prefixes).allMatch(prefix -> argumentMultimap.getValue(prefix).isPresent());
+        return Stream
+            .of(prefixes)
+            .allMatch(prefix -> argumentMultimap
+                .getValue(prefix)
+                .isPresent());
     }
 }

@@ -16,7 +16,9 @@ public class ToStringBuilder {
      * Constructs a {@code ToStringBuilder} whose formatted output will be prefixed with {@code objectName}.
      */
     public ToStringBuilder(String objectName) {
-        stringBuilder.append(objectName).append(OBJECT_PREFIX);
+        stringBuilder
+            .append(objectName)
+            .append(OBJECT_PREFIX);
     }
 
     /**
@@ -24,13 +26,15 @@ public class ToStringBuilder {
      * canonical class name of {@code object}.
      */
     public ToStringBuilder(Object object) {
-        this(object.getClass().getCanonicalName());
+        this(object
+            .getClass()
+            .getCanonicalName());
     }
 
     /**
      * Adds a field name/value pair to the output string.
      *
-     * @param fieldName The name of the field.
+     * @param fieldName  The name of the field.
      * @param fieldValue The value of the field.
      * @return A reference to this {@code ToStringBuilder} object, allowing method calls to be chained.
      */
@@ -38,7 +42,10 @@ public class ToStringBuilder {
         if (hasField) {
             stringBuilder.append(FIELD_SEPARATOR);
         }
-        stringBuilder.append(fieldName).append(FIELD_NAME_VALUE_SEPARATOR).append(fieldValue);
+        stringBuilder
+            .append(fieldName)
+            .append(FIELD_NAME_VALUE_SEPARATOR)
+            .append(fieldValue);
         hasField = true;
         return this;
     }
@@ -48,6 +55,6 @@ public class ToStringBuilder {
      */
     @Override
     public String toString() {
-        return stringBuilder.toString() + OBJECT_SUFFIX;
+        return stringBuilder + OBJECT_SUFFIX;
     }
 }

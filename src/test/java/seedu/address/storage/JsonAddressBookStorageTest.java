@@ -38,7 +38,7 @@ import seedu.address.testutil.ProjectBuilder;
 public class JsonAddressBookStorageTest {
     private static final Path TEST_DATA_FOLDER = Paths.get("src", "test", "data", "JsonAddressBookStorageTest");
     private static final Path SERIALIZABLE_TEST_DATA_FOLDER =
-            Paths.get("src", "test", "data", "JsonSerializableAddressBookTest");
+        Paths.get("src", "test", "data", "JsonSerializableAddressBookTest");
 
     @TempDir
     public Path testFolder;
@@ -54,8 +54,8 @@ public class JsonAddressBookStorageTest {
 
     private Path addToTestDataPathIfNotNull(String prefsFileInTestDataFolder) {
         return prefsFileInTestDataFolder != null
-                ? TEST_DATA_FOLDER.resolve(prefsFileInTestDataFolder)
-                : null;
+            ? TEST_DATA_FOLDER.resolve(prefsFileInTestDataFolder)
+            : null;
     }
 
     @Test
@@ -92,8 +92,8 @@ public class JsonAddressBookStorageTest {
         JsonAddressBookStorage jsonAddressBookStorage = new JsonAddressBookStorage(filePath);
 
         assertThrows(DataLoadingException.class,
-                IllegalValueException.class.getName() + ": " + JsonSerializableAddressBook.MESSAGE_DUPLICATE_PERSON_ID,
-                jsonAddressBookStorage::readAddressBook);
+            IllegalValueException.class.getName() + ": " + JsonSerializableAddressBook.MESSAGE_DUPLICATE_PERSON_ID,
+            jsonAddressBookStorage::readAddressBook);
     }
 
     @Test
@@ -102,50 +102,76 @@ public class JsonAddressBookStorageTest {
         JsonAddressBookStorage jsonAddressBookStorage = new JsonAddressBookStorage(filePath);
 
         assertThrows(DataLoadingException.class,
-                IllegalValueException.class.getName() + ": " + JsonSerializableAddressBook.MESSAGE_DUPLICATE_PERSON,
-                jsonAddressBookStorage::readAddressBook);
+            IllegalValueException.class.getName() + ": " + JsonSerializableAddressBook.MESSAGE_DUPLICATE_PERSON,
+            jsonAddressBookStorage::readAddressBook);
     }
 
     @Test
     public void readAndSaveAddressBook_sameNameContacts_preservesIdsAndMemberships() throws Exception {
-        Person otherAlice = new PersonBuilder(ALICE).withPersonId(PersonId.generate())
-                .withPhone("91234567").build();
+        Person otherAlice = new PersonBuilder(ALICE)
+            .withPersonId(PersonId.generate())
+            .withPhone("91234567")
+            .build();
         AddressBook original = new AddressBook();
         original.addPerson(ALICE);
         original.addPerson(otherAlice);
         Project project = new ProjectBuilder().build();
-        Project otherProject = new ProjectBuilder().withName("Other project").build();
+        Project otherProject = new ProjectBuilder()
+            .withName("Other project")
+            .build();
         original.addProject(project);
         original.addProject(otherProject);
         ProjectMembership membership = new ProjectMembership(ALICE.getPersonId(), project.getProjectId());
         ProjectMembership otherMembership = new ProjectMembership(otherAlice.getPersonId(),
-                otherProject.getProjectId());
+            otherProject.getProjectId());
         original.addProjectMembership(membership);
         original.addProjectMembership(otherMembership);
         Path filePath = testFolder.resolve("SameNameContacts.json");
 
         new JsonAddressBookStorage(filePath).saveAddressBook(original);
-        AddressBook restored = new AddressBook(new JsonAddressBookStorage(filePath).readAddressBook().orElseThrow());
+        AddressBook restored = new AddressBook(new JsonAddressBookStorage(filePath)
+            .readAddressBook()
+            .orElseThrow());
 
         assertEquals(original, restored);
         assertEquals(List.of(ALICE.getPersonId(), otherAlice.getPersonId()),
-                restored.getPersonList().stream().map(Person::getPersonId).toList());
+            restored
+                .getPersonList()
+                .stream()
+                .map(Person::getPersonId)
+                .toList());
         assertEquals(List.of(project.getProjectId(), otherProject.getProjectId()),
-                restored.getProjectList().stream().map(Project::getProjectId).toList());
+            restored
+                .getProjectList()
+                .stream()
+                .map(Project::getProjectId)
+                .toList());
         assertEquals(List.of(membership, otherMembership), restored.getProjectMembershipList());
-        assertEquals(List.of(ALICE), restored.getProjectMembers(restored.getProjectList().get(0)));
-        assertEquals(List.of(otherAlice), restored.getProjectMembers(restored.getProjectList().get(1)));
+        assertEquals(List.of(ALICE), restored.getProjectMembers(restored
+            .getProjectList()
+            .get(0)));
+        assertEquals(List.of(otherAlice), restored.getProjectMembers(restored
+            .getProjectList()
+            .get(1)));
     }
 
     @Test
     public void readAddressBook_missingIds_generatesDistinctNonNullIds() throws Exception {
         ReadOnlyAddressBook original = readAddressBook("legacyAddressBookWithoutIds.json").get();
 
-        assertEquals(2, original.getPersonList().size());
+        assertEquals(2, original
+            .getPersonList()
+            .size());
         for (Person person : original.getPersonList()) {
             assertNotNull(person.getPersonId());
         }
-        assertNotEquals(original.getPersonList().get(0).getPersonId(), original.getPersonList().get(1).getPersonId());
+        assertNotEquals(original
+            .getPersonList()
+            .get(0)
+            .getPersonId(), original
+            .getPersonList()
+            .get(1)
+            .getPersonId());
     }
 
     @Test
@@ -154,19 +180,33 @@ public class JsonAddressBookStorageTest {
         Files.copy(TEST_DATA_FOLDER.resolve("legacyPersonIdsAddressBook.json"), filePath);
         String json = Files.readString(filePath);
         JsonAddressBookStorage jsonAddressBookStorage = new JsonAddressBookStorage(filePath);
-        ReadOnlyAddressBook original = jsonAddressBookStorage.readAddressBook().get();
+        ReadOnlyAddressBook original = jsonAddressBookStorage
+            .readAddressBook()
+            .get();
 
-        assertEquals(2, original.getPersonList().size());
+        assertEquals(2, original
+            .getPersonList()
+            .size());
         for (Person person : original.getPersonList()) {
             assertNotNull(person.getPersonId());
         }
         assertEquals(json, Files.readString(filePath));
 
-        ReadOnlyAddressBook readBack = new JsonAddressBookStorage(filePath).readAddressBook().get();
+        ReadOnlyAddressBook readBack = new JsonAddressBookStorage(filePath)
+            .readAddressBook()
+            .get();
         assertEquals(original, new AddressBook(readBack));
-        for (int i = 0; i < original.getPersonList().size(); i++) {
-            assertNotEquals(original.getPersonList().get(i).getPersonId(),
-                    readBack.getPersonList().get(i).getPersonId());
+        for (int i = 0; i < original
+            .getPersonList()
+            .size(); i++) {
+            assertNotEquals(original
+                    .getPersonList()
+                    .get(i)
+                    .getPersonId(),
+                readBack
+                    .getPersonList()
+                    .get(i)
+                    .getPersonId());
         }
         assertEquals(json, Files.readString(filePath));
     }
@@ -174,19 +214,31 @@ public class JsonAddressBookStorageTest {
     @Test
     public void readAndSaveAddressBook_validStoredIds_preservesEveryId() throws Exception {
         ReadOnlyAddressBook original = new JsonAddressBookStorage(
-                SERIALIZABLE_TEST_DATA_FOLDER.resolve("validPersonIdsAddressBook.json")).readAddressBook().get();
+            SERIALIZABLE_TEST_DATA_FOLDER.resolve("validPersonIdsAddressBook.json"))
+            .readAddressBook()
+            .get();
         List<PersonId> personIds = List.of(
-                PersonId.fromString("550e8400-e29b-41d4-a716-446655440001"),
-                PersonId.fromString("550e8400-e29b-41d4-a716-446655440002"));
-        assertEquals(personIds, original.getPersonList().stream().map(Person::getPersonId).toList());
+            PersonId.fromString("550e8400-e29b-41d4-a716-446655440001"),
+            PersonId.fromString("550e8400-e29b-41d4-a716-446655440002"));
+        assertEquals(personIds, original
+            .getPersonList()
+            .stream()
+            .map(Person::getPersonId)
+            .toList());
 
         Path filePath = testFolder.resolve("AddressBookWithIds.json");
         JsonAddressBookStorage jsonAddressBookStorage = new JsonAddressBookStorage(filePath);
         jsonAddressBookStorage.saveAddressBook(original);
-        ReadOnlyAddressBook readBack = jsonAddressBookStorage.readAddressBook().get();
+        ReadOnlyAddressBook readBack = jsonAddressBookStorage
+            .readAddressBook()
+            .get();
 
         assertEquals(original, new AddressBook(readBack));
-        assertEquals(personIds, readBack.getPersonList().stream().map(Person::getPersonId).toList());
+        assertEquals(personIds, readBack
+            .getPersonList()
+            .stream()
+            .map(Person::getPersonId)
+            .toList());
     }
 
     @Test
@@ -196,36 +248,66 @@ public class JsonAddressBookStorageTest {
         JsonAddressBookStorage jsonAddressBookStorage = new JsonAddressBookStorage(filePath);
         jsonAddressBookStorage.saveAddressBook(original);
 
-        JsonNode json = JsonUtil.readJsonFile(filePath, JsonNode.class).get();
+        JsonNode json = JsonUtil
+            .readJsonFile(filePath, JsonNode.class)
+            .get();
         JsonNode persons = json.get("persons");
         assertNotNull(persons);
         assertTrue(persons.isArray());
-        assertEquals(original.getPersonList().size(), persons.size());
+        assertEquals(original
+            .getPersonList()
+            .size(), persons.size());
         for (int i = 0; i < persons.size(); i++) {
             JsonNode person = persons.get(i);
             assertTrue(person.hasNonNull("id"));
-            assertTrue(person.get("id").isTextual());
-            assertEquals(original.getPersonList().get(i).getPersonId().toString(), person.get("id").textValue());
+            assertTrue(person
+                .get("id")
+                .isTextual());
+            assertEquals(original
+                .getPersonList()
+                .get(i)
+                .getPersonId()
+                .toString(), person
+                .get("id")
+                .textValue());
         }
     }
 
     @Test
     public void readAndSaveAddressBook_legacyIds_preservesGeneratedIds() throws Exception {
         ReadOnlyAddressBook original = readAddressBook("legacyPersonIdsAddressBook.json").get();
-        assertEquals(2, original.getPersonList().size());
+        assertEquals(2, original
+            .getPersonList()
+            .size());
         for (Person person : original.getPersonList()) {
             assertNotNull(person.getPersonId());
         }
-        assertNotEquals(original.getPersonList().get(0).getPersonId(), original.getPersonList().get(1).getPersonId());
+        assertNotEquals(original
+            .getPersonList()
+            .get(0)
+            .getPersonId(), original
+            .getPersonList()
+            .get(1)
+            .getPersonId());
 
         Path filePath = testFolder.resolve("LegacyAddressBook.json");
         JsonAddressBookStorage jsonAddressBookStorage = new JsonAddressBookStorage(filePath);
         jsonAddressBookStorage.saveAddressBook(original);
-        ReadOnlyAddressBook readBack = new JsonAddressBookStorage(filePath).readAddressBook().get();
+        ReadOnlyAddressBook readBack = new JsonAddressBookStorage(filePath)
+            .readAddressBook()
+            .get();
 
         assertEquals(original, new AddressBook(readBack));
-        assertEquals(original.getPersonList().stream().map(Person::getPersonId).toList(),
-                readBack.getPersonList().stream().map(Person::getPersonId).toList());
+        assertEquals(original
+                .getPersonList()
+                .stream()
+                .map(Person::getPersonId)
+                .toList(),
+            readBack
+                .getPersonList()
+                .stream()
+                .map(Person::getPersonId)
+                .toList());
     }
 
     @Test
@@ -236,50 +318,89 @@ public class JsonAddressBookStorageTest {
 
         // Save in new file and read back
         jsonAddressBookStorage.saveAddressBook(original, filePath);
-        ReadOnlyAddressBook readBack = jsonAddressBookStorage.readAddressBook(filePath).get();
+        ReadOnlyAddressBook readBack = jsonAddressBookStorage
+            .readAddressBook(filePath)
+            .get();
         assertEquals(original, new AddressBook(readBack));
-        assertEquals(original.getPersonList().stream().map(Person::getPersonId).toList(),
-                readBack.getPersonList().stream().map(Person::getPersonId).toList());
+        assertEquals(original
+                .getPersonList()
+                .stream()
+                .map(Person::getPersonId)
+                .toList(),
+            readBack
+                .getPersonList()
+                .stream()
+                .map(Person::getPersonId)
+                .toList());
 
         // Modify data, overwrite existing file, and read back
         original.addPerson(HOON);
         original.removePerson(ALICE);
         jsonAddressBookStorage.saveAddressBook(original, filePath);
-        readBack = jsonAddressBookStorage.readAddressBook(filePath).get();
+        readBack = jsonAddressBookStorage
+            .readAddressBook(filePath)
+            .get();
         assertEquals(original, new AddressBook(readBack));
-        assertEquals(original.getPersonList().stream().map(Person::getPersonId).toList(),
-                readBack.getPersonList().stream().map(Person::getPersonId).toList());
+        assertEquals(original
+                .getPersonList()
+                .stream()
+                .map(Person::getPersonId)
+                .toList(),
+            readBack
+                .getPersonList()
+                .stream()
+                .map(Person::getPersonId)
+                .toList());
 
         // Save and read without specifying file path
         original.addPerson(IDA);
         jsonAddressBookStorage.saveAddressBook(original); // file path not specified
-        readBack = jsonAddressBookStorage.readAddressBook().get(); // file path not specified
+        readBack = jsonAddressBookStorage
+            .readAddressBook()
+            .get(); // file path not specified
         assertEquals(original, new AddressBook(readBack));
-        assertEquals(original.getPersonList().stream().map(Person::getPersonId).toList(),
-                readBack.getPersonList().stream().map(Person::getPersonId).toList());
+        assertEquals(original
+                .getPersonList()
+                .stream()
+                .map(Person::getPersonId)
+                .toList(),
+            readBack
+                .getPersonList()
+                .stream()
+                .map(Person::getPersonId)
+                .toList());
 
     }
 
     @Test
     public void readAndSaveAddressBook_withProject_preservesProjectIdAndDetails() throws Exception {
         AddressBook original = getTypicalAddressBook();
-        Project project = new ProjectBuilder().withName("CS2103T Project").build();
+        Project project = new ProjectBuilder()
+            .withName("CS2103T Project")
+            .build();
         original.addProject(project);
         Path filePath = testFolder.resolve("AddressBookWithProject.json");
         JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
 
         storage.saveAddressBook(original);
-        ReadOnlyAddressBook readBack = storage.readAddressBook().get();
+        ReadOnlyAddressBook readBack = storage
+            .readAddressBook()
+            .get();
 
         assertEquals(original, new AddressBook(readBack));
         assertEquals(List.of(project), readBack.getProjectList());
-        assertEquals(project.getProjectId(), readBack.getProjectList().get(0).getProjectId());
+        assertEquals(project.getProjectId(), readBack
+            .getProjectList()
+            .get(0)
+            .getProjectId());
     }
 
     @Test
     public void readAndSaveAddressBook_withMembership_preservesAssociation() throws Exception {
         AddressBook original = getTypicalAddressBook();
-        Project project = new ProjectBuilder().withName("CS2103T Project").build();
+        Project project = new ProjectBuilder()
+            .withName("CS2103T Project")
+            .build();
         ProjectMembership membership = new ProjectMembership(ALICE.getPersonId(), project.getProjectId());
         original.addProject(project);
         original.addProjectMembership(membership);
@@ -287,7 +408,9 @@ public class JsonAddressBookStorageTest {
         JsonAddressBookStorage storage = new JsonAddressBookStorage(filePath);
 
         storage.saveAddressBook(original);
-        ReadOnlyAddressBook readBack = storage.readAddressBook().get();
+        ReadOnlyAddressBook readBack = storage
+            .readAddressBook()
+            .get();
 
         assertEquals(original, new AddressBook(readBack));
         assertEquals(List.of(membership), readBack.getProjectMembershipList());
@@ -298,15 +421,19 @@ public class JsonAddressBookStorageTest {
         AddressBook original = new AddressBook();
         original.addPerson(ALICE);
         original.addPerson(BENSON);
-        Project firstProject = new ProjectBuilder().withName("CS2103T Team Project").build();
-        Project secondProject = new ProjectBuilder().withName("Orbital").build();
+        Project firstProject = new ProjectBuilder()
+            .withName("CS2103T Team Project")
+            .build();
+        Project secondProject = new ProjectBuilder()
+            .withName("Orbital")
+            .build();
         original.addProject(firstProject);
         original.addProject(secondProject);
         ProjectMembership selectedMembership = new ProjectMembership(ALICE.getPersonId(), firstProject.getProjectId());
         ProjectMembership sameContactMembership =
-                new ProjectMembership(ALICE.getPersonId(), secondProject.getProjectId());
+            new ProjectMembership(ALICE.getPersonId(), secondProject.getProjectId());
         ProjectMembership sameProjectMembership =
-                new ProjectMembership(BENSON.getPersonId(), firstProject.getProjectId());
+            new ProjectMembership(BENSON.getPersonId(), firstProject.getProjectId());
         original.addProjectMembership(selectedMembership);
         original.addProjectMembership(sameContactMembership);
         original.addProjectMembership(sameProjectMembership);
@@ -316,16 +443,28 @@ public class JsonAddressBookStorageTest {
 
         original.removeProjectMembership(selectedMembership);
         storage.saveAddressBook(original);
-        ReadOnlyAddressBook restored = new JsonAddressBookStorage(filePath).readAddressBook().orElseThrow();
+        ReadOnlyAddressBook restored = new JsonAddressBookStorage(filePath)
+            .readAddressBook()
+            .orElseThrow();
 
-        assertFalse(restored.getProjectMembershipList().contains(selectedMembership));
+        assertFalse(restored
+            .getProjectMembershipList()
+            .contains(selectedMembership));
         assertEquals(List.of(sameContactMembership, sameProjectMembership), restored.getProjectMembershipList());
         assertEquals(List.of(ALICE, BENSON), restored.getPersonList());
         assertEquals(List.of(ALICE.getPersonId(), BENSON.getPersonId()),
-                restored.getPersonList().stream().map(Person::getPersonId).toList());
+            restored
+                .getPersonList()
+                .stream()
+                .map(Person::getPersonId)
+                .toList());
         assertEquals(List.of(firstProject, secondProject), restored.getProjectList());
         assertEquals(List.of(firstProject.getProjectId(), secondProject.getProjectId()),
-                restored.getProjectList().stream().map(Project::getProjectId).toList());
+            restored
+                .getProjectList()
+                .stream()
+                .map(Project::getProjectId)
+                .toList());
         assertEquals(original, new AddressBook(restored));
     }
 
@@ -333,7 +472,9 @@ public class JsonAddressBookStorageTest {
     public void readAndSaveAddressBook_removedLastMembership_preservesEmptyMembershipList() throws Exception {
         AddressBook original = new AddressBook();
         original.addPerson(ALICE);
-        Project project = new ProjectBuilder().withName("CS2103T Team Project").build();
+        Project project = new ProjectBuilder()
+            .withName("CS2103T Team Project")
+            .build();
         original.addProject(project);
         ProjectMembership membership = new ProjectMembership(ALICE.getPersonId(), project.getProjectId());
         original.addProjectMembership(membership);
@@ -343,13 +484,23 @@ public class JsonAddressBookStorageTest {
 
         original.removeProjectMembership(membership);
         storage.saveAddressBook(original);
-        ReadOnlyAddressBook restored = new JsonAddressBookStorage(filePath).readAddressBook().orElseThrow();
+        ReadOnlyAddressBook restored = new JsonAddressBookStorage(filePath)
+            .readAddressBook()
+            .orElseThrow();
 
-        assertTrue(restored.getProjectMembershipList().isEmpty());
+        assertTrue(restored
+            .getProjectMembershipList()
+            .isEmpty());
         assertEquals(List.of(ALICE), restored.getPersonList());
-        assertEquals(ALICE.getPersonId(), restored.getPersonList().get(0).getPersonId());
+        assertEquals(ALICE.getPersonId(), restored
+            .getPersonList()
+            .get(0)
+            .getPersonId());
         assertEquals(List.of(project), restored.getProjectList());
-        assertEquals(project.getProjectId(), restored.getProjectList().get(0).getProjectId());
+        assertEquals(project.getProjectId(), restored
+            .getProjectList()
+            .get(0)
+            .getProjectId());
         assertEquals(original, new AddressBook(restored));
     }
 
@@ -364,7 +515,7 @@ public class JsonAddressBookStorageTest {
     private void saveAddressBook(ReadOnlyAddressBook addressBook, String filePath) {
         try {
             new JsonAddressBookStorage(Paths.get(filePath))
-                    .saveAddressBook(addressBook, addToTestDataPathIfNotNull(filePath));
+                .saveAddressBook(addressBook, addToTestDataPathIfNotNull(filePath));
         } catch (IOException ioe) {
             throw new AssertionError("There should not be an error writing to the file.", ioe);
         }

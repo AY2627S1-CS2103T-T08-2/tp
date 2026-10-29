@@ -61,7 +61,7 @@ public class ParserUtilTest {
 
     @Test
     public void parseName_null_throwsNullPointerException() {
-        assertThrows(NullPointerException.class, () -> ParserUtil.parseName((String) null));
+        assertThrows(NullPointerException.class, () -> ParserUtil.parseName(null));
     }
 
     @Test
@@ -84,7 +84,7 @@ public class ParserUtilTest {
 
     @Test
     public void parsePhone_null_throwsNullPointerException() {
-        assertThrows(NullPointerException.class, () -> ParserUtil.parsePhone((String) null));
+        assertThrows(NullPointerException.class, () -> ParserUtil.parsePhone(null));
     }
 
     @Test
@@ -107,7 +107,7 @@ public class ParserUtilTest {
 
     @Test
     public void parseAddress_null_throwsNullPointerException() {
-        assertThrows(NullPointerException.class, () -> ParserUtil.parseAddress((String) null));
+        assertThrows(NullPointerException.class, () -> ParserUtil.parseAddress(null));
     }
 
     @Test
@@ -130,7 +130,7 @@ public class ParserUtilTest {
 
     @Test
     public void parseEmail_null_throwsNullPointerException() {
-        assertThrows(NullPointerException.class, () -> ParserUtil.parseEmail((String) null));
+        assertThrows(NullPointerException.class, () -> ParserUtil.parseEmail(null));
     }
 
     @Test
@@ -186,7 +186,9 @@ public class ParserUtilTest {
 
     @Test
     public void parseTags_emptyCollection_returnsEmptySet() throws Exception {
-        assertTrue(ParserUtil.parseTags(List.of()).isEmpty());
+        assertTrue(ParserUtil
+            .parseTags(List.of())
+            .isEmpty());
     }
 
     @Test
@@ -254,22 +256,22 @@ public class ParserUtilTest {
     @Test
     public void parseDeadline_validValue_returnsDeadline() throws Exception {
         assertEquals(
-                new Deadline(LocalDate.of(2026, 11, 13)),
-                ParserUtil.parseDeadline("  2026-11-13  "));
+            new Deadline(LocalDate.of(2026, 11, 13)),
+            ParserUtil.parseDeadline("  2026-11-13  "));
     }
 
     @Test
     public void parseDeadline_validLeapDay_returnsDeadline() throws Exception {
         assertEquals(
-                new Deadline(LocalDate.of(2028, 2, 29)),
-                ParserUtil.parseDeadline("2028-02-29"));
+            new Deadline(LocalDate.of(2028, 2, 29)),
+            ParserUtil.parseDeadline("2028-02-29"));
     }
 
     @Test
     public void parseDeadline_pastDate_returnsDeadline() throws Exception {
         assertEquals(
-                new Deadline(LocalDate.of(2000, 1, 1)),
-                ParserUtil.parseDeadline("2000-01-01"));
+            new Deadline(LocalDate.of(2000, 1, 1)),
+            ParserUtil.parseDeadline("2000-01-01"));
     }
 
     @Test
@@ -290,7 +292,7 @@ public class ParserUtilTest {
 
     @Test
     public void parseDescription_lineBreaks_throwsParseException() {
-        String[] lineBreaks = {"\r", "\n", "\u0085", "\u2028", "\u2029"};
+        String[] lineBreaks = {"\r", "\n", String.valueOf((char) 11), "\f", "\u0085", "\u2028", "\u2029"};
 
         for (String lineBreak : lineBreaks) {
             assertThrows(ParseException.class, () -> ParserUtil.parseDescription("First" + lineBreak + "Second"));
@@ -304,8 +306,8 @@ public class ParserUtilTest {
     @Test
     public void parseDescription_validValue_preservesInternalSpacingAndCase() throws Exception {
         assertEquals(
-                new Description("Build  a Contact Manager!"),
-                ParserUtil.parseDescription("  Build  a Contact Manager!  "));
+            new Description("Build  a Contact Manager!"),
+            ParserUtil.parseDescription("  Build  a Contact Manager!  "));
     }
 
     @Test
@@ -314,8 +316,8 @@ public class ParserUtilTest {
 
         String description = "a".repeat(200);
         assertEquals(
-                new Description(description),
-                ParserUtil.parseDescription("  " + description + "  "));
+            new Description(description),
+            ParserUtil.parseDescription("  " + description + "  "));
     }
 
     @Test
@@ -337,10 +339,17 @@ public class ParserUtilTest {
 
     @Test
     public void parseRole_lineBreaks_throwsParseException() {
-        for (String lineBreak : new String[] {"\r", "\n", "\u0085", "\u2028", "\u2029"}) {
+        String[] lineBreaks = {"\r", "\n", String.valueOf((char) 11), "\f", "\u0085", "\u2028", "\u2029"};
+        for (String lineBreak : lineBreaks) {
             assertThrows(ParseException.class, Role.MESSAGE_CONSTRAINTS, () -> ParserUtil.parseRole(lineBreak));
             assertThrows(ParseException.class, Role.MESSAGE_CONSTRAINTS, () -> {
                 ParserUtil.parseRole("First" + lineBreak + "Second");
+            });
+            assertThrows(ParseException.class, Role.MESSAGE_CONSTRAINTS, () -> {
+                ParserUtil.parseRole(lineBreak + "Role");
+            });
+            assertThrows(ParseException.class, Role.MESSAGE_CONSTRAINTS, () -> {
+                ParserUtil.parseRole("Role" + lineBreak);
             });
         }
     }

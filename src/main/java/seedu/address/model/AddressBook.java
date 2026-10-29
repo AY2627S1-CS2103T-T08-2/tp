@@ -118,8 +118,13 @@ public class AddressBook implements ReadOnlyAddressBook {
      * {@code key} must exist in the address book.
      */
     public void removePerson(Person key) {
-        persons.remove(key);
-        memberships.removeAllForPerson(key.getPersonId());
+        requireNonNull(key);
+        Person storedPerson = persons.asUnmodifiableObservableList().stream()
+                .filter(key::equals)
+                .findFirst()
+                .orElseThrow(PersonNotFoundException::new);
+        persons.remove(storedPerson);
+        memberships.removeAllForPerson(storedPerson.getPersonId());
     }
 
     //// project-level operations

@@ -8,6 +8,7 @@ import static seedu.address.logic.commands.CommandTestUtil.VALID_TAG_HUSBAND;
 import static seedu.address.testutil.Assert.assertThrows;
 import static seedu.address.testutil.TypicalPersons.ALICE;
 import static seedu.address.testutil.TypicalPersons.BOB;
+import static seedu.address.testutil.TypicalPersons.CARL;
 
 import java.util.List;
 
@@ -191,6 +192,56 @@ public class UniquePersonListTest {
 
         assertThrows(IllegalArgumentException.class, () -> uniquePersonList.setPerson(ALICE, personWithDifferentId));
         assertEquals(List.of(ALICE), uniquePersonList.asUnmodifiableObservableList());
+    }
+
+    @Test
+    public void setPerson_equivalentTargetClaimsDifferentId_rejectsWithoutMutation() {
+        List<Person> people = List.of(ALICE, BOB, CARL);
+        for (int targetIndex = 0; targetIndex < people.size(); targetIndex++) {
+            for (Person claimedIdOwner : people) {
+                if (claimedIdOwner == people.get(targetIndex)) {
+                    continue;
+                }
+                for (boolean changeDetails : List.of(false, true)) {
+                    uniquePersonList.setPersons(people);
+                    Person storedPerson = people.get(targetIndex);
+                    Person target = new PersonBuilder(storedPerson).withPersonId(claimedIdOwner.getPersonId()).build();
+                    PersonBuilder replacement = new PersonBuilder(target);
+                    if (changeDetails) {
+                        replacement.withAddress(VALID_ADDRESS_BOB);
+                    }
+
+                    assertThrows(IllegalArgumentException.class, () ->
+                        uniquePersonList.setPerson(target, replacement.build()));
+
+                    assertEquals(people, uniquePersonList.asUnmodifiableObservableList());
+                    assertEquals(people.stream().map(Person::getPersonId).toList(),
+                            uniquePersonList.asUnmodifiableObservableList().stream()
+                                    .map(Person::getPersonId).toList());
+                }
+            }
+
+            uniquePersonList.setPersons(people);
+            Person storedPerson = people.get(targetIndex);
+            Person target = new PersonBuilder(storedPerson).withPersonId(PersonId.generate()).build();
+            assertThrows(IllegalArgumentException.class, () -> uniquePersonList.setPerson(target, target));
+            assertEquals(people.stream().map(Person::getPersonId).toList(),
+                    uniquePersonList.asUnmodifiableObservableList().stream()
+                            .map(Person::getPersonId).toList());
+        }
+    }
+
+    @Test
+    public void setPerson_equivalentTargetWithStoredId_allowsEdit() {
+        uniquePersonList.setPersons(List.of(ALICE, BOB));
+        Person target = new PersonBuilder(ALICE).build();
+        Person editedAlice = new PersonBuilder(target).withAddress(VALID_ADDRESS_BOB).build();
+
+        uniquePersonList.setPerson(target, editedAlice);
+
+        assertEquals(editedAlice, uniquePersonList.asUnmodifiableObservableList().get(0));
+        assertEquals(ALICE.getPersonId(), uniquePersonList.asUnmodifiableObservableList().get(0).getPersonId());
+        assertEquals(BOB.getPersonId(), uniquePersonList.asUnmodifiableObservableList().get(1).getPersonId());
     }
 
     @Test

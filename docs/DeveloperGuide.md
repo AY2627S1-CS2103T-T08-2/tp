@@ -712,17 +712,15 @@ testers are expected to do more *exploratory* testing.
 
    1. Download the JAR file and copy it into an empty folder.
 
-   1. Double-click the JAR file.<br>
+   2. Double-click the JAR file.<br>
       Expected: The GUI opens with a set of sample contacts. The window size may not be optimal.
 
-1. Saving window preferences
+2. Saving window preferences
 
    1. Resize the window to an optimal size. Move the window to a different location. Close the window.
 
-   1. Relaunch the app by double-clicking the JAR file.<br>
+   2. Relaunch the app by double-clicking the JAR file.<br>
        Expected: The most recent window size and location are retained.
-
-1. _{ more test cases … }_
 
 ### Contacts with the same name
 
@@ -731,44 +729,44 @@ testers are expected to do more *exploratory* testing.
    1. Prerequisites: Use a disposable copy of the app and data file. Execute `clear` to start with an empty address
       book; this removes the disposable copy's existing contacts, projects, and memberships.
 
-   1. Execute `add n/Alex Tan p/91234567 e/alex@example.com a/Block 1 t/friend t/classmate`, then
+   2. Execute `add n/Alex Tan p/91234567 e/alex@example.com a/Block 1 t/friend t/classmate`, then
       `add n/Alex Tan p/98765432 e/alex@example.com a/Block 1 t/classmate t/friend`.<br>
       Expected: Both commands succeed. The Contacts tab shows two contacts named Alex Tan with different phone
       numbers. Their saved JSON entries have distinct `id` values.
 
-   1. Repeat the first command with the tags in reverse order.<br>
+   3. Repeat the first command with the tags in reverse order.<br>
       Expected: `This contact already exists in UniTeam.` No contact is added; tag order does not distinguish contacts.
 
-   1. Execute `find Nobody`, then repeat the first `add` command.<br>
+   4. Execute `find Nobody`, then repeat the first `add` command.<br>
       Expected: The filtered list is empty, but the addition is still rejected as a duplicate. Execute `list` and
       confirm that both original contacts remain with their details and IDs unchanged.
 
-1. Editing same-name contacts
+2. Editing same-name contacts
 
    1. Prerequisites: Continue from the preceding test with both contacts displayed in their original order.
 
-   1. Execute `edit 2 n/Alex Tan`.<br>
+   2. Execute `edit 2 n/Alex Tan`.<br>
       Expected: The edit succeeds although the supplied name is unchanged.
 
-   1. Execute `edit 2 p/91234567`.<br>
+   3. Execute `edit 2 p/91234567`.<br>
       Expected: `This contact already exists in UniTeam.` The second contact still has phone number `98765432`.
 
-   1. Execute `edit 2 n/Jamie Tan`, then `find Jamie`, then `edit 1 p/91234567 n/Alex Tan`.<br>
+   4. Execute `edit 2 n/Jamie Tan`, then `find Jamie`, then `edit 1 p/91234567 n/Alex Tan`.<br>
       Expected: The first two commands succeed. The final edit is rejected because it would match the hidden Alex
       Tan contact's complete details. Execute `list` and confirm that Jamie Tan's details and both IDs are unchanged.
 
-   1. Execute `edit 2 n/Alex Tan a/Block 2`.<br>
+   5. Execute `edit 2 n/Alex Tan a/Block 2`.<br>
       Expected: The edit succeeds. Both contacts share a name, retain their IDs, and have different details.
 
-1. Saving same-name contacts and independent memberships
+3. Saving same-name contacts and independent memberships
 
    1. Prerequisites: Continue from the editing test with both contacts displayed. Execute
       `addproject n/First project d/2027-01-01` and `addproject n/Second project d/2027-01-02`.
 
-   1. Execute `associate c/1 pr/1` and `associate c/2 pr/2`, then record the contact IDs and membership ID pairs in
+   2. Execute `associate c/1 pr/1` and `associate c/2 pr/2`, then record the contact IDs and membership ID pairs in
       `data/addressbook.json`.
 
-   1. Close and restart the app, then execute `list`, `listmembers pr/First project`, and
+   3. Close and restart the app, then execute `list`, `listmembers pr/First project`, and
       `listmembers pr/Second project`.<br>
       Expected: Both same-name contacts load with their saved details. Each project reports one member named
       Alex Tan. Since the member output shows names only, check the saved JSON to confirm that the first project
@@ -781,23 +779,21 @@ testers are expected to do more *exploratory* testing.
 
    1. Prerequisites: List all persons using the `list` command, with multiple persons in the list.
 
-   1. Test case: `delete 1`<br>
+   2. Test case: `delete 1`<br>
       Expected: The first contact is deleted from the list. The status message shows the deleted contact's details.
 
-   1. Test case: `delete 0`<br>
+   3. Test case: `delete 0`<br>
       Expected: No person is deleted. The status message shows error details.
 
-   1. Other incorrect delete commands to try: `delete`, `delete x`, `...` (where x is larger than the list size)<br>
+   4. Other incorrect delete commands to try: `delete`, `delete x`, `...` (where x is larger than the list size)<br>
       Expected: Similar to previous.
-
-1. _{ more test cases … }_
 
 ### Listing projects
 
 1. In a fresh session, run `listprojects`.<br>
    Expected: UniTeam reports that there are no projects to list.
 
-1. Add projects with and without descriptions using `addproject`, then run `listprojects`.<br>
+2. Add projects with and without descriptions using `addproject`, then run `listprojects`.<br>
    Expected: Projects are shown in insertion order with their displayed number, deadline, and description.
 
 ### Listing a contact's projects
@@ -815,29 +811,29 @@ testers are expected to do more *exploratory* testing.
    associate c/2 pr/2
    ```
 
-1. Run `listprojects`, then `listprojects c/2`.<br>
+2. Run `listprojects`, then `listprojects c/2`.<br>
    Expected: The first command lists all three projects. The second identifies Blair Querytest and lists Alpha as 2
    and Beta as 3, despite their reverse association order. Both results include deadlines and descriptions, with
    `No description provided` for Beta. The Contacts and Projects tabs retain all entries in their original order.
 
-1. Run `find Blair`, then `listprojects c/1`.<br>
+3. Run `find Blair`, then `listprojects c/1`.<br>
    Expected: The result still identifies Blair and lists projects 2 and 3. The contact search remains active.
    Run `listprojects c/2`; it reports an invalid displayed contact index because only one contact is displayed.
 
-1. Try `listprojects c/`, `listprojects c/0`, `listprojects c/-1`, `listprojects c/abc`,
+4. Try `listprojects c/`, `listprojects c/0`, `listprojects c/-1`, `listprojects c/abc`,
    `listprojects c/2147483648`, `listprojects c/1 c/2`, `listprojects pr/2`, and `listprojects c/1 extra`.<br>
    Expected: Each command reports an error. Run `listprojects c/1` again to confirm the same two associations remain
    and the contact search is still active.
 
-1. Run `dissociate c/1 pr/2`, then `listprojects c/1`.<br>
+5. Run `dissociate c/1 pr/2`, then `listprojects c/1`.<br>
    Expected: Only Beta is listed, still numbered 3. This confirms that a result's project number can be used directly
    for dissociation. Alpha remains in the Projects tab.
 
-1. Close and restart the disposable app from the same folder, run `list`, then `listprojects c/2`.<br>
+6. Close and restart the disposable app from the same folder, run `list`, then `listprojects c/2`.<br>
    Expected: Blair still belongs only to Beta, numbered 3. All contact and project details and IDs are retained in
    `data/addressbook.json`, and the unrelated association between Alex and project 1 is retained.
 
-1. Run `dissociate c/2 pr/3`, then `listprojects c/2`.<br>
+7. Run `dissociate c/2 pr/3`, then `listprojects c/2`.<br>
    Expected: The result reports that no projects are associated with Blair. The contact and all three projects remain.
    Run `associate c/2 pr/2`, then `listprojects c/2`; Alpha is listed again as project 2.
 

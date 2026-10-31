@@ -85,6 +85,5 @@ ProjectName -[hidden]right-> Deadline
 Deadline -[hidden]right-> Description
 
 ModelManager --> "~* filtered" Person
-ModelManager --> "~* filtered" Person
 ModelManager --> "~* filtered" Project
 @enduml

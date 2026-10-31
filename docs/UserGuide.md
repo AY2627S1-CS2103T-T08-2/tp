@@ -21,15 +21,15 @@ contacts faster than traditional GUI applications.
 1. Ensure that Java `25` or later is installed on your computer.<br>
    **Mac users:** Ensure you have the precise JDK version prescribed [here](https://se-education.org/guides/tutorials/javaInstallationMac.html).
 
-1. Download the latest `.jar` file from [here](https://github.com/AY2627S1-CS2103T-T08-2/tp/releases).
+2. Download the latest `.jar` file from [here](https://github.com/AY2627S1-CS2103T-T08-2/tp/releases).
 
-1. Copy the file to the folder you want to use as the _home folder_ for UniTeam.
+3. Copy the file to the folder you want to use as the _home folder_ for UniTeam.
 
-1. Open a terminal, `cd` to the folder containing the JAR file, and run `java -jar uniteam.jar`.<br>
+4. Open a terminal, `cd` to the folder containing the JAR file, and run `java -jar uniteam.jar`.<br>
    A GUI similar to the one below should appear in a few seconds. Note how the app contains some sample data.<br>
    ![Ui](images/Ui.png)
 
-1. Type a command in the command box and press Enter to execute it. For example, type **`help`** and press Enter to open the help window.<br>
+5. Type a command in the command box and press Enter to execute it. For example, type **`help`** and press Enter to open the help window.<br>
    Some example commands you can try:
 
    * `list` : Lists all contacts.
@@ -39,11 +39,11 @@ contacts faster than traditional GUI applications.
 
    * `delete 3` : Deletes the 3rd contact shown in the current list.
 
-   * `clear` : Deletes all contacts.
+   * `clear` : Deletes all contacts, projects, associations and member roles.
 
    * `exit` : Exits the app.
 
-1. Refer to the [Features](#features) section below for details of each command.
+6. Refer to the [Features](#features) section below for details of each command.
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -62,8 +62,19 @@ contacts faster than traditional GUI applications.
 * Items followed by `...` can appear zero or more times.<br>
   For example, `[t/TAG]... ` may be omitted, or written as `t/friend` or `t/friend t/family`.
 
-* Parameters can be in any order.<br>
-  For example, if the command specifies `n/NAME p/PHONE_NUMBER`, `p/PHONE_NUMBER n/NAME` is also acceptable.
+* Prefixed parameters can appear in any order.<br>
+  For example, `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS` also accepts
+  `add p/PHONE_NUMBER n/NAME a/ADDRESS e/EMAIL`.
+  Positional parameters, such as the index in `edit INDEX`, must remain in
+  the position shown in the command format.
+
+* Enter each command on a single line. Separate prefixed arguments with spaces
+  or tabs.
+
+* Contacts and Projects have separate displayed lists and filters.
+  An index refers to the number currently shown in the relevant list, not a
+  permanent identifier. Check the displayed numbers after changing a filter
+  or modifying a list.
 
 * Commands that take no parameters (`help`, `list`, `exit`, and `clear`) reject extra arguments.<br>
   For example, `help 123` reports an invalid command format and shows the usage for `help`.
@@ -112,6 +123,100 @@ Repeating either command is rejected with `This contact already exists in UniTea
 Adds a project to UniTeam.
 
 Format: `addproject n/PROJECT_NAME d/YYYY-MM-DD [desc/DESCRIPTION]`
+
+* `PROJECT_NAME` must contain 1–50 characters after whitespace normalisation.
+  It must contain at least one letter or digit, and may contain letters, digits,
+  spaces, hyphens, apostrophes, ampersands and parentheses.
+* Leading and trailing whitespace is removed, and repeated whitespace is
+  replaced with a single space.
+* Project names must be unique after case and whitespace normalisation.
+* The deadline must be a valid calendar date in `YYYY-MM-DD` format.
+  Past dates are allowed.
+* `DESCRIPTION` is optional and may contain up to 200 characters without line
+  breaks. If `desc/` is supplied, its value must not be blank.
+* Adding a project clears the current project search, so the Projects list
+  shows all projects. The contact filter is unchanged.
+* Each prefix may appear at most once. Invalid input or a duplicate project
+  name produces an error without adding a project.
+
+Examples:
+
+* `addproject n/CS2103T Team Project d/2026-11-13`
+* `addproject n/Orbital d/2027-08-01 desc/Build a project planning application`
+
+### Editing a project: `editproject`
+
+Edits the details of a project identified by its displayed index.
+
+Format: `editproject INDEX [n/PROJECT_NAME] [d/YYYY-MM-DD] [desc/DESCRIPTION]`
+
+* `INDEX` must be a positive integer referring to the currently displayed
+  Projects list, including results from `findproject`.
+* At least one field must be supplied. Omitted fields retain their values.
+* The name, deadline and description follow the same constraints as
+  `addproject`.
+* Enter `desc/` without a value to clear the description.
+* A project cannot be renamed to another project's name, including a project
+  hidden by the current search.
+* Editing a project preserves its contact associations and member roles.
+* A successful edit clears the project search and shows all projects.
+  The contact filter is unchanged.
+* Providing an existing value without changing the project's details is allowed.
+
+Examples:
+
+* `editproject 1 d/2026-12-01` changes the first displayed project's deadline.
+* `editproject 2 n/Updated Project desc/` renames the second displayed project
+  and clears its description.
+* `findproject Orbital` followed by `editproject 1 desc/Build a mobile application`
+  edits the first project in those search results.
+
+### Locating projects by name: `findproject`
+
+Finds projects whose names contain any of the supplied keywords and opens
+the Projects tab.
+
+Format: `findproject KEYWORD [MORE_KEYWORDS]...`
+
+* At least one keyword is required.
+* Searching is case-insensitive and considers project names only.
+* Keywords match whole words separated by whitespace.
+  For example, `Team` matches `Team Project`, but `Tea` does not.
+* A project is returned when its name matches at least one keyword.
+* Keyword order does not matter.
+* Results retain their original list order and are numbered starting from 1.
+* Project-index commands use these displayed numbers.
+* The contact filter is unchanged.
+* If nothing matches, the Projects list is empty. Use `listprojects` to show
+  all projects again.
+
+Examples:
+
+* `findproject CS2103T` finds projects containing the word `CS2103T`.
+* `findproject Team Orbital` finds projects containing either `Team` or `Orbital`.
+* `listprojects` restores the complete Projects list after a search.
+
+### Deleting a project: `deleteproject`
+
+Deletes a project identified by its displayed index.
+
+Format: `deleteproject INDEX`
+
+* `INDEX` must be a positive integer referring to the currently displayed
+  Projects list, including results from `findproject`.
+* Deleting a project also removes its contact associations and member roles.
+  The contacts themselves remain in UniTeam.
+* Other projects and their associations are unchanged.
+* The current project search remains active after deletion.
+* If the Contacts list was showing members of the deleted project, that list
+  becomes empty. Use `list` to show all contacts again.
+* This action cannot be undone within UniTeam.
+
+Examples:
+
+* `listprojects` followed by `deleteproject 2` deletes the second displayed project.
+* `findproject Orbital` followed by `deleteproject 1` deletes the first project
+  in those search results.
 
 
 ### Listing all contacts: `list`
@@ -193,7 +298,9 @@ Format: `delete INDEX`
 
 * Deletes the contact at the specified `INDEX`.
 * The index refers to the index number shown in the displayed contact list.
-* The index **must be a positive integer** 1, 2, 3, ...
+* The index **must be a positive integer** 1, 2, 3, ... 
+* Deleting a contact also removes all of that contact's project associations 
+and member roles. The projects themselves remain in UniTeam.
 
 Examples:
 * `list` followed by `delete 2` deletes the 2nd contact in UniTeam .
@@ -213,8 +320,10 @@ Format: `associate c/CONTACT_INDEX pr/PROJECT_INDEX`
 * The success message identifies the contact and project. Invalid syntax, out-of-range indices, and duplicate
   associations produce an error and leave existing associations unchanged.
 
-Projects are numbered in the Projects tab starting at 1, in the order they are added with `addproject`.
-Switching tabs does not change either list's indices or reset the contact search results.
+Projects are numbered starting from 1 in the currently displayed Projects list.
+After `findproject`, these numbers refer to the search results. Use `listprojects`
+to restore all projects before selecting a project hidden by the search.
+Switching tabs does not change either list's indices or reset its filter.
 
 Example, in a new session with at least two contacts:
 
@@ -252,8 +361,8 @@ Repeating dissociation for the same pair reports that the contact is not associa
 
 ### Listing project members: `listmembers`
 
-Lists the contacts associated with a project, in the order they appear in the contact list. A member's role is shown
-beside their name when one has been assigned.
+Lists the contacts associated with a project, in address-book order.
+The Contacts tab shows their contact cards. The command feedback lists their names and any assigned member roles.
 
 Format: `listmembers pr/PROJECT_NAME`
 
@@ -273,21 +382,37 @@ and displays an empty contact list.
 If no project has the specified name, UniTeam reports that the project does not exist. Project names are matched
 without regard to letter case and with whitespace normalised.
 
-### Setting a project member's role: `setrole`
+### Setting or clearing a project member's role: `setrole`
 
-Sets a short description of a contact's task allotment in a project. Roles belong to a contact-project association,
+Sets or clears a contact's role in a project. Roles belong to a contact-project association,
 so the same contact can have different roles in different projects.
 
-Format: `setrole c/CONTACT_INDEX pr/PROJECT_INDEX r/ROLE`
+Format: `setrole c/CONTACT_INDEX pr/PROJECT_INDEX r/[ROLE]`
 
-* `CONTACT_INDEX` is the numbered contact in the Contacts tab, including current search results.
-* `PROJECT_INDEX` is the numbered project in the Projects tab.
-* `ROLE` must be non-empty, no more than 200 characters, and contain no line breaks.
-* The contact must already be associated with the selected project using `associate`.
+* `CONTACT_INDEX` refers to the currently displayed Contacts list, including
+  results from `find` or `listmembers`.
+* `PROJECT_INDEX` refers to the currently displayed Projects list, including
+  results from `findproject`.
+* Both indices must be positive integers.
+* The contact must already be associated with the selected project.
+* The `c/`, `pr/` and `r/` prefixes are all required and must each appear once.
+  Their order does not matter.
+* A role may contain up to 200 characters and must not contain line breaks.
+  Surrounding whitespace is removed.
+* Leave the value after `r/` empty to clear the role while retaining the
+  contact-project association.
+* Setting an unchanged role or clearing an already empty role is allowed.
+* Both list filters remain unchanged.
+* Roles are saved and remain available after restarting UniTeam.
 
-Example: `setrole c/2 pr/1 r/Implement the parser` assigns that task allotment to contact 2 in project 1. Run
-`listmembers pr/CS2103T Team Project` to see the role beside the contact's name. The role is saved with the membership
-and remains after restarting UniTeam. Existing data without a role continues to load with an empty role.
+Examples:
+
+* `setrole c/2 pr/1 r/Implement the parser` assigns that role to displayed
+  contact 2 in displayed project 1.
+* `setrole c/2 pr/1 r/` clears that member's role without removing the association.
+
+Run `listmembers pr/PROJECT_NAME` to see member roles in the command feedback.
+The contact cards display contact details.
 
 ### Clearing all entries: `clear`
 
@@ -303,13 +428,30 @@ Format: `exit`
 
 ### Saving the data
 
-UniTeam automatically saves contacts, projects and associations after every successful command. You do not need to 
-save manually.
+UniTeam automatically saves contacts, projects, associations and member roles
+after every successful command. No separate save command is needed.
+
+The data file is `data/addressbook.json`, relative to the folder from which
+you launch UniTeam. Following the Quick start instructions places this file
+inside the folder containing your JAR.
+
+If a command changes stored data but saving fails, UniTeam restores the previous
+data and list filters, and reports that the command was not applied.
+Resolve the reported save problem before retrying.
+
+Commands that do not change stored data, such as `help`, `list` and `exit`,
+can still complete when saving fails. Their feedback includes a warning.
+
+If the data file could not be loaded at startup, saving remains disabled for
+that session. See the recovery instructions under
+[Editing the data file](#editing-the-data-file).
 
 ### Editing the data file
 
-UniTeam data is saved automatically as a JSON file `[JAR file location]/data/addressbook.json`. Advanced users are 
-welcome to update data directly by editing that data file.
+UniTeam stores its data in `data/addressbook.json`, relative to the folder
+from which you launch the application. Close UniTeam and back up this file
+before editing it. Save the file as valid UTF-8 JSON and preserve the identifiers
+and references connecting contacts, projects and associations.
 
 <box type="warning" seamless>
 
@@ -322,8 +464,6 @@ Furthermore, certain edits can cause UniTeam to behave in unexpected ways (e.g.,
 acceptable range). Therefore, edit the data file only if you are confident that you can update it correctly.
 </box>
 
-_Details coming soon ..._
-
 --------------------------------------------------------------------------------------------------------------------
 
 ## FAQ
@@ -331,6 +471,11 @@ _Details coming soon ..._
 **Q**: How do I transfer my data to another computer?<br>
 **A**: Install the app on the other computer and overwrite the data file it creates with the data file from your 
 previous UniTeam home folder.
+
+**Q**: Why does a second copy of UniTeam close immediately?<br>
+**A**: Only one UniTeam instance can use the same data folder at a time.
+Use the existing instance, or close it before launching another.
+The terminal and log report `UniTeam is already running in this folder.`
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -343,18 +488,22 @@ previous UniTeam home folder.
 
 ## Command summary
 
-Action     | Format, Examples
------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------
-**Add**    | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]... ` <br> e.g., `add n/James Ho p/22224444 e/jamesho@example.com a/123, Clementi Rd, 1234665 t/friend t/colleague`
-**Associate** | `associate c/CONTACT_INDEX pr/PROJECT_INDEX`<br> e.g., `associate c/2 pr/1`
-**Clear**  | `clear`
-**Delete** | `delete INDEX`<br> e.g., `delete 3`
-**Dissociate** | `dissociate c/CONTACT_INDEX pr/PROJECT_INDEX`<br> e.g., `dissociate c/2 pr/1`
-**Edit**   | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]... `<br> e.g.,`edit 2 n/James Lee e/jameslee@example.com`
-**Find**   | `find KEYWORD [MORE_KEYWORDS]`<br> e.g., `find James Jake`
-**List**   | `list`
-**List projects** | `listprojects [c/CONTACT_INDEX]`<br> e.g., `listprojects c/2`
-**List members** | `listmembers pr/PROJECT_NAME`<br> e.g., `listmembers pr/CS2103T Team Project`
-
-**Set member role** | `setrole c/CONTACT_INDEX pr/PROJECT_INDEX r/ROLE`<br> e.g., `setrole c/2 pr/1 r/Implement the parser`
-**Help**   | `help`
+Action | Format and examples
+--- | ---
+**Add contact** | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]...`<br>Example: `add n/James Ho p/22224444 e/jamesho@example.com a/Clementi t/friend`
+**Add project** | `addproject n/PROJECT_NAME d/YYYY-MM-DD [desc/DESCRIPTION]`<br>Example: `addproject n/Orbital d/2027-08-01`
+**Associate** | `associate c/CONTACT_INDEX pr/PROJECT_INDEX`<br>Example: `associate c/2 pr/1`
+**Clear all entries** | `clear`
+**Delete contact** | `delete INDEX`<br>Example: `delete 3`
+**Delete project** | `deleteproject INDEX`<br>Example: `deleteproject 2`
+**Dissociate** | `dissociate c/CONTACT_INDEX pr/PROJECT_INDEX`<br>Example: `dissociate c/2 pr/1`
+**Edit contact** | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...`<br>Example: `edit 2 n/James Lee`
+**Edit project** | `editproject INDEX [n/PROJECT_NAME] [d/YYYY-MM-DD] [desc/DESCRIPTION]`<br>Example: `editproject 1 d/2026-12-01`
+**Exit** | `exit`
+**Find contacts** | `find KEYWORD [MORE_KEYWORDS]...`<br>Example: `find James Jake`
+**Find projects** | `findproject KEYWORD [MORE_KEYWORDS]...`<br>Example: `findproject CS2103T Orbital`
+**Help** | `help`
+**List contacts** | `list`
+**List projects** | `listprojects [c/CONTACT_INDEX]`<br>Example: `listprojects c/2`
+**List members** | `listmembers pr/PROJECT_NAME`<br>Example: `listmembers pr/CS2103T Team Project`
+**Set or clear member role** | `setrole c/CONTACT_INDEX pr/PROJECT_INDEX r/[ROLE]`<br>Set: `setrole c/2 pr/1 r/Implement the parser`<br>Clear: `setrole c/2 pr/1 r/`

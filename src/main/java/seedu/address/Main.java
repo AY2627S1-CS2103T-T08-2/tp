@@ -1,5 +1,11 @@
 package seedu.address;
 
+import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.logging.Logger;
 
 import javafx.application.Application;
@@ -27,7 +33,30 @@ public class Main {
     static void main(String[] args) {
 
         logger.warning("The warnings about a 'restricted method in java.lang.System' "
-            + "and 'enabling native access' appearing below (if any) can be ignored.");
-        Application.launch(MainApp.class, args);
+                + "and 'enabling native access' appearing below (if any) can be ignored.");
+        launchWithLock(Path.of("data", "uniteam.lock"), () -> Application.launch(MainApp.class, args));
+    }
+
+    /**
+     * Holds a separate file lock until the application exits, preventing concurrent use of the same data folder.
+     */
+    static void launchWithLock(Path lockPath, Runnable launch) {
+        try {
+            Files.createDirectories(lockPath.getParent());
+            try (
+                    FileChannel channel = FileChannel.open(lockPath,
+                    StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+                    FileLock lock = channel.tryLock()
+            ) {
+                if (lock == null) {
+                    logger.warning("UniTeam is already running in this folder.");
+                    return;
+                }
+
+                launch.run();
+            }
+        } catch (IOException e) {
+            logger.severe("Unable to acquire or release the UniTeam instance lock: " + e.getMessage());
+        }
     }
 }

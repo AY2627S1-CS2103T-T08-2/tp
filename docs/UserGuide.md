@@ -295,9 +295,9 @@ Format: `delete INDEX`
 
 * Deletes the contact at the specified `INDEX`.
 * The index refers to the index number shown in the displayed contact list.
-* The index **must be a positive integer** 1, 2, 3, ... 
-* Deleting a contact also removes all of that contact's project associations 
-and member roles. The projects themselves remain in UniTeam.
+* The index **must be a positive integer** 1, 2, 3, ...
+* Deleting a contact also removes all of that contact's project associations
+  and member roles. The projects themselves remain in UniTeam.
 
 Examples:
 * `list` followed by `delete 2` deletes the 2nd contact in UniTeam .

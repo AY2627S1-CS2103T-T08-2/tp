@@ -121,6 +121,11 @@ The sequence diagram below illustrates the interactions within the `Logic` compo
 
 <puml src="diagrams/DeleteSequenceDiagram.puml" alt="Interactions Inside the Logic Component for the `delete 1` Command" />
 
+The diagram illustrates parsing and command execution for a successful
+`delete 1`. Snapshot creation, saving and save-failure handling are omitted
+for clarity. These are described under
+[Handling save failures](#handling-save-failures).
+
 <box type="info" seamless>
 
 **Note:** The lifeline for `DeleteCommandParser` should end at the destroy marker (X), but due to a limitation of PlantUML, the lifeline continues till the end of diagram.
@@ -490,8 +495,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 | Priority | As a …                                     | I want to …                                                          | So that I can…                                                         |
 |----------|--------------------------------------------|----------------------------------------------------------------------|------------------------------------------------------------------------|
 | `* * *`  | new user                                   | see usage instructions                                               | refer to instructions when I forget how to use the App                 |
-| `* * *`  | user                                       | add a new person                                                     |                                                                        |
-| `* * *`  | user                                       | delete a person                                                      | remove entries that I no longer need                                   |
+| `* * *`  | user                                       | add a new contact                                                    | keep academic contact details in one place                             || `* * *`  | user                                       | delete a person                                                      | remove entries that I no longer need                                   |
 | `* * *`  | user                                       | find a person by name                                                | locate details of persons without having to go through the entire list |
 | `* * *`  | returning user                             | retain my contacts, projects and their associations between sessions | continue where I left off without re-entering information              |
 | `* * *`  | university student                         | add a new project                                                    | organise contacts according to the projects they are involved in       |

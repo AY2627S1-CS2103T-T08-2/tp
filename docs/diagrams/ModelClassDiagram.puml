@@ -30,6 +30,7 @@ Class Description
 
 Class UniqueProjectMembershipList
 Class ProjectMembership
+Class Role
 
 Class I #FFFFFF
 }
@@ -66,6 +67,7 @@ AddressBook *--> "1" UniqueProjectMembershipList
 UniqueProjectMembershipList --> "~* all" ProjectMembership
 ProjectMembership --> "1" PersonId
 ProjectMembership --> "1" ProjectId
+ProjectMembership --> "1" Role
 
 Person -[hidden]up--> I
 UniquePersonList -[hidden]right-> I
@@ -83,4 +85,6 @@ ProjectName -[hidden]right-> Deadline
 Deadline -[hidden]right-> Description
 
 ModelManager --> "~* filtered" Person
+ModelManager --> "~* filtered" Person
+ModelManager --> "~* filtered" Project
 @enduml

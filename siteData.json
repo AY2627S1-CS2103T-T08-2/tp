@@ -52,8 +52,9 @@
         "common-classes": "Common classes",
         "implementation": "Implementation",
         "project-membership-model": "Project membership model",
-        "proposed-undo-redo-feature": "[Proposed] Undo/redo feature",
-        "proposed-data-archiving": "[Proposed] Data archiving",
+        "project-management": "Project management",
+        "project-search-and-filter-maintenance": "Project search and filter maintenance",
+        "handling-save-failures": "Handling save failures",
         "documentation-logging-testing-dev-ops": "Documentation, logging, testing, dev-ops",
         "appendix-requirements": "Appendix: Requirements",
         "product-scope": "Product scope",
@@ -70,7 +71,8 @@
         "associating-a-contact-with-a-project": "Associating a contact with a project",
         "dissociating-a-contact-from-a-project": "Dissociating a contact from a project",
         "listing-contacts-in-a-project": "Listing contacts in a project",
-        "saving-data": "Saving data"
+        "saving-data": "Saving data",
+        "project-commands-filters-and-member-roles": "Project commands, filters and member roles"
       },
       "headingKeywords": {}
     },
@@ -115,11 +117,14 @@
       "title": "User Guide",
       "headings": {
         "uniteam-user-guide": "UniTeam User Guide",
-        "quick-start": "Quick start",
+        "quick-start": "Quick Start",
         "features": "Features",
         "viewing-help-help": "Viewing help: help",
         "adding-a-contact-add": "Adding a contact: add",
         "adding-a-project-addproject": "Adding a project: addproject",
+        "editing-a-project-editproject": "Editing a project: editproject",
+        "locating-projects-by-name-findproject": "Locating projects by name: findproject",
+        "deleting-a-project-deleteproject": "Deleting a project: deleteproject",
         "listing-all-contacts-list": "Listing all contacts: list",
         "listing-projects-listprojects": "Listing projects: listprojects",
         "editing-a-contact-edit": "Editing a contact: edit",
@@ -128,14 +133,14 @@
         "associating-a-contact-with-a-project-associate": "Associating a contact with a project: associate",
         "dissociating-a-contact-from-a-project-dissociate": "Dissociating a contact from a project: dissociate",
         "listing-project-members-listmembers": "Listing project members: listmembers",
-        "setting-a-project-member-s-role-setrole": "Setting a project member's role: setrole",
+        "setting-or-clearing-a-project-member-s-role-setrole": "Setting or clearing a project member's role: setrole",
         "clearing-all-entries-clear": "Clearing all entries: clear",
         "exiting-the-program-exit": "Exiting the program: exit",
         "saving-the-data": "Saving the data",
         "editing-the-data-file": "Editing the data file",
         "faq": "FAQ",
-        "known-issues": "Known issues",
-        "command-summary": "Command summary"
+        "known-issues": "Known Issues",
+        "command-summary": "Command Summary"
       },
       "headingKeywords": {}
     },

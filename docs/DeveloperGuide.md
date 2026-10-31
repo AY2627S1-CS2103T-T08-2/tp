@@ -130,10 +130,10 @@ The sequence diagram below illustrates the interactions within the `Logic` compo
 How the `Logic` component works:
 
 1. When `Logic` is called upon to execute a command, the command is passed to an `AddressBookParser` object, which in turn creates a parser that matches the command (e.g., `DeleteCommandParser`) and uses it to parse the command.
-1. This results in a `Command` object (more precisely, an object of one of its subclasses e.g., `DeleteCommand`) which is executed by the `LogicManager`.
-1. The command can communicate with the `Model` when it is executed (e.g. to delete a person).<br>
+2. This results in a `Command` object (more precisely, an object of one of its subclasses e.g., `DeleteCommand`) which is executed by the `LogicManager`.
+3. The command can communicate with the `Model` when it is executed (e.g. to delete a person).<br>
    Note that although this is shown as a single step in the diagram above for simplicity, the code can require several interactions between the command object and the `Model` to complete the operation.
-1. The result of the command execution is encapsulated as a `CommandResult` object which is returned from `Logic`.
+4. The result of the command execution is encapsulated as a `CommandResult` object which is returned from `Logic`.
 
 Here are the other classes in `Logic` (omitted from the class diagram above) that are used for parsing a user command:
 
@@ -151,14 +151,17 @@ How the parsing works:
 
 The `Model` component,
 
+* stores contacts, projects and memberships in `UniquePersonList`,
+  `UniqueProjectList` and `UniqueProjectMembershipList`, respectively.
+* gives each `Person` a non-null, immutable internal `PersonId`, represented
+  by a UUID, that is not displayed to users.
 * maintains independent `FilteredList<Person>` and `FilteredList<Project>`
   views over the address book's observable collections. These views are
   exposed through `getFilteredPersonList()` and `getFilteredProjectList()`
   for the UI to observe.
-* gives each `Person` a non-null, immutable internal `PersonId`, represented by a UUID, that is not displayed to users.
-* stores the `Person` objects selected by the current filter, such as search results, in a separate _filtered_ list. It exposes this list as an unmodifiable `ObservableList<Person>` that the UI can observe and bind to, so the UI updates when the list changes.
-* stores a `UserPrefs` object that represents the user’s preferences (currently, just the GUI settings). This is exposed to the outside as a `ReadOnlyUserPrefs` object.
-* does not depend on any of the other three components (as the `Model` represents data entities of the domain, they should make sense on their own without depending on other components)
+* stores a `UserPrefs` object representing the user's GUI preferences,
+  exposed through `ReadOnlyUserPrefs`.
+* does not depend on the UI, Logic or Storage components.
 
 Each `Person` owns exactly one `PersonId`, shown by the composition in the Model diagrams. The normal `Person` constructor generates a new ID, while the reconstruction constructor accepts an existing ID. Editing replaces the person's details but preserves its ID.
 
@@ -359,6 +362,18 @@ select a different displayed project.
 The contact-specific form preserves both predicates and returns a
 `ListViewTarget` of `NONE`, leaving the selected tab unchanged.
 
+#### Design considerations
+
+**Aspect: Where to store project memberships:**
+
+* **Alternative 1 (current choice):** Store memberships as a separate collection in `AddressBook`.
+    * Pros: Represents each association once, avoids copying entity data, and centralizes duplicate checking,
+      referential integrity, and deletion cleanup.
+    * Cons: Looking up a person's projects or a project's members requires filtering the membership collection.
+* **Alternative 2:** Store associated projects in each `Person` and associated people in each `Project`.
+    * Pros: Makes navigation from either entity direct.
+    * Cons: Duplicates relationship state and requires both sides to be kept synchronized during every update.
+
 ### Project management
 
 `Project` is an immutable entity containing a stable `ProjectId`, a
@@ -442,18 +457,6 @@ commands may still execute in memory. Their results warn that saving is
 disabled and session changes will be lost. The unreadable original data file
 is not overwritten.
 
-#### Design considerations
-
-**Aspect: Where to store project memberships:**
-
-* **Alternative 1 (current choice):** Store memberships as a separate collection in `AddressBook`.
-  * Pros: Represents each association once, avoids copying entity data, and centralizes duplicate checking,
-    referential integrity, and deletion cleanup.
-  * Cons: Looking up a person's projects or a project's members requires filtering the membership collection.
-* **Alternative 2:** Store associated projects in each `Person` and associated people in each `Project`.
-  * Pros: Makes navigation from either entity direct.
-  * Cons: Duplicates relationship state and requires both sides to be kept synchronized during every update.
-
 --------------------------------------------------------------------------------------------------------------------
 
 ## **Documentation, logging, testing, dev-ops**
@@ -484,19 +487,19 @@ is not overwritten.
 
 Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
 
-| Priority | As a …                                    | I want to …                 | So that I can…                                                        |
-|----------|--------------------------------------------|------------------------------|------------------------------------------------------------------------|
-| `* * *`  | new user                                   | see usage instructions       | refer to instructions when I forget how to use the App                 |
-| `* * *`  | user                                       | add a new person             |                                                                        |
-| `* * *`  | user                                       | delete a person              | remove entries that I no longer need                                   |
-| `* * *`  | user                                       | find a person by name        | locate details of persons without having to go through the entire list |
-| `* * *`  | returning user | retain my contacts, projects and their associations between sessions | continue where I left off without re-entering information |
-| `* * *`  | university student | add a new project | organise contacts according to the projects they are involved in |
-| `* * *`  | university student | associate a contact with a project | keep track of everyone involved |
-| `* * *`  | university student | view all contacts for a project | see everyone involved at a glance |
-| `* * *`  | university student | view all projects | quickly find the project I am working on |
-| `* *`    | user                                       | hide private contact details | minimize chance of someone else seeing them by accident                |
-| `*`      | user with many persons in the address book | sort persons by name         | locate a person easily                                                 |
+| Priority | As a …                                     | I want to …                                                          | So that I can…                                                         |
+|----------|--------------------------------------------|----------------------------------------------------------------------|------------------------------------------------------------------------|
+| `* * *`  | new user                                   | see usage instructions                                               | refer to instructions when I forget how to use the App                 |
+| `* * *`  | user                                       | add a new person                                                     |                                                                        |
+| `* * *`  | user                                       | delete a person                                                      | remove entries that I no longer need                                   |
+| `* * *`  | user                                       | find a person by name                                                | locate details of persons without having to go through the entire list |
+| `* * *`  | returning user                             | retain my contacts, projects and their associations between sessions | continue where I left off without re-entering information              |
+| `* * *`  | university student                         | add a new project                                                    | organise contacts according to the projects they are involved in       |
+| `* * *`  | university student                         | associate a contact with a project                                   | keep track of everyone involved                                        |
+| `* * *`  | university student                         | view all contacts for a project                                      | see everyone involved at a glance                                      |
+| `* * *`  | university student                         | view all projects                                                    | quickly find the project I am working on                               |
+| `* *`    | user                                       | hide private contact details                                         | minimize chance of someone else seeing them by accident                |
+| `*`      | user with many persons in the address book | sort persons by name                                                 | locate a person easily                                                 |
 
 ### Use cases
 
@@ -542,11 +545,12 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
       Use case resumes at step 1.
 
 
-* 5a. UniTeam is unable to save the data.
+* 5a. UniTeam is unable to save the updated data.
 
-    * 4a1. UniTeam shows an error message
+    * 5a1. UniTeam restores the previous data and list filters.
+    * 5a2. UniTeam displays an error explaining that the contact was not added.
 
-      Use case ends.
+  Use case ends.
 
 
 **Use case: Add a project**
@@ -581,11 +585,12 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
       Use case resumes at step 1.
 
-* 4a. UniTeam is unable to save the data.
+* 4a. UniTeam is unable to save the updated data.
 
-    * 4a1. UniTeam shows an error message
+    * 4a1. UniTeam restores the previous data and list filters.
+    * 4a2. UniTeam displays an error explaining that the project was not added.
 
-      Use case ends.
+  Use case ends.
 
 **Use case: Assign contact to project**
 
@@ -636,10 +641,10 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 * 4a. UniTeam cannot save the association.
 
-    * 4a1. UniTeam informs the user that the association could not be saved.
-    * 4a2. UniTeam leaves the existing contact and project data unchanged.
+    * 4a1. UniTeam restores the previous data and list filters.
+    * 4a2. UniTeam displays an error explaining that the association was not applied.
 
-      Use case ends.
+  Use case ends.
 
 **Use case: List project contacts**
 
@@ -960,10 +965,11 @@ Projects and memberships are saved with contacts after successful commands and r
    3. Run `listmembers pr/Zeta dissociation test`.<br>
       Expected: UniTeam reports no contacts associated with Zeta. The project remains in the Projects tab.
 
-   4. Test case: `dissociate c/2 pr/2`.<br>
-      Expected: An invalid contact-index error occurs because only one contact is displayed, even though the full
-      contact list contains at least two contacts. `listmembers pr/Alpha dissociation test` still shows the first
-      contact from the original list.
+   4. Execute `dissociate c/2 pr/2`.<br>
+      Expected: An invalid contact-index error occurs because the preceding
+      `listmembers pr/Zeta dissociation test` command displayed an empty
+      Contacts list. Execute `listmembers pr/Alpha dissociation test`;
+      the original first contact is still associated with Alpha.
 
    5. Execute `list`.<br>
       Expected: Both original contacts remain, with their original details.
@@ -973,19 +979,20 @@ Projects and memberships are saved with contacts after successful commands and r
    1. Keep the preceding session. Inspect `data/addressbook.json` and record the contact and project IDs. Zeta has
       no members, and Alpha contains only the first contact.
 
-   1. Close and restart the app from the same folder. Execute `list`, `listprojects`, and both `listmembers`
+   2. Close and restart the app from the same folder. Execute `list`, `listprojects`, and both `listmembers`
       commands.<br>
       Expected: All contacts and projects retain their details and IDs. Zeta still has no members, Alpha still
       contains the first contact, and both projects retain their displayed order.
 
-   1. Execute `dissociate c/1 pr/1` and `dissociate c/2 pr/1`.<br>
-      Expected: Both produce not-associated errors naming the selected entities; the removed memberships have not
-      reappeared after restarting.
+   3. Execute `list`, then `dissociate c/1 pr/1` and `dissociate c/2 pr/1`.<br>
+      Expected: Both dissociation attempts produce not-associated errors
+      naming the selected contacts and Zeta. This confirms that the removed
+      memberships have not reappeared after restarting.
 
-   1. Execute `dissociate c/1 pr/2`, then `listmembers pr/Alpha dissociation test`.<br>
+   4. Execute `dissociate c/1 pr/2`, then `listmembers pr/Alpha dissociation test`.<br>
       Expected: Removal succeeds, and Alpha has no members. No memberships remain in the app.
 
-   1. Close and restart again, then inspect the contact and project lists, run both `listmembers` commands, and
+   5. Close and restart again, then inspect the contact and project lists, run both `listmembers` commands, and
       compare the saved IDs with the recorded values.<br>
       Expected: Both projects still have no members, and all contacts and projects retain their details and IDs.
 
@@ -1059,8 +1066,13 @@ Projects and memberships are saved with contacts after successful commands and r
       Expected: The restored data and new contact load normally; saving is enabled. No loading-error dialog or saving-disabled status warning appears.
    5. Close the app and move the disposable data file elsewhere, then restart and execute `list`.<br>
       Expected: Sample contacts are loaded and saved normally; no loading-error dialog or saving-disabled warning appears. Moving the original file while the app is closed is also the intentional fresh-start procedure.
-   6. Where filesystem permissions allow it, close the disposable app and deny access to the data file's parent directory while keeping the file in place. Restart the app, then restore the permissions after testing.<br>
-      Expected: If file absence cannot be established, reading is attempted and the access failure produces a loading-error dialog with saving disabled, rather than loading sample contacts. The original file remains unchanged.
+   6. Where filesystem permissions allow it, close the disposable app and
+      deny read access to `data/addressbook.json` while keeping the data
+      directory and `data/uniteam.lock` accessible. Restart the app.<br>
+      Expected: If the operating system denies the read, UniTeam displays
+      the loading-error dialog and disables saving for that session.
+      The original data file remains unchanged.
+      Restore the file permissions and restart UniTeam after testing.
 
 ### Project commands, filters and member roles
 

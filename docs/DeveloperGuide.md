@@ -6,9 +6,6 @@
 
 # UniTeam Developer Guide
 
-<!-- * Table of Contents -->
-<page-nav-print />
-
 --------------------------------------------------------------------------------------------------------------------
 
 ## **Acknowledgements**
@@ -41,6 +38,15 @@ classes [`Main`](https://github.com/AY2627S1-CS2103T-T08-2/tp/tree/master/src/ma
 in charge of the app launch and shut down.
 * At app launch, it initialises the other components in the correct sequence, and connects them up with each other.
 * At shut down, it shuts down the other components and invokes cleanup methods where necessary.
+
+`Main#launchWithLock` acquires an exclusive file lock on `data/uniteam.lock`
+before calling `Application.launch`. The lock remains held until the
+application exits. A second instance using the same data folder logs a warning
+and exits before application initialisation.
+
+The lock is released when its resources close, and the operating system also
+releases it when the process terminates. The lock file remains on disk;
+its existence does not indicate that an instance is still running.
 
 The bulk of the app's work is done by the following four components:
 
@@ -75,7 +81,19 @@ in [`Ui.java`](https://github.com/AY2627S1-CS2103T-T08-2/tp/tree/master/src/main
 
 <puml src="diagrams/UiClassDiagram.puml" alt="Structure of the UI Component"/>
 
-The UI consists of a `MainWindow` and its parts, such as `CommandBox`, `ResultDisplay`, `PersonListPanel`, and `StatusBarFooter`. All of these, including `MainWindow`, inherit from the abstract `UiPart` class, which captures common behavior among classes that represent visible GUI parts.
+The UI consists of `MainWindow` and its parts, including `CommandBox`,
+`ResultDisplay`, `PersonListPanel`, `ProjectListPanel`, `HelpWindow` and
+`StatusBarFooter`. These components inherit from `UiPart`, which loads their
+corresponding FXML layouts.
+
+The Contacts tab displays `PersonCard` objects, while the Projects tab displays
+`ProjectCard` objects. Both panels observe filtered lists supplied through
+`Logic`, so changes to their contents are reflected in the UI.
+
+`CommandResult` carries command feedback, help and exit flags, and a
+`ListViewTarget`. `MainWindow` uses that target to select the Contacts or
+Projects tab. A target of `NONE` preserves the currently selected tab.
+Member roles appear in command feedback rather than on contact cards.
 
 The `UI` component uses the JavaFX UI framework. The layouts of these UI parts are defined in matching `.fxml` files 
 in `src/main/resources/view`. For example,
@@ -88,7 +106,8 @@ The `UI` component,
 * executes user commands using the `Logic` component.
 * listens for changes to `Model` data so that the UI can be updated with the modified data.
 * keeps a reference to the `Logic` component, because the `UI` relies on the `Logic` to execute commands.
-* depends on some classes in the `Model` component because it displays `Person` objects from the model.
+* depends on model classes such as `Person` and `Project` because their data
+  is displayed in contact and project cards.
 
 ### Logic component
 
@@ -132,8 +151,10 @@ How the parsing works:
 
 The `Model` component,
 
-* stores the address book data: all `Person` objects in a `UniquePersonList`, all `Project` objects in a
-  `UniqueProjectList`, and all `ProjectMembership` objects in a `UniqueProjectMembershipList`.
+* maintains independent `FilteredList<Person>` and `FilteredList<Project>`
+  views over the address book's observable collections. These views are
+  exposed through `getFilteredPersonList()` and `getFilteredProjectList()`
+  for the UI to observe.
 * gives each `Person` a non-null, immutable internal `PersonId`, represented by a UUID, that is not displayed to users.
 * stores the `Person` objects selected by the current filter, such as search results, in a separate _filtered_ list. It exposes this list as an unmodifiable `ObservableList<Person>` that the UI can observe and bind to, so the UI updates when the list changes.
 * stores a `UserPrefs` object that represents the user’s preferences (currently, just the GUI settings). This is exposed to the outside as a `ReadOnlyUserPrefs` object.
@@ -171,11 +192,22 @@ one `c/` prefix and one `pr/` prefix, rejects a non-empty preamble, and parses b
 Syntax errors include the command usage message, while repeated prefixes retain the standard duplicate-field
 diagnostic. The parser checks positive-integer syntax; the command checks the indices against the model lists.
 
-The Contacts tab displays `Model#getFilteredPersonList()`, while the Projects tab displays `Model#getProjectList()`
-through `Logic#getProjectList()` and `ProjectListPanel`. The project list is neither sorted nor filtered by the UI,
-and project cards are numbered from 1 in list order. `pr/PROJECT_INDEX` uses that number, not the UUID shown beside
-`ID:` on the card. Switching tabs does not change the lists or reset the contact filter.
+The Contacts tab displays `Model#getFilteredPersonList()` through
+`Logic#getFilteredPersonList()` and `PersonListPanel`. The Projects tab displays
+`Model#getFilteredProjectList()` through `Logic#getFilteredProjectList()` and
+`ProjectListPanel`.
 
+Contact and project indices refer to positions in their respective filtered
+lists. Each displayed list is numbered starting from 1. Commands resolve an
+index against the displayed list before modifying the selected entity.
+The UUID shown on a project card is not a command index.
+
+The complete collections remain available through
+`Model#getAddressBook().getPersonList()` and
+`Model#getAddressBook().getProjectList()`. Duplicate detection and exact project
+lookup consider the complete data, including entities hidden by filters.
+
+Switching tabs changes neither filter.
 
 <box type="info" seamless>
 
@@ -205,6 +237,46 @@ both checks pass. Same-name contacts with different details and distinct IDs can
 together. Duplicate IDs are reported as invalid data through the same storage-loading exception path as malformed
 IDs. The JSON format is unchanged, and memberships continue to reference contacts by their IDs.
 
+#### Validation and loading recovery
+
+`FileUtil#readFromFile` uses `Files.readString` to decode UTF-8 strictly.
+Malformed byte sequences cause an `IOException` rather than being replaced
+silently with replacement characters.
+
+`JsonUtil` rejects null JSON roots, duplicate JSON property names and content
+following the first JSON root value. Trailing whitespace is allowed.
+
+`JsonSerializableAddressBook#toModelType` validates contacts, projects and
+memberships before returning an address book. Validation includes duplicate
+entities and IDs, invalid field values, null collection entries, null tags
+and membership references to missing entities.
+
+Missing or null top-level collections are treated as empty for compatibility
+with older data. A missing or null stored membership role becomes `Role.EMPTY`.
+
+Loading errors are reported through `DataLoadingException`.
+`StorageManager` records an address-book loading failure and blocks address-book
+saving for the remainder of that session.
+
+`MainApp` starts with an empty address book after such a failure.
+`UiManager` displays recovery instructions, and the status bar retains a
+saving-disabled warning. A file confirmed to be missing instead follows
+first-launch behaviour and loads sample data.
+
+Preference-loading failures use default preferences. A null `guiSettings`
+value is rejected by `JsonUserPrefsStorage` before model initialisation.
+
+#### Atomic address-book saving
+
+`JsonAddressBookStorage#saveAddressBook` writes the serialised data to a
+temporary file in the destination directory. Once writing succeeds, it
+replaces the target using `ATOMIC_MOVE` and `REPLACE_EXISTING`.
+
+Writing to a temporary file avoids truncating the existing data file before
+serialisation finishes. Temporary-file cleanup is attempted whether saving
+succeeds or fails. Save failures propagate to `LogicManager`, which handles
+model rollback or warning-only feedback.
+
 #### Legacy migration
 
 Loading legacy data generates IDs in memory but does not rewrite the JSON file. `LogicManager#execute()` saves the address book after every successful command, including commands such as `list` that do not change contact details. That save writes the generated IDs, and subsequent loads restore them.
@@ -216,6 +288,13 @@ Immediate migration write-back is not implemented. If IDs must remain stable acr
 ### Common classes
 
 Classes used by multiple components are in the `seedu.address.commons` package.
+
+`LogsCenter` configures the parent `baseLogger` with console and file handlers.
+Class-specific loggers inherit these handlers.
+
+The console handler is installed before the file handler. If opening the log
+file fails, `LogsCenter` reports the failure through the already-initialised
+`baseLogger` and continues with console logging.
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -235,22 +314,133 @@ change. It also avoids the stale or inconsistent data that could result from sto
 each membership. Names and list indexes are unsuitable references because names can be edited and indexes change when
 the displayed list is filtered or reordered.
 
-`AddressBook` owns the person, project, and membership collections, so it also enforces the relationship invariants. It
-rejects duplicate ID pairs and memberships with unknown IDs, and removes related memberships when a person or project
-is deleted. During reset, persons and projects are installed before memberships so that membership references can be
-validated against the replacement data.
+`AddressBook` owns the person, project and membership collections and enforces
+their relationship invariants. It rejects duplicate membership ID pairs and
+memberships referencing unknown entities. Deleting a person or project removes
+its related memberships.
 
-The `listmembers` command resolves a project name to its `Project`, then asks the model for that project's contacts.
-`AddressBook#getProjectMembers` matches membership IDs and returns contacts in address-book order. The command reads
-the corresponding membership roles to display them beside contact names. `SetRoleCommand` resolves the selected
-contact and project, confirms their membership exists, then replaces that membership with a value carrying the new
-role. The membership identity remains the same because equality is based on the person and project IDs.
+Bulk replacement first copies the incoming collections into temporary unique
+lists and validates membership references against the replacement data.
+Only after validation succeeds are the live collections replaced. This prevents
+invalid replacement data from partially changing the address book and preserves
+data when a collection is replaced using itself or one of its live views.
 
-The `listprojects` command optionally accepts `c/CONTACT_INDEX`. Its parser creates a command with or without a contact
-index. When an index is supplied, the command resolves it against `Model#getFilteredPersonList`, then calls
-`Model#getPersonProjects`. `ModelManager` delegates to `AddressBook#getPersonProjects`, which validates the contact's
-ID and matches membership ID pairs to return projects in address-book order. The command formats each result with its
-original index from the full project list. It changes neither the model nor the displayed lists or contact filter.
+`ListMembersCommand` resolves the supplied project name using
+`Model#findProject`, which searches the complete project collection.
+`AddressBook#getProjectMembers` returns the project's contacts in address-book
+order. The command then installs a contact predicate that checks membership
+using the selected project's stable ID. Member names and roles are formatted
+in the command feedback, while the Contacts tab displays contact cards.
+
+`SetRoleCommand` resolves both indices against the currently filtered lists,
+checks that the membership exists, and replaces it with an immutable
+`ProjectMembership` carrying the new role. `ProjectMembership#equals` and
+`hashCode` use the person-project ID pair; the role is not part of membership
+identity.
+
+`SetRoleCommandParser` requires the `r/` prefix but allows its value to be empty.
+`ParserUtil#parseRole` returns `Role.EMPTY` for an empty trimmed value. Clearing
+a role therefore preserves the membership instead of dissociating the contact.
+
+`ListProjectsCommand` optionally accepts `c/CONTACT_INDEX`. With no contact
+index, it resets the project predicate to `PREDICATE_SHOW_ALL_PROJECTS`,
+lists all projects and requests the Projects tab.
+
+With a contact index, the command resolves the contact against
+`Model#getFilteredPersonList()` and calls `Model#getPersonProjects()`.
+`AddressBook#getPersonProjects()` matches membership IDs and returns associated
+projects in address-book order.
+
+Each associated project is numbered using its position in the current filtered
+Projects list. A project hidden by the project filter is labelled
+`[not displayed]` without an index. This avoids presenting a number that would
+select a different displayed project.
+
+The contact-specific form preserves both predicates and returns a
+`ListViewTarget` of `NONE`, leaving the selected tab unchanged.
+
+### Project management
+
+`Project` is an immutable entity containing a stable `ProjectId`, a
+`ProjectName`, a `Deadline` and a `Description`.
+
+`UniqueProjectList` enforces unique project IDs and normalised names.
+Name comparison currently uses a lowercase `Locale.ROOT` comparison key after
+whitespace normalisation. Project replacement must preserve the stored ID.
+
+`AddProjectCommandParser` requires a name and deadline and accepts an optional
+description. `AddProjectCommand` checks for duplicates against the complete
+project collection before adding the project. A successful addition clears
+the project filter.
+
+`EditProjectCommandParser` creates an `EditProjectDescriptor` containing only
+the supplied fields. At least one field is required. An empty `desc/` supplies
+`Description.EMPTY`, while an omitted description retains its existing value.
+
+`EditProjectCommand` resolves the displayed project index, constructs a
+replacement preserving the project's ID, checks for a conflicting name, and
+calls `Model#setProject`. A successful edit clears the project filter.
+Memberships remain valid because they reference the unchanged project ID.
+
+`DeleteProjectCommand` resolves its index against the filtered Projects list
+and calls `Model#deleteProject`. `AddressBook#removeProject` removes the project
+and its memberships. Contacts and memberships belonging to other projects
+remain unchanged.
+
+### Project search and filter maintenance
+
+`FindProjectCommandParser` splits the supplied keywords on whitespace and
+creates a `ProjectNameContainsKeywordsPredicate`.
+
+The predicate applies `StringUtil#containsWordIgnoreCase` to the project's name.
+A project matches when at least one keyword matches a complete whitespace-
+separated word. Descriptions and deadlines are not searched.
+
+`FindProjectCommand` replaces the current project predicate, reports the result
+count and requests the Projects tab. `listprojects` without a contact index
+restores the complete project list. Neither command changes the contact filter.
+
+Changes to the observable project collection propagate to its `FilteredList`.
+An additional project-filter refresh method is therefore unnecessary for
+project additions, replacements and deletions.
+
+A project-member contact predicate depends on the separate membership
+collection. Changing a membership does not itself modify the observable person
+collection. `ModelManager#refreshPersonFilter` therefore temporarily removes
+and reinstalls the current contact predicate after membership addition,
+membership removal and project deletion.
+
+For example, deleting the project currently selected by `listmembers` removes
+its memberships and re-evaluates the contact predicate, producing an empty
+Contacts list.
+
+### Handling save failures
+
+Before parsing and executing a command, `LogicManager#execute` copies the
+address book and records both current filter predicates.
+
+After the command executes, `LogicManager` attempts to save the address book.
+If saving fails with an `IOException`, it compares the current stored data
+with the snapshot.
+
+Ordinary model equality is insufficient for this comparison:
+`Person#equals` ignores person IDs, `ProjectName#equals` ignores case through
+its comparison key, and `ProjectMembership#equals` ignores roles.
+`LogicManager#hasSameStoredData` therefore also compares person IDs, exact
+project-name strings and membership roles.
+
+If stored data changed, `LogicManager` restores the snapshot and the previous
+filtering behaviour, then throws a `CommandException` explaining that the
+command was not applied.
+
+If stored data is unchanged, the command result is returned with a save warning.
+Its help flag, exit flag and list-view target are preserved. This allows
+commands such as `help`, `list` and `exit` to complete despite a save failure.
+
+When storage reports that saving is blocked following a loading failure,
+commands may still execute in memory. Their results warn that saving is
+disabled and session changes will be lost. The unreadable original data file
+is not overwritten.
 
 #### Design considerations
 
@@ -263,100 +453,6 @@ original index from the full project list. It changes neither the model nor the 
 * **Alternative 2:** Store associated projects in each `Person` and associated people in each `Project`.
   * Pros: Makes navigation from either entity direct.
   * Cons: Duplicates relationship state and requires both sides to be kept synchronized during every update.
-
-### \[Proposed\] Undo/redo feature
-
-#### Proposed Implementation
-
-The proposed undo/redo mechanism is facilitated by `VersionedAddressBook`. It extends `AddressBook` with an undo/redo history, stored internally as an `addressBookStateList` and `currentStatePointer`. Additionally, it implements the following operations:
-
-* `VersionedAddressBook#commit()` -- Saves the current address book state in its history.
-* `VersionedAddressBook#undo()` -- Restores the previous address book state from its history.
-* `VersionedAddressBook#redo()` -- Restores a previously undone address book state from its history.
-
-These operations are exposed in the `Model` interface as `Model#commitAddressBook()`, `Model#undoAddressBook()` and `Model#redoAddressBook()` respectively.
-
-Given below is an example usage scenario and how the undo/redo mechanism behaves at each step.
-
-Step 1. The user launches the application for the first time. The `VersionedAddressBook` will be initialized with the initial address book state, and the `currentStatePointer` pointing to that single address book state.
-
-<puml src="diagrams/UndoRedoState0.puml" alt="UndoRedoState0" />
-
-Step 2. The user executes `delete 5` command to delete the 5th person in the address book. The `delete` command calls `Model#commitAddressBook()`, causing the modified state of the address book after the `delete 5` command executes to be saved in the `addressBookStateList`, and the `currentStatePointer` is shifted to the newly inserted address book state.
-
-<puml src="diagrams/UndoRedoState1.puml" alt="UndoRedoState1" />
-
-Step 3. The user executes `add n/David …​` to add a new person. The `add` command also calls `Model#commitAddressBook()`, causing another modified address book state to be saved into the `addressBookStateList`.
-
-<puml src="diagrams/UndoRedoState2.puml" alt="UndoRedoState2" />
-
-<box type="info" seamless>
-
-**Note:** If a command fails its execution, it will not call `Model#commitAddressBook()`, so the address book state will not be saved into the `addressBookStateList`.
-</box>
-
-Step 4. The user now decides that adding the person was a mistake, and decides to undo that action by executing the `undo` command. The `undo` command will call `Model#undoAddressBook()`, which will shift the `currentStatePointer` once to the left, pointing it to the previous address book state, and restores the address book to that state.
-
-<puml src="diagrams/UndoRedoState3.puml" alt="UndoRedoState3" />
-
-
-<box type="info" seamless>
-
-**Note:** If the `currentStatePointer` is at index 0, pointing to the initial AddressBook state, then there are no previous AddressBook states to restore. The `undo` command uses `Model#canUndoAddressBook()` to check if this is the case. If so, it will return an error to the user rather
-than attempting to perform the undo.
-</box>
-
-The following sequence diagram shows how an undo operation goes through the `Logic` component:
-
-<puml src="diagrams/UndoSequenceDiagram-Logic.puml" alt="UndoSequenceDiagram-Logic" />
-
-<box type="info" seamless>
-
-**Note:** The lifeline for `UndoCommand` should end at the destroy marker (X), but due to a limitation of PlantUML, it continues to the end of the diagram.
-</box>
-
-Similarly, how an undo operation goes through the `Model` component is shown below:
-
-<puml src="diagrams/UndoSequenceDiagram-Model.puml" alt="UndoSequenceDiagram-Model" />
-
-The `redo` command does the opposite — it calls `Model#redoAddressBook()`, which shifts the `currentStatePointer` once to the right, pointing to the previously undone state, and restores the address book to that state.
-
-<box type="info" seamless>
-
-**Note:** If the `currentStatePointer` is at index `addressBookStateList.size() - 1`, pointing to the latest address book state, then there are no undone AddressBook states to restore. The `redo` command uses `Model#canRedoAddressBook()` to check if this is the case. If so, it will return an error to the user rather than attempting to perform the redo.
-</box>
-
-Step 5. The user then decides to execute the command `list`. Commands that do not modify the address book, such as `list`, will usually not call `Model#commitAddressBook()`, `Model#undoAddressBook()` or `Model#redoAddressBook()`. Thus, the `addressBookStateList` remains unchanged.
-
-<puml src="diagrams/UndoRedoState4.puml" alt="UndoRedoState4" />
-
-Step 6. The user executes `clear`, which calls `Model#commitAddressBook()`. Since the `currentStatePointer` is not pointing at the end of the `addressBookStateList`, all address book states after the `currentStatePointer` will be purged. Reason: It no longer makes sense to redo the `add n/David …` command. This is the behavior that most modern desktop applications follow.
-
-<puml src="diagrams/UndoRedoState5.puml" alt="UndoRedoState5" />
-
-The following activity diagram summarizes what happens when a user executes a new command:
-
-<puml src="diagrams/CommitActivityDiagram.puml" width="250" />
-
-#### Design considerations:
-
-**Aspect: How undo & redo execute:**
-
-* **Alternative 1 (current choice):** Saves the entire address book.
-  * Pros: Easy to implement.
-  * Cons: May have performance issues in terms of memory usage.
-
-* **Alternative 2:** Individual command knows how to undo/redo by
-  itself.
-  * Pros: Will use less memory (e.g. for `delete`, just save the person being deleted).
-  * Cons: We must ensure that the implementation of each individual command is correct.
-
-_{more aspects and alternatives to be added}_
-
-### \[Proposed\] Data archiving
-
-_{Explain here how the data archiving feature will be implemented}_
-
 
 --------------------------------------------------------------------------------------------------------------------
 
@@ -410,7 +506,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 **MSS**
 
-1. User request to add a contact, giving contact's name, role and contact details
+1. User request to add a contact, giving contact's name and contact details
 2. UniTeam checks that the input is in the correct format
 3. UniTeams checks that each given detail is valid
 4. UniTeams checks that the contact does not already exist
@@ -457,7 +553,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 **MSS**
 
-1. User requests to add a project, giving the project name
+1. User requests to add a project, giving the project name, deadline and optional description
 2. UniTeam checks that no existing project has the same name
 3. UniTeam adds the project to the project list
 4. UniTeam saves the updated data
@@ -498,7 +594,7 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 1. User requests to view all contacts
 2. UniTeam displays the contact list
 3. User requests to associate a displayed contact with an existing project using `c/CONTACT_INDEX pr/PROJECT_INDEX`
-4. UniTeam records the association for the current session and displays a confirmation with both names
+4. UniTeam records and saves the association
 
    Use case ends.
 
@@ -605,8 +701,6 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 ## **Appendix: Instructions for manual testing**
 
 Given below are instructions to test the app manually.
-
-<box type="info" seamless>
 
 **Note:** These instructions only provide a starting point for testers to work on;
 testers are expected to do more *exploratory* testing.
@@ -756,56 +850,56 @@ testers are expected to do more *exploratory* testing.
       `addproject n/Association test project d/2026-11-13`, then open the Projects tab and confirm that the project
       is numbered 1. Use this number for `pr/`, not the UUID beside `ID:`.
 
-   1. With the Contacts tab selected, execute `associate c/2 pr/1`.<br>
+   2. With the Contacts tab selected, execute `associate c/2 pr/1`.<br>
       Expected: The status message names the second displayed contact and `Association test project`.
 
-   1. Switch to the Projects tab and repeat `associate c/2 pr/1`.<br>
+   3. Switch to the Projects tab and repeat `associate c/2 pr/1`.<br>
       Expected: An already-associated error names both entities. No second membership is added; switching tabs
       did not change the indices.
 
-   1. With the Projects tab still selected, execute `associate pr/1 c/1`.<br>
+   4. With the Projects tab still selected, execute `associate pr/1 c/1`.<br>
       Expected: Association succeeds for the first contact in the Contacts tab. One project can have multiple
       contacts, and association works from either tab.
 
-1. Unsuccessful association attempts
+2. Unsuccessful association attempts
 
    1. Prerequisites: Keep the preceding session, with only project 1 and the two successful associations.
 
-   1. Test cases: `associate`, `associate c/2`, `associate c/ pr/1`, `associate c/0 pr/1`,
+   2. Test cases: `associate`, `associate c/2`, `associate c/ pr/1`, `associate c/0 pr/1`,
       `associate c/2 proj/1`, and `associate c/2 pr/1 x/3`.<br>
       Expected: Each command shows the `associate` usage message and creates no membership.
 
-   1. Test cases: `associate c/1 c/2 pr/1` and `associate c/2 pr/1 pr/1`.<br>
+   3. Test cases: `associate c/1 c/2 pr/1` and `associate c/2 pr/1 pr/1`.<br>
       Expected: The duplicate-field diagnostic identifies `c/` and `pr/`, respectively. No membership is added.
 
-   1. Test case: `associate c/10000 pr/1`<br>
+   4. Test case: `associate c/10000 pr/1`<br>
       Expected: The status message reports an invalid contact index. No membership is added.
 
-   1. Test case: `associate c/1 pr/2`<br>
+   5. Test case: `associate c/1 pr/2`<br>
       Expected: The status message reports an invalid project index. No membership is added.
 
-   1. Repeat both successful associations from the preceding scenario, trying each from both tabs.<br>
+   6. Repeat both successful associations from the preceding scenario, trying each from both tabs.<br>
       Expected: Both still produce already-associated errors; the rejected commands preserved existing memberships.
 
-1. Association using a filtered contact list
+3. Association using a filtered contact list
 
    1. Create another project using `addproject n/Filtered association test d/2026-11-13`. Open the Projects tab and
       confirm that `Association test project` is still numbered 1 and `Filtered association test` is numbered 2.
 
-   1. Select the Contacts tab and use `find` with a name keyword that matches only the second contact from the
+   2. Select the Contacts tab and use `find` with a name keyword that matches only the second contact from the
       original list. Confirm that the matching contact is now numbered 1.
 
-   1. Switch to Projects and back to Contacts.<br>
+   3. Switch to Projects and back to Contacts.<br>
       Expected: Both project indices remain unchanged, and the Contacts tab still shows only the matching contact.
 
-   1. With the Projects tab selected, execute `associate c/1 pr/2`.<br>
+   4. With the Projects tab selected, execute `associate c/1 pr/2`.<br>
       Expected: The status message names that contact and `Filtered association test`; contact index 1 refers to the
       search result rather than the first contact in the full address book.
 
-   1. Test case: `associate c/2 pr/2`<br>
+   5. Test case: `associate c/2 pr/2`<br>
       Expected: An invalid contact-index error occurs because only one contact is displayed.
 
-   1. Select the Contacts tab and execute `list`, then `associate c/2 pr/2`.<br>
+   6. Select the Contacts tab and execute `list`, then `associate c/2 pr/2`.<br>
       Expected: The already-associated error identifies the same contact and project, confirming that membership
       refers to the selected contact's ID rather than its temporary search-result index.
 
@@ -821,64 +915,64 @@ Projects and memberships are saved with contacts after successful commands and r
       `addproject n/Alpha dissociation test d/2026-11-13`. Open the Projects tab and confirm that Zeta is numbered 1
       and Alpha is numbered 2, following insertion order. Use these numbers for `pr/`, not the UUIDs beside `ID:`.
 
-   1. Execute `associate c/1 pr/1`, `associate c/1 pr/2`, and `associate c/2 pr/1`. Run
+   2. Execute `associate c/1 pr/1`, `associate c/1 pr/2`, and `associate c/2 pr/1`. Run
       `listmembers pr/Zeta dissociation test` and `listmembers pr/Alpha dissociation test`.<br>
       Expected: Zeta contains the first two contacts, and Alpha contains only the first contact.
 
-   1. With the Contacts tab selected, execute `dissociate c/1 pr/1`.<br>
+   3. With the Contacts tab selected, execute `dissociate c/1 pr/1`.<br>
       Expected: The success message names the first contact and `Zeta dissociation test`.
 
-   1. Run both `listmembers` commands again, inspect the Contacts tab, and run `listprojects`.<br>
+   4. Run both `listmembers` commands again, inspect the Contacts tab, and run `listprojects`.<br>
       Expected: Zeta contains only the second contact, and Alpha still contains the first contact. Both contacts
       retain their details, and both projects retain their details, IDs, and displayed order.
 
-1. Unsuccessful dissociation attempts
+2. Unsuccessful dissociation attempts
 
    1. Prerequisites: Keep the preceding session. The first contact belongs only to Alpha, and the second belongs
       only to Zeta. Both contacts are displayed and there are exactly two projects.
 
-   1. Test cases: `dissociate`, `dissociate c/1`, `dissociate pr/1`, `dissociate c/ pr/1`,
+   2. Test cases: `dissociate`, `dissociate c/1`, `dissociate pr/1`, `dissociate c/ pr/1`,
       `dissociate c/0 pr/1`, `dissociate c/1 pr/abc`, `dissociate c/1 proj/1`, and
       `dissociate c/1 pr/1 x/3`.<br>
       Expected: Each command shows the `dissociate` usage message and removes no membership.
 
-   1. Test cases: `dissociate c/1 c/2 pr/1` and `dissociate c/2 pr/1 pr/2`.<br>
+   3. Test cases: `dissociate c/1 c/2 pr/1` and `dissociate c/2 pr/1 pr/2`.<br>
       Expected: The duplicate-field diagnostic identifies `c/` and `pr/`, respectively.
 
-   1. Test case: `dissociate c/10000 pr/1`.<br>
+   4. Test case: `dissociate c/10000 pr/1`.<br>
       Expected: An invalid contact-index error occurs.
 
-   1. Test case: `dissociate c/1 pr/3`.<br>
+   5. Test case: `dissociate c/1 pr/3`.<br>
       Expected: An invalid project-index error occurs.
 
-   1. Test case: `dissociate c/1 pr/1`.<br>
+   6. Test case: `dissociate c/1 pr/1`.<br>
       Expected: A not-associated error names the first contact and `Zeta dissociation test`.
 
-   1. After each rejected command, run both `listmembers` commands and inspect the contact and project lists.<br>
+   7. After each rejected command, run both `listmembers` commands and inspect the contact and project lists.<br>
       Expected: Zeta still contains only the second contact, Alpha still contains only the first contact, and all
       contact and project details remain unchanged.
 
-1. Filtered contact indices and removal of a project's last member
+3. Filtered contact indices and removal of a project's last member
 
    1. Keep the preceding session and use `find` with a name keyword that matches only the second contact from the
       original list. Confirm that this contact is now numbered 1 in the Contacts tab.
 
-   1. Switch to the Projects tab and execute `dissociate pr/1 c/1`.<br>
+   2. Switch to the Projects tab and execute `dissociate pr/1 c/1`.<br>
       Expected: The success message names the search-result contact and `Zeta dissociation test`. The reversed
       prefix order works, the contact search remains active, and project indices remain unchanged.
 
-   1. Run `listmembers pr/Zeta dissociation test`.<br>
+   3. Run `listmembers pr/Zeta dissociation test`.<br>
       Expected: UniTeam reports no contacts associated with Zeta. The project remains in the Projects tab.
 
-   1. Test case: `dissociate c/2 pr/2`.<br>
+   4. Test case: `dissociate c/2 pr/2`.<br>
       Expected: An invalid contact-index error occurs because only one contact is displayed, even though the full
       contact list contains at least two contacts. `listmembers pr/Alpha dissociation test` still shows the first
       contact from the original list.
 
-   1. Execute `list`.<br>
+   5. Execute `list`.<br>
       Expected: Both original contacts remain, with their original details.
 
-1. Saving and restarting, including an empty membership list
+4. Saving and restarting, including an empty membership list
 
    1. Keep the preceding session. Inspect `data/addressbook.json` and record the contact and project IDs. Zeta has
       no members, and Alpha contains only the first contact.
@@ -904,16 +998,16 @@ Projects and memberships are saved with contacts after successful commands and r
 1. Use `addproject n/CS2103T Team Project d/2026-11-13`, then associate two contacts with project 1 using
    `associate c/1 pr/1` and `associate c/2 pr/1`.
 
-1. Run `listmembers pr/CS2103T Team Project`.<br>
+2. Run `listmembers pr/CS2103T Team Project`.<br>
    Expected: Both associated contact names are displayed in contact-list order with the total count.
 
-1. Run `listmembers pr/Unknown Project`.<br>
+3. Run `listmembers pr/Unknown Project`.<br>
    Expected: UniTeam reports that the project does not exist.
 
-1. Add a second project without associating any contacts, then run `listmembers pr/Second Project`.<br>
+4. Add a second project without associating any contacts, then run `listmembers pr/Second Project`.<br>
    Expected: UniTeam reports that no contacts are associated with that project.
 
-1. Try `listmembers`, `listmembers pr/`, and `listmembers pr/CS2103T pr/Second Project`.<br>
+5. Try `listmembers`, `listmembers pr/`, and `listmembers pr/CS2103T pr/Second Project`.<br>
    Expected: The command displays a useful format or duplicate-prefix error, and does not change project data.
 
 ### Saving data
@@ -922,54 +1016,109 @@ Projects and memberships are saved with contacts after successful commands and r
 
    1. Prerequisites: Use a disposable copy of the app with at least one contact. Its data file is `data/addressbook.json` by default.
 
-   1. Edit a contact's phone number using `edit 1 p/91234567`, then inspect the saved JSON and record that contact's `id` value.
+   2. Edit a contact's phone number using `edit 1 p/91234567`, then inspect the saved JSON and record that contact's `id` value.
 
-   1. Close and restart the app. Edit the same contact's phone number using `edit 1 p/92345678`, then inspect the saved JSON.<br>
+   3. Close and restart the app. Edit the same contact's phone number using `edit 1 p/92345678`, then inspect the saved JSON.<br>
       Expected: The contact's details load successfully and its `id` remains the same.
 
-1. Loading legacy contacts without IDs
+2. Loading legacy contacts without IDs
 
    1. In the disposable copy, close the app and remove the `id` property from one contact in the JSON file. For another contact, set `"id": null`.
 
-   1. Restart the app, then close its window without entering a command. Inspect the JSON.<br>
+   2. Restart the app, then close its window without entering a command. Inspect the JSON.<br>
       Expected: Both legacy contacts load with their original details, but the file still has the missing or null IDs. Loading and closing the window do not write back the generated IDs. Do not use the `exit` command for this step, because successful commands save the address book.
 
-   1. Restart the app and execute `list` to trigger a save, then inspect the JSON.<br>
+   3. Restart the app and execute `list` to trigger a save, then inspect the JSON.<br>
       Expected: Each legacy contact now has a distinct UUID in its `id` property. Existing non-null IDs are preserved. Generated IDs are written on saving, rather than immediately on loading.
 
-   1. Record the IDs, close the window, restart the app, and execute `list` again.<br>
+   4. Record the IDs, close the window, restart the app, and execute `list` again.<br>
       Expected: All recorded IDs remain unchanged after loading and saving the migrated file.
 
-1. Rejecting malformed stored IDs
+3. Rejecting malformed stored IDs
 
    1. In the disposable copy, close the app and replace one contact's `id` with `"not-a-uuid"`, then restart.<br>
       Expected: The data file is rejected, a loading warning is logged, and the app starts with an empty address book.
 
-   1. Repeat with an empty ID string or `"1-1-1-1-1"`.<br>
+   2. Repeat with an empty ID string or `"1-1-1-1-1"`.<br>
       Expected: The same invalid-data behavior occurs. No replacement ID is generated for a malformed value.
 
-1. Rejecting duplicate stored IDs
+4. Rejecting duplicate stored IDs
 
    1. Prerequisites: Use a disposable copy of the app with at least two contacts with different names. Close the app and copy the first contact's `id` value into the second contact's `id` property in the JSON file.
 
-   1. Restart the app.<br>
+   2. Restart the app.<br>
       Expected: The data file is rejected, a loading warning is logged, and the app starts with an empty address book. The log identifies duplicate person IDs.
 
-   1. Repeat with one copy of the UUID written in uppercase and the other in lowercase.<br>
+   3. Repeat with one copy of the UUID written in uppercase and the other in lowercase.<br>
       Expected: The same duplicate-ID rejection occurs.
 
-1. Dealing with missing/corrupted data files
+5. Dealing with missing/corrupted data files
 
    1. Use a disposable copy of the app and data file. Close the app and remove a closing brace from `data/addressbook.json`. Record the resulting file contents.
-   1. Restart the app and execute `list`, `listprojects`, `help`, a valid `add` command, and `exit`.<br>
+   2. Restart the app and execute `list`, `listprojects`, `help`, a valid `add` command, and `exit`.<br>
       Expected: The app starts with an empty address book and shows an error dialog with the absolute data file path and recovery instructions. After dismissing the dialog, a saving-disabled warning remains in the status bar, including after commands. Each successful command warns that saving is disabled and session changes will be lost. Help and exit still work. The original file contents remain unchanged. Hover over the status bar path to see its full value if it is truncated.
-   1. Restart again without repairing the file and execute `list`.<br>
+   3. Restart again without repairing the file and execute `list`.<br>
       Expected: Saving remains disabled and the original file contents remain unchanged.
-   1. Close the app, restore a valid backup, restart, add a contact, and restart again.<br>
+   4. Close the app, restore a valid backup, restart, add a contact, and restart again.<br>
       Expected: The restored data and new contact load normally; saving is enabled. No loading-error dialog or saving-disabled status warning appears.
-   1. Close the app and move the disposable data file elsewhere, then restart and execute `list`.<br>
+   5. Close the app and move the disposable data file elsewhere, then restart and execute `list`.<br>
       Expected: Sample contacts are loaded and saved normally; no loading-error dialog or saving-disabled warning appears. Moving the original file while the app is closed is also the intentional fresh-start procedure.
-   1. Where filesystem permissions allow it, close the disposable app and deny access to the data file's parent directory while keeping the file in place. Restart the app, then restore the permissions after testing.<br>
+   6. Where filesystem permissions allow it, close the disposable app and deny access to the data file's parent directory while keeping the file in place. Restart the app, then restore the permissions after testing.<br>
       Expected: If file absence cannot be established, reading is attempted and the access failure produces a loading-error dialog with saving disabled, rather than loading sample contacts. The original file remains unchanged.
 
-1. _{ more test cases … }_
+### Project commands, filters and member roles
+
+1. Use a disposable copy of UniTeam in a separate folder. The following setup
+   deletes that disposable copy's existing data:
+
+   ```text
+   clear
+   add n/Alex Tan p/81234567 e/alex@example.com a/Block 1
+   add n/Blair Tan p/82345678 e/blair@example.com a/Block 2
+   addproject n/Zeta d/2027-01-01
+   addproject n/Alpha d/2027-01-02
+   addproject n/Beta d/2027-01-03 desc/Original description
+   associate c/1 pr/2
+   associate c/1 pr/3
+   associate c/2 pr/3
+   setrole c/1 pr/2 r/Leader
+   setrole c/1 pr/3 r/Reviewer
+   setrole c/2 pr/3 r/Developer
+   ```
+
+2. Execute `findproject Beta`, `listmembers pr/Alpha`, then `listprojects c/1`.<br>
+   Expected: Only Beta is displayed in the Projects list, numbered 1.
+   Only Alex is displayed in Contacts. The feedback lists Alpha as
+   `[not displayed]` and Beta as project 1. Both filters remain active,
+   and the Contacts tab remains selected.
+
+3. Execute `setrole c/1 pr/1 r/`, then `listmembers pr/Beta`.<br>
+   Expected: Alex's role in Beta is cleared, while Alex remains associated
+   with Beta. Blair retains the Developer role.
+   Execute `setrole c/1 pr/1 r/Reviewer` to restore Alex's Beta role.
+
+4. Execute `editproject 1 n/Beta Revised desc/`, then
+   `listmembers pr/Beta Revised`.<br>
+   Expected: Beta is renamed and its description is cleared. All three
+   projects are displayed because editing clears the project filter.
+   Alex and Blair remain associated with the renamed project, with their
+   Reviewer and Developer roles retained.
+
+5. Close and restart UniTeam, then execute
+   `listmembers pr/Beta Revised`.<br>
+   Expected: The renamed project, cleared description, both memberships
+   and both roles persist.
+
+6. Execute `findproject Revised`, then `deleteproject 1`.<br>
+   Expected: Beta Revised is deleted. Its active member filter now displays
+   an empty Contacts list.
+   Execute `list` and `listprojects`; both contacts remain, while the
+   Projects list contains Zeta and Alpha.
+
+7. Execute `listmembers pr/Alpha`.<br>
+   Expected: Alex remains associated with Alpha and retains the Leader role.
+
+8. Execute `addproject n/Beta Revised d/2027-01-03`, then
+   `listmembers pr/Beta Revised`.<br>
+   Expected: Recreating the deleted project's name creates a new project
+   without restoring its former memberships or roles.

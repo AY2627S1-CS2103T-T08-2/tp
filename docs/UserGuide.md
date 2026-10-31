@@ -11,12 +11,9 @@ and organised by involvement in projects, optimised for use through a Command Li
 while retaining the benefits of a Graphical User Interface (GUI). If you type quickly, UniTeam can help you manage 
 contacts faster than traditional GUI applications.
 
-<!-- * Table of Contents -->
-<page-nav-print />
-
 --------------------------------------------------------------------------------------------------------------------
 
-## Quick start
+## Quick Start
 
 1. Ensure that Java `25` or later is installed on your computer.<br>
    **Mac users:** Ensure you have the precise JDK version prescribed [here](https://se-education.org/guides/tutorials/javaInstallationMac.html).
@@ -479,31 +476,31 @@ The terminal and log report `UniTeam is already running in this folder.`
 
 --------------------------------------------------------------------------------------------------------------------
 
-## Known issues
+## Known Issues
 
 1. **When using multiple screens**, if you move the application to a secondary screen, and later switch to using only the primary screen, the GUI will open off-screen. The remedy is to delete the `preferences.json` file created by the application before running the application again.
 2. **If you minimize the Help Window** and then run the `help` command (or use the `Help` menu, or the keyboard shortcut `F1`) again, the original Help Window will remain minimized, and no new Help Window will appear. The remedy is to manually restore the minimized Help Window.
 
 --------------------------------------------------------------------------------------------------------------------
 
-## Command summary
+## Command Summary
 
-Action | Format and examples
---- | ---
-**Add contact** | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]...`<br>Example: `add n/James Ho p/22224444 e/jamesho@example.com a/Clementi t/friend`
-**Add project** | `addproject n/PROJECT_NAME d/YYYY-MM-DD [desc/DESCRIPTION]`<br>Example: `addproject n/Orbital d/2027-08-01`
-**Associate** | `associate c/CONTACT_INDEX pr/PROJECT_INDEX`<br>Example: `associate c/2 pr/1`
-**Clear all entries** | `clear`
-**Delete contact** | `delete INDEX`<br>Example: `delete 3`
-**Delete project** | `deleteproject INDEX`<br>Example: `deleteproject 2`
-**Dissociate** | `dissociate c/CONTACT_INDEX pr/PROJECT_INDEX`<br>Example: `dissociate c/2 pr/1`
-**Edit contact** | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...`<br>Example: `edit 2 n/James Lee`
-**Edit project** | `editproject INDEX [n/PROJECT_NAME] [d/YYYY-MM-DD] [desc/DESCRIPTION]`<br>Example: `editproject 1 d/2026-12-01`
-**Exit** | `exit`
-**Find contacts** | `find KEYWORD [MORE_KEYWORDS]...`<br>Example: `find James Jake`
-**Find projects** | `findproject KEYWORD [MORE_KEYWORDS]...`<br>Example: `findproject CS2103T Orbital`
-**Help** | `help`
-**List contacts** | `list`
-**List projects** | `listprojects [c/CONTACT_INDEX]`<br>Example: `listprojects c/2`
-**List members** | `listmembers pr/PROJECT_NAME`<br>Example: `listmembers pr/CS2103T Team Project`
-**Set or clear member role** | `setrole c/CONTACT_INDEX pr/PROJECT_INDEX r/[ROLE]`<br>Set: `setrole c/2 pr/1 r/Implement the parser`<br>Clear: `setrole c/2 pr/1 r/`
+| Action                       | Format and examples                                                                                                                        |
+|------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| **Add contact**              | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]...`<br>Example: `add n/James Ho p/22224444 e/jamesho@example.com a/Clementi t/friend` |
+| **Add project**              | `addproject n/PROJECT_NAME d/YYYY-MM-DD [desc/DESCRIPTION]`<br>Example: `addproject n/Orbital d/2027-08-01`                                |
+| **Associate**                | `associate c/CONTACT_INDEX pr/PROJECT_INDEX`<br>Example: `associate c/2 pr/1`                                                              |
+| **Clear all entries**        | `clear`                                                                                                                                    |
+| **Delete contact**           | `delete INDEX`<br>Example: `delete 3`                                                                                                      |
+| **Delete project**           | `deleteproject INDEX`<br>Example: `deleteproject 2`                                                                                        |
+| **Dissociate**               | `dissociate c/CONTACT_INDEX pr/PROJECT_INDEX`<br>Example: `dissociate c/2 pr/1`                                                            |
+| **Edit contact**             | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...`<br>Example: `edit 2 n/James Lee`                                   |
+| **Edit project**             | `editproject INDEX [n/PROJECT_NAME] [d/YYYY-MM-DD] [desc/DESCRIPTION]`<br>Example: `editproject 1 d/2026-12-01`                            |
+| **Exit**                     | `exit`                                                                                                                                     |
+| **Find contacts**            | `find KEYWORD [MORE_KEYWORDS]...`<br>Example: `find James Jake`                                                                            |
+| **Find projects**            | `findproject KEYWORD [MORE_KEYWORDS]...`<br>Example: `findproject CS2103T Orbital`                                                         |
+| **Help**                     | `help`                                                                                                                                     |
+| **List contacts**            | `list`                                                                                                                                     |
+| **List projects**            | `listprojects [c/CONTACT_INDEX]`<br>Example: `listprojects c/2`                                                                            |
+| **List members**             | `listmembers pr/PROJECT_NAME`<br>Example: `listmembers pr/CS2103T Team Project`                                                            |
+| **Set or clear member role** | `setrole c/CONTACT_INDEX pr/PROJECT_INDEX r/[ROLE]`<br>Set: `setrole c/2 pr/1 r/Implement the parser`<br>Clear: `setrole c/2 pr/1 r/`      |

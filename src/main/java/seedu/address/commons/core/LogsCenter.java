@@ -92,6 +92,5 @@ public class LogsCenter {
     // This static block ensures essential loggers are created early
     static {
         setBaseLogger();
-        logger = LogsCenter.getLogger(LogsCenter.class);
     }
 }

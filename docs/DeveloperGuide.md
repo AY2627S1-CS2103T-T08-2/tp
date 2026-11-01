@@ -957,8 +957,10 @@ Projects and memberships are saved with contacts after successful commands and r
 
 2. Unsuccessful dissociation attempts
 
-   1. Prerequisites: Keep the preceding session. The first contact belongs only to Alpha, and the second belongs
-      only to Zeta. Both contacts are displayed and there are exactly two projects.
+   1. Prerequisites: Keep the preceding session. The first contact belongs
+      only to Alpha, and the second belongs only to Zeta. There are exactly
+      two projects. Execute `list` to restore both contacts before running
+      the following tests.
 
    2. Test cases: `dissociate`, `dissociate c/1`, `dissociate pr/1`, `dissociate c/ pr/1`,
       `dissociate c/0 pr/1`, `dissociate c/1 pr/abc`, `dissociate c/1 proj/1`, and
@@ -977,9 +979,12 @@ Projects and memberships are saved with contacts after successful commands and r
    6. Test case: `dissociate c/1 pr/1`.<br>
       Expected: A not-associated error names the first contact and `Zeta dissociation test`.
 
-   7. After each rejected command, run both `listmembers` commands and inspect the contact and project lists.<br>
-      Expected: Zeta still contains only the second contact, Alpha still contains only the first contact, and all
-      contact and project details remain unchanged.
+   7. After each rejected command, run both `listmembers` commands to check
+      the memberships. Then execute `list` and inspect the Contacts and
+      Projects lists.<br>
+      Expected: Zeta still contains only the second contact, Alpha still
+      contains only the first contact, and all contact and project details
+      remain unchanged. Both contacts are displayed again after `list`.
 
 3. Filtered contact indices and removal of a project's last member
 

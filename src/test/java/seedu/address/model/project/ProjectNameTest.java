@@ -78,4 +78,33 @@ public class ProjectNameTest {
         // different values -> returns false
         assertFalse(name.equals(new ProjectName("Other Valid Project Name")));
     }
+
+    @Test
+    public void equals_unicodeCaseVariants_returnsTrueWithSameHashCode() {
+        String[][] namePairs = {
+                {"ΟΣ", "οσ"},
+                {"ΟΣ", "ος"},
+                {"οσ", "ος"},
+                {"İ", "i"},
+                {"I", "ı"},
+                {"ſ", "S"},
+                {"\uD801\uDC00", "\uD801\uDC28"}
+        };
+
+        for (String[] namePair : namePairs) {
+            ProjectName first = new ProjectName(namePair[0]);
+            ProjectName second = new ProjectName(namePair[1]);
+
+            assertEquals(first, second);
+            assertEquals(second, first);
+            assertEquals(first.hashCode(), second.hashCode());
+            assertEquals(namePair[0], first.toString());
+            assertEquals(namePair[1], second.toString());
+        }
+    }
+
+    @Test
+    public void equals_multiCharacterCaseExpansion_returnsFalse() {
+        assertFalse(new ProjectName("Straße").equals(new ProjectName("STRASSE")));
+    }
 }

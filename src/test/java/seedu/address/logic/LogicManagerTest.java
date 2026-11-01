@@ -45,6 +45,7 @@ import seedu.address.model.membership.Role;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.PersonId;
 import seedu.address.model.project.Project;
+import seedu.address.model.project.ProjectName;
 import seedu.address.storage.JsonAddressBookStorage;
 import seedu.address.storage.JsonUserPrefsStorage;
 import seedu.address.storage.StorageManager;
@@ -618,5 +619,34 @@ public class LogicManagerTest {
         logic = new LogicManager(model, new StorageManager(failingStorage,
             new JsonUserPrefsStorage(temporaryFolder.resolve("preferences.json"))));
         return filePath;
+    }
+
+    @Test
+    public void execute_unicodeProjectName_searchLookupAndDuplicatesAgree() throws Exception {
+        model.addPerson(AMY);
+        model.addPerson(BENSON);
+        logic.execute("addproject n/ΟΣ d/2026-12-01");
+
+        Project original = model.getAddressBook().getProjectList().getFirst();
+        logic.execute("associate c/1 pr/1");
+
+        logic.execute("findproject οσ");
+        assertEquals(List.of(original), model.getFilteredProjectList());
+
+        logic.execute("listmembers pr/οσ");
+        assertEquals(List.of(AMY), model.getFilteredPersonList());
+
+        assertThrows(CommandException.class, () -> logic.execute("addproject n/ος d/2026-12-01"));
+        assertEquals(List.of(original), model.getAddressBook().getProjectList());
+
+        logic.execute("addproject n/Other d/2026-12-01");
+        assertThrows(CommandException.class, () -> logic.execute("editproject 2 n/οσ"));
+        assertEquals("Other", model.getAddressBook().getProjectList().get(1).getName().toString());
+
+        ReadOnlyAddressBook reloaded = new JsonAddressBookStorage(temporaryFolder.resolve("addressBook.json"))
+                .readAddressBook().orElseThrow();
+        Model reloadedModel = new ModelManager(reloaded, new UserPrefs());
+        assertEquals(original, reloadedModel.findProject(new ProjectName("οσ")).orElseThrow());
+        assertEquals("ΟΣ", reloaded.getProjectList().getFirst().getName().toString());
     }
 }

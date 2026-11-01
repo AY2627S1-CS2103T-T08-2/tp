@@ -44,7 +44,9 @@ import seedu.address.model.membership.ProjectMembership;
 import seedu.address.model.membership.Role;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.PersonId;
+import seedu.address.model.project.Description;
 import seedu.address.model.project.Project;
+import seedu.address.model.project.ProjectName;
 import seedu.address.storage.JsonAddressBookStorage;
 import seedu.address.storage.JsonUserPrefsStorage;
 import seedu.address.storage.StorageManager;
@@ -618,5 +620,74 @@ public class LogicManagerTest {
         logic = new LogicManager(model, new StorageManager(failingStorage,
             new JsonUserPrefsStorage(temporaryFolder.resolve("preferences.json"))));
         return filePath;
+    }
+
+    @Test
+    public void execute_unicodeProjectName_searchLookupAndDuplicatesAgree() throws Exception {
+        model.addPerson(AMY);
+        model.addPerson(BENSON);
+        logic.execute("addproject n/ΟΣ d/2026-12-01");
+
+        Project original = model.getAddressBook().getProjectList().getFirst();
+        logic.execute("associate c/1 pr/1");
+
+        logic.execute("findproject οσ");
+        assertEquals(List.of(original), model.getFilteredProjectList());
+
+        logic.execute("listmembers pr/οσ");
+        assertEquals(List.of(AMY), model.getFilteredPersonList());
+
+        assertThrows(CommandException.class, () -> logic.execute("addproject n/ος d/2026-12-01"));
+        assertEquals(List.of(original), model.getAddressBook().getProjectList());
+
+        logic.execute("addproject n/Other d/2026-12-01");
+        assertThrows(CommandException.class, () -> logic.execute("editproject 2 n/οσ"));
+        assertEquals("Other", model.getAddressBook().getProjectList().get(1).getName().toString());
+
+        ReadOnlyAddressBook reloaded = new JsonAddressBookStorage(temporaryFolder.resolve("addressBook.json"))
+                .readAddressBook().orElseThrow();
+        Model reloadedModel = new ModelManager(reloaded, new UserPrefs());
+        assertEquals(original, reloadedModel.findProject(new ProjectName("οσ")).orElseThrow());
+        assertEquals("ΟΣ", reloaded.getProjectList().getFirst().getName().toString());
+    }
+
+    @Test
+    public void execute_lineBreakInput_preservesRoleDescriptionAndSavedFile() throws Exception {
+        model.addPerson(AMY);
+        Project project = new ProjectBuilder()
+                .withName("Alpha")
+                .withDescription("Original description")
+                .build();
+        model.addProject(project);
+        model.addProjectMembership(new ProjectMembership(
+                AMY.getPersonId(), project.getProjectId(), new Role("Leader")));
+        logic.execute("listmembers pr/Alpha");
+
+        Path savedFile = temporaryFolder.resolve("addressBook.json");
+        String originalJson = Files.readString(savedFile);
+        String[] invalidCommands = {
+                "setrole c/1 pr/1 r/\f",
+                "setrole c/1 pr/1 r/\u000B",
+                "setrole c/1 pr/1 r/\fLeader",
+                "editproject 1 desc/\f",
+                "editproject 1 desc/\u000B",
+                "editproject 1 desc/Notes\u000B",
+                "addproject n/Beta d/2026-12-01 desc/\fNotes"
+        };
+
+        for (String command : invalidCommands) {
+            assertThrows(ParseException.class, () -> logic.execute(command));
+            assertEquals(new Role("Leader"), model.getAddressBook().getProjectMembershipList().getFirst().getRole());
+            assertEquals(List.of(project), model.getAddressBook().getProjectList());
+            assertEquals(List.of(AMY), model.getFilteredPersonList());
+            assertEquals(List.of(project), model.getFilteredProjectList());
+            assertEquals(originalJson, Files.readString(savedFile));
+        }
+
+        logic.execute(" \tsetrole\tc/1\tpr/1\tr/ \t");
+        assertEquals(Role.EMPTY, model.getAddressBook().getProjectMembershipList().getFirst().getRole());
+
+        logic.execute(" \teditproject\t1\tdesc/ \t");
+        assertEquals(Description.EMPTY, model.getAddressBook().getProjectList().getFirst().getDescription());
     }
 }

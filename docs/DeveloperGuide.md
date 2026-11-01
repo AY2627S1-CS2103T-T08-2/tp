@@ -145,6 +145,11 @@ Here are the other classes in `Logic` (omitted from the class diagram above) tha
 <puml src="diagrams/ParserClasses.puml" width="600"/>
 
 How the parsing works:
+* Before dispatching a command, `AddressBookParser` checks the raw input for line
+  breaks using the `\R` regular expression. A line break, including a vertical tab
+  or form feed, causes a `ParseException`. This check runs before `trim()` so that
+  invalid line breaks cannot disappear during whitespace processing. Spaces and
+  tabs remain supported.
 * When called upon to parse a user command, the `AddressBookParser` class creates an `XYZCommandParser` (`XYZ` is a placeholder for the specific command name, e.g., `AddCommandParser`). The parser uses the other classes shown above to parse the user command and create an `XYZCommand` object (e.g., `AddCommand`). The `AddressBookParser` returns that object as a `Command` object.
 * All `XYZCommandParser` classes, such as `AddCommandParser` and `DeleteCommandParser`, implement the `Parser` interface so they can be treated similarly where appropriate, for example during testing.
 
@@ -385,8 +390,12 @@ The contact-specific form preserves both predicates and returns a
 `ProjectName`, a `Deadline` and a `Description`.
 
 `UniqueProjectList` enforces unique project IDs and normalised names.
-Name comparison currently uses a lowercase `Locale.ROOT` comparison key after
-whitespace normalisation. Project replacement must preserve the stored ID.
+After whitespace normalisation, `ProjectName` builds a comparison key by applying
+`Character.toUpperCase` followed by `Character.toLowerCase` to each Unicode code point.
+Both `equals` and `hashCode` use this key. This keeps exact project lookup and
+name-based duplicate detection consistent with the case-insensitive comparison
+used by project search. The original capitalisation is preserved for display.
+Project replacement must preserve the stored ID.
 
 `AddProjectCommandParser` requires a name and deadline and accepts an optional
 description. `AddProjectCommand` checks for duplicates against the complete
@@ -492,19 +501,31 @@ is not overwritten.
 
 Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unlikely to have) - `*`
 
-| Priority | As a …                                     | I want to …                                                          | So that I can…                                                         |
-|----------|--------------------------------------------|----------------------------------------------------------------------|------------------------------------------------------------------------|
-| `* * *`  | new user                                   | see usage instructions                                               | refer to instructions when I forget how to use the App                 |
-| `* * *`  | user                                       | add a new contact                                                    | keep academic contact details in one place                             |
-| `* * *`  | user                                       | delete a person                                                      | remove entries that I no longer need                                   |
-| `* * *`  | user                                       | find a person by name                                                | locate details of persons without having to go through the entire list |
-| `* * *`  | returning user                             | retain my contacts, projects and their associations between sessions | continue where I left off without re-entering information              |
-| `* * *`  | university student                         | add a new project                                                    | organise contacts according to the projects they are involved in       |
-| `* * *`  | university student                         | associate a contact with a project                                   | keep track of everyone involved                                        |
-| `* * *`  | university student                         | view all contacts for a project                                      | see everyone involved at a glance                                      |
-| `* * *`  | university student                         | view all projects                                                    | quickly find the project I am working on                               |
-| `* *`    | user                                       | hide private contact details                                         | minimize chance of someone else seeing them by accident                |
-| `*`      | user with many persons in the address book | sort persons by name                                                 | locate a person easily                                                 |
+| Priority | As a …                                     | I want to …                                                          | So that I can…                                                           |
+|----------|--------------------------------------------|----------------------------------------------------------------------|--------------------------------------------------------------------------|
+| `* * *`  | new user                                   | see usage instructions                                               | refer to instructions when I forget how to use the App                   |
+| `* * *`  | user                                       | add a new contact                                                    | keep academic contact details in one place                               |
+| `* * *`  | user                                       | delete a person                                                      | remove entries that I no longer need                                     |
+| `* * *`  | user                                       | find a person by name                                                | locate details of persons without having to go through the entire list   |
+| `* * *`  | returning user                             | retain my contacts, projects and their associations between sessions | continue where I left off without re-entering information                |
+| `* * *`  | university student                         | add a new project                                                    | organise contacts according to the projects they are involved in         |
+| `* * *`  | university student                         | associate a contact with a project                                   | keep track of everyone involved                                          |
+| `* * *`  | university student                         | view all contacts for a project                                      | see everyone involved at a glance                                        |
+| `* * *`  | university student                         | view all projects                                                    | quickly find the project I am working on                                 |
+| `* * *`  | user                                       | view all contacts                                                    | browse my saved academic contacts                                        |
+| `* * *`  | user                                       | update a contact's details                                           | keep my contact information accurate                                     |
+| `* * *`  | university student                         | find projects by name                                                | locate a project without browsing the entire list                        |
+| `* * *`  | university student                         | edit a project's details                                             | keep its name, deadline and description up to date                       |
+| `* * *`  | university student                         | delete a project                                                     | remove projects I no longer need to track                                |
+| `* * *`  | university student                         | remove a contact from a project                                      | reflect team changes while retaining the contact's details               |
+| `* *`    | university student                         | manage each member's role in a project                               | track responsibilities separately for each project                       |
+| `* *`    | university student                         | view the projects associated with a contact                          | see which teams that person is involved in                               |
+| `* *`    | user                                       | clear all stored entries                                             | start with an empty address book when I no longer need the existing data |
+| `* *`    | user                                       | hide private contact details                                         | minimize chance of someone else seeing them by accident                  |
+| `*`      | user with many persons in the address book | sort persons by name                                                 | locate a person easily                                                   |
+
+The stories about hiding private contact details and sorting contacts are
+future requirements and are not implemented in v1.6.
 
 ### Use cases
 
@@ -514,12 +535,12 @@ Priorities: High (must have) - `* * *`, Medium (nice to have) - `* *`, Low (unli
 
 **MSS**
 
-1. User request to add a contact, giving contact's name and contact details
-2. UniTeam checks that the input is in the correct format
-3. UniTeams checks that each given detail is valid
-4. UniTeams checks that the contact does not already exist
-5. UniTeams adds the contact and saves the updated data
-6. Uniteams displays a confirmation message and shows the new contact in the contact list
+1. User requests to add a contact, providing the contact's name and details.
+2. UniTeam checks that the input is in the correct format.
+3. UniTeam checks that each given detail is valid.
+4. UniTeam checks that the contact does not already exist.
+5. UniTeam adds the contact and saves the updated data.
+6. UniTeam displays a confirmation message and updates the contact list.
 
     Use case ends.
 
@@ -714,22 +735,21 @@ Given below are instructions to test the app manually.
 
 **Note:** These instructions only provide a starting point for testers to work on;
 testers are expected to do more *exploratory* testing.
-</box>
 
 ### Launch and shutdown
 
 1. Initial launch
 
-   1. Download the JAR file and copy it into an empty folder.
+    1. Download `uniteam.jar` and copy it into an empty folder.
 
-   2. Double-click the JAR file.<br>
-      Expected: The GUI opens with a set of sample contacts. The window size may not be optimal.
+    2. Open a terminal in that folder and run `java -jar uniteam.jar`.<br>
+       Expected: The GUI opens with a set of sample contacts. The window size may not be optimal.
 
 2. Saving window preferences
 
-   1. Resize the window to an optimal size. Move the window to a different location. Close the window.
+    1. Resize the window to an optimal size. Move the window to a different location. Close the window.
 
-   2. Relaunch the app by double-clicking the JAR file.<br>
+    2. Open a terminal in the same folder and run `java -jar uniteam.jar` again.<br>
        Expected: The most recent window size and location are retained.
 
 ### Contacts with the same name
@@ -1031,16 +1051,24 @@ Projects and memberships are saved with contacts after successful commands and r
 
 2. Loading legacy contacts without IDs
 
-   1. In the disposable copy, close the app and remove the `id` property from one contact in the JSON file. For another contact, set `"id": null`.
+    1. Prerequisites: Use a disposable copy of the app with at least two contacts that are not associated with any
+       projects. Close the app and back up `data/addressbook.json` before editing it. Removing IDs from associated
+       contacts would leave memberships referencing missing IDs, causing a loading error.
 
-   2. Restart the app, then close its window without entering a command. Inspect the JSON.<br>
-      Expected: Both legacy contacts load with their original details, but the file still has the missing or null IDs. Loading and closing the window do not write back the generated IDs. Do not use the `exit` command for this step, because successful commands save the address book.
+    2. Remove the `id` property from one unassociated contact. For another unassociated contact, set `"id": null`.
+       Preserve all other identifiers and membership references.
 
-   3. Restart the app and execute `list` to trigger a save, then inspect the JSON.<br>
-      Expected: Each legacy contact now has a distinct UUID in its `id` property. Existing non-null IDs are preserved. Generated IDs are written on saving, rather than immediately on loading.
+    3. Restart the app, then close its window without entering a command. Inspect the JSON.<br>
+       Expected: Both legacy contacts load with their original details, but the file still has the missing or null IDs.
+       Loading and closing the window do not write back the generated IDs. Do not use `exit` for this step, because
+       successful commands save the address book.
 
-   4. Record the IDs, close the window, restart the app, and execute `list` again.<br>
-      Expected: All recorded IDs remain unchanged after loading and saving the migrated file.
+    4. Restart the app and execute `list` to trigger a save, then inspect the JSON.<br>
+       Expected: Each legacy contact now has a distinct UUID in its `id` property. Existing non-null IDs are preserved.
+       Generated IDs are written on saving, rather than immediately on loading.
+
+    5. Record the IDs, close the window, restart the app, and execute `list` again.<br>
+       Expected: All recorded IDs remain unchanged after loading and saving the migrated file.
 
 3. Rejecting malformed stored IDs
 

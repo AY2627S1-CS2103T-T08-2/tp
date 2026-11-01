@@ -258,4 +258,30 @@ public class AddressBookParserTest {
         assertEquals(new Deadline(LocalDate.of(2026, 11, 13)), actualProject.getDeadline());
         assertEquals(new Description("Build a contact manager"), actualProject.getDescription());
     }
+
+    @Test
+    public void parseCommand_lineBreaksBeforeTrimming_throwsParseException() {
+        String[] lineBreaks = {"\r", "\n", "\r\n", "\u000B", "\f", "\u0085", "\u2028", "\u2029"};
+
+        for (String lineBreak : lineBreaks) {
+            String[] commands = {
+                    lineBreak + "help",
+                    "help" + lineBreak,
+                    "setrole c/1 pr/1 r/" + lineBreak,
+                    "setrole c/1 pr/1 r/" + lineBreak + "Leader",
+                    "setrole c/1 pr/1 r/Lead" + lineBreak + "er",
+                    "setrole c/1 pr/1 r/Leader" + lineBreak,
+                    "addproject n/Alpha d/2026-12-01 desc/" + lineBreak + "Notes",
+                    "addproject n/Alpha d/2026-12-01 desc/Notes" + lineBreak,
+                    "editproject 1 desc/" + lineBreak,
+                    "editproject 1 desc/" + lineBreak + "Notes",
+                    "editproject 1 desc/Notes" + lineBreak
+            };
+
+            for (String command : commands) {
+                assertThrows(ParseException.class,
+                        "Commands must be entered on a single line.", () -> parser.parseCommand(command));
+            }
+        }
+    }
 }

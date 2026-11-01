@@ -46,8 +46,6 @@ contacts faster than traditional GUI applications.
 
 ## Features
 
-<box type="info" seamless>
-
 **Notes about the command format:**<br>
 
 * Words in `UPPER_CASE` are the parameters to be supplied by the user.<br>
@@ -78,7 +76,6 @@ contacts faster than traditional GUI applications.
   Leading and trailing whitespace is allowed.
 
 * If you are using a PDF version of this document, be careful when copying and pasting commands that span multiple lines as space characters surrounding line-breaks may be omitted when copied over to the application.
-</box>
 
 ### Viewing help: `help`
 
@@ -129,10 +126,7 @@ Contacts can share a name. A contact is rejected as a duplicate only when its na
 and tags all match an existing contact, including contacts hidden by the current filter. Tag order does not matter.
 A difference in any of these fields allows a separate contact, even if only the address or tags differ.
 
-<box type="tip" seamless>
-
 **Tip:** A contact can have any number of tags, including zero.
-</box>
 
 Examples:
 * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01`
@@ -144,6 +138,74 @@ For example, both of these commands succeed because the contacts have different 
 * `add n/Alex Tan p/98765432 e/alex@example.com a/Block 1`
 
 Repeating either command is rejected with `This contact already exists in UniTeam.`
+
+### Listing all contacts: `list`
+
+Shows a list of all contacts in UniTeam.
+
+Format: `list`
+
+### Locating contacts by name: `find`
+
+Finds contacts whose names contain any of the given keywords.
+
+Format: `find KEYWORD [MORE_KEYWORDS]`
+
+* The search is case-insensitive; for example, `hans` matches `Hans`.
+* Keyword order does not matter; for example, `Hans Bo` matches `Bo Hans`.
+* The search considers only names.
+* Only full words match; for example, `Han` does not match `Hans`.
+* Contacts matching at least one keyword are returned (an `OR` search); for example, `Hans Bo` returns `Hans Gruber`
+  and `Bo Yang`.
+
+Examples:
+* `find John` returns `john` and `John Doe`
+* `find alex david` returns `Alex Yeoh`, `David Li`<br>
+  ![result for 'find alex david'](images/findAlexDavidResult.png)
+
+### Editing a contact: `edit`
+
+Edits an existing contact in UniTeam.
+
+Format: `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]... `
+
+* Edits the contact at the specified `INDEX`. The index refers to the index number shown in the displayed contact list.
+  The index **must be a positive integer** 1, 2, 3, ...
+* At least one of the optional fields must be provided.
+* Existing values will be updated to the input values.
+* When editing tags, all of the contact's existing tags are removed; adding tags is not cumulative.
+* To remove all of a contact's tags, enter `t/` without a tag after it.
+* A contact can be renamed to share another contact's name, provided their complete details differ.
+  An edit that makes all five fields match another contact is rejected with
+  `This contact already exists in UniTeam.`, including when the other contact is hidden by a filter.
+  The rejected edit leaves the contacts unchanged.
+* Providing an existing field value without changing the contact's details is allowed.
+* Edited values follow the same
+  [field restrictions as adding a contact](#adding-a-contact-add).
+  Each of `n/`, `p/`, `e/` and `a/` may appear at most once.
+  The `t/` prefix may appear multiple times; a single empty `t/` clears all tags.
+
+Examples:
+*  `edit 1 p/91234567 e/johndoe@example.com` Edits the phone number and email address of the 1st contact to be
+   `91234567`
+   and `johndoe@example.com` respectively.
+*  `edit 2 n/Betsy Crower t/` Edits the name of the 2nd contact to be `Betsy Crower` and clears all existing tags.
+
+### Deleting a contact: `delete`
+
+Deletes the specified contact from UniTeam.
+
+Format: `delete INDEX`
+
+* Deletes the contact at the specified `INDEX`.
+* The index refers to the index number shown in the displayed contact list.
+* The index **must be a positive integer** 1, 2, 3, ...
+* Deleting a contact also removes all of that contact's project associations
+  and member roles. The projects themselves remain in UniTeam.
+
+Examples:
+* `list` followed by `delete 2` deletes the 2nd contact in UniTeam .
+* `find Betsy` followed by `delete 1` deletes the 1st contact in the results of the `find` command.
 
 ### Adding a project: `addproject`
 
@@ -170,6 +232,54 @@ Examples:
 
 * `addproject n/CS2103T Team Project d/2026-11-13`
 * `addproject n/Orbital d/2027-08-01 desc/Build a project planning application`
+
+### Listing projects: `listprojects`
+
+Lists projects in the order they were added, including each project's deadline and description.
+
+Format: `listprojects [c/CONTACT_INDEX]`
+
+* Without `c/`, lists all projects. If no projects exist, UniTeam reports that there are no projects to list.
+* With `c/`, lists only projects associated with the selected contact and identifies the contact in the result.
+  `CONTACT_INDEX` must be a positive integer referring to the currently displayed Contacts list, including after `find`.
+* Project numbers match the currently displayed Projects list, so they remain valid for `associate` and `dissociate`.
+  Associated projects hidden by a project search are still listed in the feedback, marked `[not displayed]` without
+  a number. Use `listprojects` to restore all projects before selecting a hidden project by index.
+* A contact with no associated projects produces an informational message.
+* Missing or invalid contact indices, out-of-range indices, duplicate `c/` prefixes, and unsupported arguments are rejected.
+* Contact-specific results appear in the command feedback area. The selected tab and both list filters remain
+  unchanged. Contacts, projects, and their associations are also unchanged.
+
+Examples:
+
+* `listprojects` lists all projects.
+* `listprojects c/2` lists projects associated with the second currently displayed contact.
+* `find Alex` followed by `listprojects c/1` lists projects for the first contact in the search results.
+
+### Locating projects by name: `findproject`
+
+Finds projects whose names contain any of the supplied keywords and opens
+the Projects tab.
+
+Format: `findproject KEYWORD [MORE_KEYWORDS]...`
+
+* At least one keyword is required.
+* Searching is case-insensitive and considers project names only.
+* Keywords match whole words separated by whitespace.
+  For example, `Team` matches `Team Project`, but `Tea` does not.
+* A project is returned when its name matches at least one keyword.
+* Keyword order does not matter.
+* Results retain their original list order and are numbered starting from 1.
+* Project-index commands use these displayed numbers.
+* The contact filter is unchanged.
+* If nothing matches, the Projects list is empty. Use `listprojects` to show
+  all projects again.
+
+Examples:
+
+* `findproject CS2103T` finds projects containing the word `CS2103T`.
+* `findproject Team Orbital` finds projects containing either `Team` or `Orbital`.
+* `listprojects` restores the complete Projects list after a search.
 
 ### Editing a project: `editproject`
 
@@ -198,31 +308,6 @@ Examples:
 * `findproject Orbital` followed by `editproject 1 desc/Build a mobile application`
   edits the first project in those search results.
 
-### Locating projects by name: `findproject`
-
-Finds projects whose names contain any of the supplied keywords and opens
-the Projects tab.
-
-Format: `findproject KEYWORD [MORE_KEYWORDS]...`
-
-* At least one keyword is required.
-* Searching is case-insensitive and considers project names only.
-* Keywords match whole words separated by whitespace.
-  For example, `Team` matches `Team Project`, but `Tea` does not.
-* A project is returned when its name matches at least one keyword.
-* Keyword order does not matter.
-* Results retain their original list order and are numbered starting from 1.
-* Project-index commands use these displayed numbers.
-* The contact filter is unchanged.
-* If nothing matches, the Projects list is empty. Use `listprojects` to show
-  all projects again.
-
-Examples:
-
-* `findproject CS2103T` finds projects containing the word `CS2103T`.
-* `findproject Team Orbital` finds projects containing either `Team` or `Orbital`.
-* `listprojects` restores the complete Projects list after a search.
-
 ### Deleting a project: `deleteproject`
 
 Deletes a project identified by its displayed index.
@@ -244,98 +329,6 @@ Examples:
 * `listprojects` followed by `deleteproject 2` deletes the second displayed project.
 * `findproject Orbital` followed by `deleteproject 1` deletes the first project
   in those search results.
-
-
-### Listing all contacts: `list`
-
-Shows a list of all contacts in UniTeam.
-
-Format: `list`
-
-### Listing projects: `listprojects`
-
-Lists projects in the order they were added, including each project's deadline and description.
-
-Format: `listprojects [c/CONTACT_INDEX]`
-
-* Without `c/`, lists all projects. If no projects exist, UniTeam reports that there are no projects to list.
-* With `c/`, lists only projects associated with the selected contact and identifies the contact in the result.
-  `CONTACT_INDEX` must be a positive integer referring to the currently displayed Contacts list, including after `find`.
-* Project numbers match the currently displayed Projects list, so they remain valid for `associate` and `dissociate`.
-  Associated projects hidden by a project search are still listed in the feedback, marked `[not displayed]` without
-  a number. Use `listprojects` to restore all projects before selecting a hidden project by index.
-* A contact with no associated projects produces an informational message.
-* Missing or invalid contact indices, out-of-range indices, duplicate `c/` prefixes, and unsupported arguments are rejected.
-* Contact-specific results appear in the command feedback area. The selected tab and both list filters remain
-  unchanged. Contacts, projects, and their associations are also unchanged.
-
-Examples:
-
-* `listprojects` lists all projects.
-* `listprojects c/2` lists projects associated with the second currently displayed contact.
-* `find Alex` followed by `listprojects c/1` lists projects for the first contact in the search results.
-
-### Editing a contact: `edit`
-
-Edits an existing contact in UniTeam.
-
-Format: `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]... `
-
-* Edits the contact at the specified `INDEX`. The index refers to the index number shown in the displayed contact list. 
-  The index **must be a positive integer** 1, 2, 3, ...
-* At least one of the optional fields must be provided.
-* Existing values will be updated to the input values.
-* When editing tags, all of the contact's existing tags are removed; adding tags is not cumulative.
-* To remove all of a contact's tags, enter `t/` without a tag after it.
-* A contact can be renamed to share another contact's name, provided their complete details differ.
-  An edit that makes all five fields match another contact is rejected with
-  `This contact already exists in UniTeam.`, including when the other contact is hidden by a filter.
-  The rejected edit leaves the contacts unchanged.
-* Providing an existing field value without changing the contact's details is allowed.
-* Edited values follow the same
-  [field restrictions as adding a contact](#adding-a-contact-add).
-  Each of `n/`, `p/`, `e/` and `a/` may appear at most once.
-  The `t/` prefix may appear multiple times; a single empty `t/` clears all tags.
-
-Examples:
-*  `edit 1 p/91234567 e/johndoe@example.com` Edits the phone number and email address of the 1st contact to be 
-   `91234567` 
-   and `johndoe@example.com` respectively.
-*  `edit 2 n/Betsy Crower t/` Edits the name of the 2nd contact to be `Betsy Crower` and clears all existing tags.
-
-### Locating contacts by name: `find`
-
-Finds contacts whose names contain any of the given keywords.
-
-Format: `find KEYWORD [MORE_KEYWORDS]`
-
-* The search is case-insensitive; for example, `hans` matches `Hans`.
-* Keyword order does not matter; for example, `Hans Bo` matches `Bo Hans`.
-* The search considers only names.
-* Only full words match; for example, `Han` does not match `Hans`.
-* Contacts matching at least one keyword are returned (an `OR` search); for example, `Hans Bo` returns `Hans Gruber` 
-  and `Bo Yang`.
-
-Examples:
-* `find John` returns `john` and `John Doe`
-* `find alex david` returns `Alex Yeoh`, `David Li`<br>
-  ![result for 'find alex david'](images/findAlexDavidResult.png)
-
-### Deleting a contact: `delete`
-
-Deletes the specified contact from UniTeam.
-
-Format: `delete INDEX`
-
-* Deletes the contact at the specified `INDEX`.
-* The index refers to the index number shown in the displayed contact list.
-* The index **must be a positive integer** 1, 2, 3, ...
-* Deleting a contact also removes all of that contact's project associations
-  and member roles. The projects themselves remain in UniTeam.
-
-Examples:
-* `list` followed by `delete 2` deletes the 2nd contact in UniTeam .
-* `find Betsy` followed by `delete 1` deletes the 1st contact in the results of the `find` command.
 
 ### Associating a contact with a project: `associate`
 
@@ -364,31 +357,6 @@ Example, in a new session with at least two contacts:
 4. `associate c/2 pr/1` associates the second contact in the Contacts tab with that project.
 
 After `find Betsy`, use `associate c/1 pr/1` to associate the first search result with project 1 instead.
-
-### Dissociating a contact from a project: `dissociate`
-
-Removes an existing association between a contact and a project while retaining their information.
-
-Format: `dissociate c/CONTACT_INDEX pr/PROJECT_INDEX`
-
-* `CONTACT_INDEX` refers to the numbered contact in the Contacts tab, including results from `find`.
-* `PROJECT_INDEX` refers to the numbered project in the Projects tab, not the UUID shown beside `ID:`.
-* Both indices must be positive integers. Each prefix must appear exactly once; their order does not matter.
-* Only the selected association is removed. The contact, project, and all other associations remain unchanged.
-* The success message identifies the contact and project. Invalid syntax, out-of-range indices, and a pair with no
-  existing association produce an error without changing the data.
-* Successful removal is saved automatically and remains in effect after restarting UniTeam.
-
-Switching tabs does not change either list's indices or reset the contact search results.
-
-Example, with at least two displayed contacts and project 1 named `CS2103T Team Project`:
-
-1. `associate c/2 pr/1` creates the association if it does not already exist.
-2. `dissociate c/2 pr/1` removes that association while retaining the contact and project.
-3. `listmembers pr/CS2103T Team Project` confirms that the contact is no longer a member; other members remain.
-
-After `find Betsy`, use `dissociate c/1 pr/1` to remove the first search result's association with project 1.
-Repeating dissociation for the same pair reports that the contact is not associated with the project.
 
 ### Listing project members: `listmembers`
 
@@ -445,6 +413,31 @@ Examples:
 Run `listmembers pr/PROJECT_NAME` to see member roles in the command feedback.
 The contact cards display contact details.
 
+### Dissociating a contact from a project: `dissociate`
+
+Removes an existing association between a contact and a project while retaining their information.
+
+Format: `dissociate c/CONTACT_INDEX pr/PROJECT_INDEX`
+
+* `CONTACT_INDEX` refers to the numbered contact in the Contacts tab, including results from `find`.
+* `PROJECT_INDEX` refers to the numbered project in the Projects tab, not the UUID shown beside `ID:`.
+* Both indices must be positive integers. Each prefix must appear exactly once; their order does not matter.
+* Only the selected association is removed. The contact, project, and all other associations remain unchanged.
+* The success message identifies the contact and project. Invalid syntax, out-of-range indices, and a pair with no
+  existing association produce an error without changing the data.
+* Successful removal is saved automatically and remains in effect after restarting UniTeam.
+
+Switching tabs does not change either list's indices or reset the contact search results.
+
+Example, with at least two displayed contacts and project 1 named `CS2103T Team Project`:
+
+1. `associate c/2 pr/1` creates the association if it does not already exist.
+2. `dissociate c/2 pr/1` removes that association while retaining the contact and project.
+3. `listmembers pr/CS2103T Team Project` confirms that the contact is no longer a member; other members remain.
+
+After `find Betsy`, use `dissociate c/1 pr/1` to remove the first search result's association with project 1.
+Repeating dissociation for the same pair reports that the contact is not associated with the project.
+
 ### Clearing all entries: `clear`
 
 Clears all contacts, projects and associations from UniTeam.
@@ -484,8 +477,6 @@ from which you launch the application. Close UniTeam and back up this file
 before editing it. Save the file as valid UTF-8 JSON and preserve the identifiers
 and references connecting contacts, projects and associations.
 
-<box type="warning" seamless>
-
 **Caution:**
 If your changes make the data file invalid, UniTeam starts with an empty address book at the next run. A startup error 
 dialog shows the absolute path of the affected file and recovery instructions. Saving is disabled for that session to preserve the original file, and the status bar keeps a saving-disabled warning visible. Successful commands also display a warning, and changes made in that session are lost when the application closes. Close the application, copy the original file somewhere safe, then repair it or restore a valid backup and restart to resume saving. We recommend backing up the file before editing it.<br>
@@ -493,7 +484,6 @@ An existing file that cannot be read also triggers loading-error handling. Only 
 To intentionally start fresh, close the application and move the original data file somewhere safe. Restart the application; it will follow the normal first-launch behavior and populate sample contacts.<br>
 Furthermore, certain edits can cause UniTeam to behave in unexpected ways (e.g., if a value entered is outside of the 
 acceptable range). Therefore, edit the data file only if you are confident that you can update it correctly.
-</box>
 
 --------------------------------------------------------------------------------------------------------------------
 

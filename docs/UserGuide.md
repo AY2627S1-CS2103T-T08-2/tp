@@ -95,6 +95,36 @@ Adds a contact to UniTeam.
 
 Format: `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]... `
 
+**Field restrictions**
+
+Leading and trailing spaces and tabs are removed from field values.
+
+| Field          | Restrictions                                                                                | Example                             |
+|----------------|---------------------------------------------------------------------------------------------|-------------------------------------|
+| `NAME`         | Must not be blank. Contains only English letters (`A–Z`, `a–z`), digits (`0–9`) and spaces. | `Alex Tan`                          |
+| `PHONE_NUMBER` | Contains only digits (`0–9`) and must be at least 3 digits long.                            | `91234567`                          |
+| `EMAIL`        | Must follow the `local-part@domain` format and the rules below.                             | `alex.tan@example.com`              |
+| `ADDRESS`      | Must not be blank. Spaces and punctuation are allowed.                                      | `Block 123, Clementi Ave 2, #01-01` |
+| `TAG`          | Contains one or more English letters or digits, without spaces or punctuation.              | `projectTeam`                       |
+
+**Email rules:**
+
+* The local part contains English letters and digits, optionally separated
+  by single `+`, `_`, `.` or `-` characters.
+* The local part must start and end with a letter or digit. Consecutive
+  special characters are rejected.
+* The domain consists of labels separated by dots. Each label contains
+  English letters and digits, optionally separated by single hyphens.
+* Each domain label must start and end with a letter or digit, and the
+  final label must contain at least 2 characters.
+
+The `n/`, `p/`, `e/` and `a/` prefixes are required and must each appear
+exactly once. The optional `t/` prefix may appear multiple times to add
+multiple tags. Each supplied tag must have a non-empty value.
+
+Invalid field values or repeated single-valued prefixes produce an error
+without adding the contact.
+
 Contacts can share a name. A contact is rejected as a duplicate only when its name, phone number, email, address,
 and tags all match an existing contact, including contacts hidden by the current filter. Tag order does not matter.
 A difference in any of these fields allows a separate contact, even if only the address or tags differ.
@@ -262,6 +292,10 @@ Format: `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]... `
   `This contact already exists in UniTeam.`, including when the other contact is hidden by a filter.
   The rejected edit leaves the contacts unchanged.
 * Providing an existing field value without changing the contact's details is allowed.
+* Edited values follow the same
+  [field restrictions as adding a contact](#adding-a-contact-add).
+  Each of `n/`, `p/`, `e/` and `a/` may appear at most once.
+  The `t/` prefix may appear multiple times; a single empty `t/` clears all tags.
 
 Examples:
 *  `edit 1 p/91234567 e/johndoe@example.com` Edits the phone number and email address of the 1st contact to be 

@@ -666,13 +666,13 @@ public class LogicManagerTest {
         Path savedFile = temporaryFolder.resolve("addressBook.json");
         String originalJson = Files.readString(savedFile);
         String[] invalidCommands = {
-                "setrole c/1 pr/1 r/\f",
-                "setrole c/1 pr/1 r/\u000B",
-                "setrole c/1 pr/1 r/\fLeader",
-                "editproject 1 desc/\f",
-                "editproject 1 desc/\u000B",
-                "editproject 1 desc/Notes\u000B",
-                "addproject n/Beta d/2026-12-01 desc/\fNotes"
+            "setrole c/1 pr/1 r/\f",
+            "setrole c/1 pr/1 r/\u000B",
+            "setrole c/1 pr/1 r/\fLeader",
+            "editproject 1 desc/\f",
+            "editproject 1 desc/\u000B",
+            "editproject 1 desc/Notes\u000B",
+            "addproject n/Beta d/2026-12-01 desc/\fNotes"
         };
 
         for (String command : invalidCommands) {

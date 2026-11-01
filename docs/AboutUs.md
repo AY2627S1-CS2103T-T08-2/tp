@@ -31,7 +31,7 @@ You can reach us at the email `seer[at]comp.nus.edu.sg`
 
 <img src="images/honeybee1011.png" width="200px">
 
-[[github](http://github.com/honeybee101)]
+[[github](http://github.com/honeybee1011)]
 
 * Role: Developer
 * Responsibilities: Features

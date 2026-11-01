@@ -349,7 +349,7 @@ After `findproject`, these numbers refer to the search results. Use `listproject
 to restore all projects before selecting a project hidden by the search.
 Switching tabs does not change either list's indices or reset its filter.
 
-Example, in a new session with at least two contacts:
+Example, with at least two contacts and no existing projects:
 
 1. `list` shows all contacts in the Contacts tab; note the second contact's name.
 2. `addproject n/CS2103T Team Project d/2026-11-13` creates project 1.
@@ -365,11 +365,14 @@ The Contacts tab shows their contact cards. The command feedback lists their nam
 
 Format: `listmembers pr/PROJECT_NAME`
 
-Example:
+Example, with at least one contact and no existing projects:
 
-1. Create a project with `addproject n/CS2103T Team Project d/2026-11-13`.
-2. Associate a contact with it, for example `associate c/1 pr/1`.
-3. Run `listmembers pr/CS2103T Team Project` to see the associated contacts as cards in the Contacts tab.
+1. Run `list` to display all contacts.
+2. Create a project with `addproject n/CS2103T Team Project d/2026-11-13`.
+   Since no projects existed beforehand, the new project is numbered 1.
+3. Run `associate c/1 pr/1` to associate the first displayed contact with it.
+4. Run `listmembers pr/CS2103T Team Project` to see the associated contact
+   as a card in the Contacts tab.
 
 UniTeam automatically opens the Contacts tab and shows only members of the named project, including their phone,
 email, address and tags. Index-based commands use the numbers on these displayed cards.
@@ -490,8 +493,24 @@ acceptable range). Therefore, edit the data file only if you are confident that 
 ## FAQ
 
 **Q**: How do I transfer my data to another computer?<br>
-**A**: Install the app on the other computer and overwrite the data file it creates with the data file from your 
-previous UniTeam home folder.
+**A**: Follow these steps:
+
+1. Set up UniTeam on the destination computer using the
+   [Quick Start](#quick-start) instructions.
+2. Close UniTeam on **both computers** before copying any data.
+3. Back up any existing `data/addressbook.json` in the destination
+   UniTeam home folder.
+4. Copy the entire `data/addressbook.json` file from the original
+   UniTeam home folder to the same relative location in the destination
+   home folder, replacing the destination file. Create the `data`
+   folder if it does not exist.
+5. Open a terminal in the destination UniTeam home folder and run
+   `java -jar uniteam.jar`. Your transferred contacts, projects,
+   associations and member roles should appear.
+
+Keep UniTeam closed throughout the file transfer. Replacing its data file
+while it is running can cause the next successful command to overwrite
+the transferred file with the data already loaded in memory.
 
 **Q**: Why does a second copy of UniTeam close immediately?<br>
 **A**: Only one UniTeam instance can use the same data folder at a time.

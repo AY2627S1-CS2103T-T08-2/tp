@@ -820,7 +820,8 @@ testers are expected to do more *exploratory* testing.
 
 ### Listing projects
 
-1. In a fresh session, run `listprojects`.<br>
+1. Launch a disposable copy of UniTeam from a separate empty folder with
+   no existing data file. Run `listprojects`.<br>
    Expected: UniTeam reports that there are no projects to list.
 
 2. Add projects with and without descriptions using `addproject`, then run `listprojects`.<br>
@@ -871,10 +872,12 @@ testers are expected to do more *exploratory* testing.
 
 1. Successful association and duplicate rejection
 
-   1. Prerequisites: Use a disposable copy of the app in a fresh session with at least two contacts. Execute `list`
-      and inspect the Contacts tab to note the first two contacts. Execute
-      `addproject n/Association test project d/2026-11-13`, then open the Projects tab and confirm that the project
-      is numbered 1. Use this number for `pr/`, not the UUID beside `ID:`.
+   1. Prerequisites: Launch a disposable copy of UniTeam from a separate empty
+      folder with no existing data file. Execute `list` and note the first
+      two sample contacts. Execute
+      `addproject n/Association test project d/2026-11-13`, then open the
+      Projects tab and confirm that the project is numbered 1.
+      Use this number for `pr/`, not the UUID beside `ID:`.
 
    2. With the Contacts tab selected, execute `associate c/2 pr/1`.<br>
       Expected: The status message names the second displayed contact and `Association test project`.
@@ -954,8 +957,10 @@ Projects and memberships are saved with contacts after successful commands and r
 
 2. Unsuccessful dissociation attempts
 
-   1. Prerequisites: Keep the preceding session. The first contact belongs only to Alpha, and the second belongs
-      only to Zeta. Both contacts are displayed and there are exactly two projects.
+   1. Prerequisites: Keep the preceding session. The first contact belongs
+      only to Alpha, and the second belongs only to Zeta. There are exactly
+      two projects. Execute `list` to restore both contacts before running
+      the following tests.
 
    2. Test cases: `dissociate`, `dissociate c/1`, `dissociate pr/1`, `dissociate c/ pr/1`,
       `dissociate c/0 pr/1`, `dissociate c/1 pr/abc`, `dissociate c/1 proj/1`, and
@@ -974,9 +979,12 @@ Projects and memberships are saved with contacts after successful commands and r
    6. Test case: `dissociate c/1 pr/1`.<br>
       Expected: A not-associated error names the first contact and `Zeta dissociation test`.
 
-   7. After each rejected command, run both `listmembers` commands and inspect the contact and project lists.<br>
-      Expected: Zeta still contains only the second contact, Alpha still contains only the first contact, and all
-      contact and project details remain unchanged.
+   7. After each rejected command, run both `listmembers` commands to check
+      the memberships. Then execute `list` and inspect the Contacts and
+      Projects lists.<br>
+      Expected: Zeta still contains only the second contact, Alpha still
+      contains only the first contact, and all contact and project details
+      remain unchanged. Both contacts are displayed again after `list`.
 
 3. Filtered contact indices and removal of a project's last member
 
@@ -1023,20 +1031,39 @@ Projects and memberships are saved with contacts after successful commands and r
 
 ### Listing contacts in a project
 
-1. Use `addproject n/CS2103T Team Project d/2026-11-13`, then associate two contacts with project 1 using
-   `associate c/1 pr/1` and `associate c/2 pr/1`.
+1. Use a disposable copy of UniTeam in a separate folder. The following
+   setup deletes that disposable copy's existing data:
+
+   ```text
+   clear
+   add n/Alex Membertest p/81234567 e/alex@example.com a/Block 1
+   add n/Blair Membertest p/82345678 e/blair@example.com a/Block 2
+   addproject n/CS2103T Team Project d/2026-11-13
+   associate c/1 pr/1
+   associate c/2 pr/1
+   ```
 
 2. Run `listmembers pr/CS2103T Team Project`.<br>
-   Expected: Both associated contact names are displayed in contact-list order with the total count.
+   Expected: The Contacts tab displays Alex Membertest and Blair Membertest,
+   numbered 1 and 2. The feedback lists both names in contact-list order
+   and reports a total of 2 members.
 
 3. Run `listmembers pr/Unknown Project`.<br>
    Expected: UniTeam reports that the project does not exist.
+   The displayed contacts and existing associations remain unchanged.
 
-4. Add a second project without associating any contacts, then run `listmembers pr/Second Project`.<br>
-   Expected: UniTeam reports that no contacts are associated with that project.
+4. Execute `addproject n/Second Project d/2026-11-14`, then
+   `listmembers pr/Second Project`.<br>
+   Expected: UniTeam reports that no contacts are associated with
+   Second Project and displays an empty Contacts list.
 
-5. Try `listmembers`, `listmembers pr/`, and `listmembers pr/CS2103T pr/Second Project`.<br>
-   Expected: The command displays a useful format or duplicate-prefix error, and does not change project data.
+5. Try `listmembers`, `listmembers pr/`, and
+   `listmembers pr/CS2103T pr/Second Project`.<br>
+   Expected: Each command displays a format or duplicate-prefix error
+   without changing the projects or associations.
+
+6. Execute `list`.<br>
+   Expected: Both contacts are displayed again.
 
 ### Saving data
 

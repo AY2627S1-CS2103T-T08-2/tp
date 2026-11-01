@@ -44,6 +44,7 @@ import seedu.address.model.membership.ProjectMembership;
 import seedu.address.model.membership.Role;
 import seedu.address.model.person.Person;
 import seedu.address.model.person.PersonId;
+import seedu.address.model.project.Description;
 import seedu.address.model.project.Project;
 import seedu.address.model.project.ProjectName;
 import seedu.address.storage.JsonAddressBookStorage;
@@ -648,5 +649,45 @@ public class LogicManagerTest {
         Model reloadedModel = new ModelManager(reloaded, new UserPrefs());
         assertEquals(original, reloadedModel.findProject(new ProjectName("οσ")).orElseThrow());
         assertEquals("ΟΣ", reloaded.getProjectList().getFirst().getName().toString());
+    }
+
+    @Test
+    public void execute_lineBreakInput_preservesRoleDescriptionAndSavedFile() throws Exception {
+        model.addPerson(AMY);
+        Project project = new ProjectBuilder()
+                .withName("Alpha")
+                .withDescription("Original description")
+                .build();
+        model.addProject(project);
+        model.addProjectMembership(new ProjectMembership(
+                AMY.getPersonId(), project.getProjectId(), new Role("Leader")));
+        logic.execute("listmembers pr/Alpha");
+
+        Path savedFile = temporaryFolder.resolve("addressBook.json");
+        String originalJson = Files.readString(savedFile);
+        String[] invalidCommands = {
+                "setrole c/1 pr/1 r/\f",
+                "setrole c/1 pr/1 r/\u000B",
+                "setrole c/1 pr/1 r/\fLeader",
+                "editproject 1 desc/\f",
+                "editproject 1 desc/\u000B",
+                "editproject 1 desc/Notes\u000B",
+                "addproject n/Beta d/2026-12-01 desc/\fNotes"
+        };
+
+        for (String command : invalidCommands) {
+            assertThrows(ParseException.class, () -> logic.execute(command));
+            assertEquals(new Role("Leader"), model.getAddressBook().getProjectMembershipList().getFirst().getRole());
+            assertEquals(List.of(project), model.getAddressBook().getProjectList());
+            assertEquals(List.of(AMY), model.getFilteredPersonList());
+            assertEquals(List.of(project), model.getFilteredProjectList());
+            assertEquals(originalJson, Files.readString(savedFile));
+        }
+
+        logic.execute(" \tsetrole\tc/1\tpr/1\tr/ \t");
+        assertEquals(Role.EMPTY, model.getAddressBook().getProjectMembershipList().getFirst().getRole());
+
+        logic.execute(" \teditproject\t1\tdesc/ \t");
+        assertEquals(Description.EMPTY, model.getAddressBook().getProjectList().getFirst().getDescription());
     }
 }

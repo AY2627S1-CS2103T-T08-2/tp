@@ -90,7 +90,7 @@ Format: `help`
 
 Adds a contact to UniTeam.
 
-Format: `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]... `
+Format: `add n/NAME p/PHONE e/EMAIL a/ADDRESS [t/TAG]... `
 
 **Field restrictions**
 
@@ -99,7 +99,7 @@ Leading and trailing spaces and tabs are removed from field values.
 | Field          | Restrictions                                                                                | Example                             |
 |----------------|---------------------------------------------------------------------------------------------|-------------------------------------|
 | `NAME`         | Must not be blank. Contains only English letters (`A–Z`, `a–z`), digits (`0–9`) and spaces. | `Alex Tan`                          |
-| `PHONE_NUMBER` | Contains only digits (`0–9`) and must be at least 3 digits long.                            | `91234567`                          |
+| `PHONE`         | Display text; must not be blank or contain control characters. Spaces, punctuation and labels are allowed. | `+65 9123 4567 (HP)`                |
 | `EMAIL`        | Must follow the `local-part@domain` format and the rules below.                             | `alex.tan@example.com`              |
 | `ADDRESS`      | Must not be blank. Spaces and punctuation are allowed.                                      | `Block 123, Clementi Ave 2, #01-01` |
 | `TAG`          | Contains one or more English letters or digits, without spaces or punctuation.              | `projectTeam`                       |
@@ -132,7 +132,7 @@ Examples:
 * `add n/John Doe p/98765432 e/johnd@example.com a/John street, block 123, #01-01`
 * `add n/Betsy Crowe t/friend e/betsycrowe@example.com a/Newgate Prison p/1234567 t/criminal`
 
-For example, both of these commands succeed because the contacts have different phone numbers:
+The phone field is stored and compared as one display string; UniTeam does not parse numbers or labels from it. It can contain multiple numbers and labels, such as `1234 5678 (HP) 1111-3333 (Office)`. Both commands below succeed because the contacts have different phone display text:
 
 * `add n/Alex Tan p/91234567 e/alex@example.com a/Block 1`
 * `add n/Alex Tan p/98765432 e/alex@example.com a/Block 1`

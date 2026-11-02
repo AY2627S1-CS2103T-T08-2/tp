@@ -250,6 +250,13 @@ both checks pass. Same-name contacts with different details and distinct IDs can
 together. Duplicate IDs are reported as invalid data through the same storage-loading exception path as malformed
 IDs. The JSON format is unchanged, and memberships continue to reference contacts by their IDs.
 
+#### Contact phone display text
+
+`Phone` stores one immutable display string. Its validation rejects blank text and control characters, while allowing
+formatting, punctuation, labels and multiple numbers. The application preserves and compares the complete string as
+entered; it does not parse or normalize individual phone numbers. `ParserUtil#parsePhone` removes surrounding
+whitespace before constructing the value object.
+
 #### Validation and loading recovery
 
 `FileUtil#readFromFile` uses `Files.readString` to decode UTF-8 strictly.
@@ -730,6 +737,12 @@ future requirements and are not implemented in v1.6.
 --------------------------------------------------------------------------------------------------------------------
 
 ## **Appendix: Instructions for manual testing**
+
+### Contact phone display text
+
+1. Add a contact with `p/+65 9123 4567` and confirm the displayed phone retains the formatting.
+2. Add or edit a contact with `p/1234 5678 (HP) 1111-3333 (Office)` and confirm the complete display string is retained.
+3. Try a blank or whitespace-only phone value and confirm the command reports a validation error.
 
 Given below are instructions to test the app manually.
 

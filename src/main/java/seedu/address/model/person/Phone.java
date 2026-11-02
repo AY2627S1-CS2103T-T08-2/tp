@@ -4,15 +4,17 @@ import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.AppUtil.checkArgument;
 
 /**
- * Represents a Person's phone number in the address book.
- * Guarantees: immutable; is valid as declared in {@link #isValidPhone(String)}
+ * Represents a Person's phone display text in the address book.
+ * Guarantees: immutable; contains non-blank printable text as declared in {@link #isValidPhone(String)}
  */
 public class Phone {
 
 
     public static final String MESSAGE_CONSTRAINTS =
-        "Phone numbers should only contain digits, and should be at least 3 digits long";
-    public static final String VALIDATION_REGEX = "\\d{3,}";
+        "Phone display text must not be blank or contain control characters";
+    public static final String VALIDATION_REGEX =
+        "[^\\x00-\\x1F\\x7F-\\x9F]*[^\\s\\x00-\\x1F\\x7F-\\x9F]"
+                + "[^\\x00-\\x1F\\x7F-\\x9F]*";
     public final String value;
 
     /**
@@ -27,7 +29,7 @@ public class Phone {
     }
 
     /**
-     * Returns true if a given string is a valid phone number.
+     * Returns true if a given string is non-blank printable phone display text.
      */
     public static boolean isValidPhone(String test) {
         return test.matches(VALIDATION_REGEX);

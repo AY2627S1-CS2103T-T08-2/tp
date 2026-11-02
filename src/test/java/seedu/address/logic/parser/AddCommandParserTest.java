@@ -49,6 +49,15 @@ public class AddCommandParserTest {
     private final AddCommandParser parser = new AddCommandParser();
 
     @Test
+    public void parse_nameWithSlash_success() {
+        String name = "John s/o Smith";
+        Person expectedPerson = new PersonBuilder(BOB).withName(name).withTags().build();
+        String userInput = " n/" + name + PHONE_DESC_BOB + EMAIL_DESC_BOB + ADDRESS_DESC_BOB;
+
+        assertParseSuccess(parser, userInput, new AddCommand(expectedPerson));
+    }
+
+    @Test
     public void parse_allFieldsPresent_success() {
         Person expectedPerson = new PersonBuilder(BOB)
             .withTags(VALID_TAG_FRIEND)

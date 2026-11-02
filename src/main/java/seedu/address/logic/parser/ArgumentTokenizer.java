@@ -159,8 +159,8 @@ public class ArgumentTokenizer {
         Prefix prefix = currentPrefixPosition.getPrefix();
 
         int valueStartPos = currentPrefixPosition.getStartPosition() + prefix
-                .getPrefix()
-                .length();
+            .getPrefix()
+            .length();
         String value = argsString.substring(valueStartPos, nextPrefixPosition.getStartPosition()).trim();
 
         if (prefix.getPrefix().isEmpty() || !value.startsWith("\"")) {

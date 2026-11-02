@@ -100,6 +100,7 @@ Leading and trailing spaces and tabs are removed from field values.
 |-----------|------------------------------------------------------------------------------------------------------------|-------------------------------------|
 | `NAME`    | Starts with a Unicode letter or digit; allows spaces, hyphens, apostrophes, and slashes.                   | `José O’Connor`                     |
 | `PHONE`   | Display text; must not be blank or contain control characters. Spaces, punctuation and labels are allowed. | `+65 9123 4567 (HP)`                |
+| `EMAIL`   | Must follow the `local-part@domain` format and the rules below.                                            | `alex.tan@example.com`              |
 | `ADDRESS` | Must not be blank. Spaces and punctuation are allowed.                                                     | `Block 123, Clementi Ave 2, #01-01` |
 | `TAG`     | Contains one or more English letters or digits, without spaces or punctuation.                             | `projectTeam`                       |
 

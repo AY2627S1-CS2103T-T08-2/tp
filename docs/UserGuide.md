@@ -98,7 +98,7 @@ Leading and trailing spaces and tabs are removed from field values.
 
 | Field          | Restrictions                                                                                | Example                             |
 |----------------|---------------------------------------------------------------------------------------------|-------------------------------------|
-| `NAME`         | Must not be blank. Contains only English letters (`A–Z`, `a–z`), digits (`0–9`) and spaces. | `Alex Tan`                          |
+| `NAME`         | Starts with a Unicode letter or digit; allows spaces, hyphens, apostrophes, and slashes. | `José O’Connor`                    |
 | `PHONE_NUMBER` | Contains only digits (`0–9`) and must be at least 3 digits long.                            | `91234567`                          |
 | `EMAIL`        | Must follow the `local-part@domain` format and the rules below.                             | `alex.tan@example.com`              |
 | `ADDRESS`      | Must not be blank. Spaces and punctuation are allowed.                                      | `Block 123, Clementi Ave 2, #01-01` |

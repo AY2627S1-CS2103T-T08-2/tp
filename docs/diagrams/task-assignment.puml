@@ -1,0 +1,124 @@
+@startuml
+' Task Assignment System UML Diagram
+
+package "Model Layer" {
+  class Person {
+    - PersonId personId
+    - Name name
+    - Phone phone
+    - Email email
+    - Address address
+    + getPersonId()
+    + getName()
+  }
+
+  class Project {
+    - ProjectId projectId
+    - ProjectName name
+    - Deadline deadline
+    - Description description
+    + getProjectId()
+    + getName()
+  }
+
+  class ProjectMembership {
+    - PersonId personId
+    - ProjectId projectId
+    - Role role
+    + getPersonId()
+    + getProjectId()
+    + getRole()
+    + withRole(Role)
+  }
+
+  class Role {
+    - String description
+    + isValidRole()
+    + getDescription()
+  }
+
+  class AddressBook {
+    - UniquePersonList persons
+    - UniqueProjectList projects
+    - UniqueProjectMembershipList memberships
+    + getProjectMembers(Project)
+    + getPersonProjects(Person)
+    + hasProjectMembership(ProjectMembership)
+    + addProjectMembership(ProjectMembership)
+    + setProjectMembership(ProjectMembership)
+    + removeProjectMembership(ProjectMembership)
+  }
+
+  class Model {
+    <<Interface>>
+    + getProjectMembers(Project)
+    + getPersonProjects(Person)
+    + hasProjectMembership(ProjectMembership)
+    + addProjectMembership(ProjectMembership)
+    + setProjectMembership(ProjectMembership)
+    + removeProjectMembership(ProjectMembership)
+  }
+
+  class ModelManager {
+    - AddressBook addressBook
+    - FilteredList<Person> filteredPersons
+    + getProjectMembers(Project)
+    + getPersonProjects(Person)
+    + hasProjectMembership(ProjectMembership)
+    + addProjectMembership(ProjectMembership)
+    + setProjectMembership(ProjectMembership)
+    + removeProjectMembership(ProjectMembership)
+  }
+}
+
+package "Logic Layer" {
+  class Command {
+    <<Interface>>
+  }
+
+  class SetRoleCommand {
+    - Index contactIndex
+    - Index projectIndex
+    - Role role
+    + execute(Model)
+  }
+
+  class CommandResult {
+    + String feedbackToUser
+  }
+}
+
+package "UI Layer" {
+  class SetRoleCommandParser {
+    + parse(String)
+  }
+}
+
+' Associations
+Person "1" --> "0..*" ProjectMembership : has >
+Project "1" --> "0..*" ProjectMembership : has >
+ProjectMembership "1" --> "1" Role : uses >
+AddressBook --> Person : contains >
+AddressBook --> Project : contains >
+AddressBook --> ProjectMembership : contains >
+Model <|-- ModelManager : implements >
+ModelManager --> AddressBook : uses >
+SetRoleCommand --> Model : uses >
+SetRoleCommandParser --> SetRoleCommand : creates >
+
+' Stereotypes
+note right of Model
+  The Model interface defines
+  all operations for managing
+  projects, persons, and their
+  task assignments via memberships
+end note
+
+note right of ProjectMembership
+  ProjectMembership links a Person
+  to a Project. The Role field
+  describes the task allotment
+  for that membership.
+end note
+
+@enduml

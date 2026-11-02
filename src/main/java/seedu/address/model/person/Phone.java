@@ -30,8 +30,9 @@ public class Phone {
      * Returns true if the given string is non-blank and contains no ISO control characters.
      */
     public static boolean isValidPhone(String test) {
-        return !test.isBlank()
-                && test.codePoints().noneMatch(Character::isISOControl);
+        boolean hasContent = test.codePoints().anyMatch(codePoint ->
+                !Character.isWhitespace(codePoint) && !Character.isSpaceChar(codePoint));
+        return hasContent && test.codePoints().noneMatch(Character::isISOControl);
     }
 
     @Override

@@ -11,10 +11,7 @@ public class Phone {
 
 
     public static final String MESSAGE_CONSTRAINTS =
-        "Phone display text must not be blank or contain control characters";
-    public static final String VALIDATION_REGEX =
-        "[^\\x00-\\x1F\\x7F-\\x9F]*[^\\s\\x00-\\x1F\\x7F-\\x9F]"
-                + "[^\\x00-\\x1F\\x7F-\\x9F]*";
+            "Phone display text must not be blank or contain control characters";
     public final String value;
 
     /**
@@ -32,7 +29,8 @@ public class Phone {
      * Returns true if a given string is non-blank printable phone display text.
      */
     public static boolean isValidPhone(String test) {
-        return !test.isBlank() && test.matches(VALIDATION_REGEX);
+        return !test.isBlank()
+                && test.codePoints().noneMatch(Character::isISOControl);
     }
 
     @Override

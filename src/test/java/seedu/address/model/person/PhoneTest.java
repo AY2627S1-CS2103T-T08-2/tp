@@ -1,8 +1,11 @@
 package seedu.address.model.person;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static seedu.address.testutil.Assert.assertThrows;
+
+import java.time.Duration;
 
 import org.junit.jupiter.api.Test;
 
@@ -70,5 +73,13 @@ public class PhoneTest {
     @Test
     public void constructor_unicodeWhitespaceOnly_throwsIllegalArgumentException() {
         assertThrows(IllegalArgumentException.class, () -> new Phone("\u2003"));
+    }
+
+    @Test
+    public void isValidPhone_longInputWithTrailingControlCharacter_returnsFalsePromptly() {
+        String invalidPhone = "1".repeat(100_000) + "\u007F";
+
+        assertTimeoutPreemptively(Duration.ofSeconds(5), () ->
+                assertFalse(Phone.isValidPhone(invalidPhone)));
     }
 }

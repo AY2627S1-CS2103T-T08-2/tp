@@ -58,8 +58,8 @@ contacts faster than traditional GUI applications.
   For example, `[t/TAG]... ` may be omitted, or written as `t/friend` or `t/friend t/family`.
 
 * Prefixed parameters can appear in any order.<br>
-  For example, `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS` also accepts
-  `add p/PHONE_NUMBER n/NAME a/ADDRESS e/EMAIL`.
+  For example, `add n/NAME p/PHONE e/EMAIL a/ADDRESS` also accepts
+  `add p/PHONE n/NAME a/ADDRESS e/EMAIL`.
   Positional parameters, such as the index in `edit INDEX`, must remain in
   the position shown in the command format.
 
@@ -96,13 +96,12 @@ Format: `add n/NAME p/PHONE e/EMAIL a/ADDRESS [t/TAG]... `
 
 Leading and trailing spaces and tabs are removed from field values.
 
-| Field          | Restrictions                                                                                | Example                             |
-|----------------|---------------------------------------------------------------------------------------------|-------------------------------------|
-| `NAME`         | Starts with a Unicode letter or digit; allows spaces, hyphens, apostrophes, and slashes. | `José O’Connor`                    |
-| `PHONE_NUMBER` | Contains only digits (`0–9`) and must be at least 3 digits long.                            | `91234567`                          |
-| `EMAIL`        | Must follow the `local-part@domain` format and the rules below.                             | `alex.tan@example.com`              |
-| `ADDRESS`      | Must not be blank. Spaces and punctuation are allowed.                                      | `Block 123, Clementi Ave 2, #01-01` |
-| `TAG`          | Contains one or more English letters or digits, without spaces or punctuation.              | `projectTeam`                       |
+| Field     | Restrictions                                                                                               | Example                             |
+|-----------|------------------------------------------------------------------------------------------------------------|-------------------------------------|
+| `NAME`    | Starts with a Unicode letter or digit; allows spaces, hyphens, apostrophes, and slashes.                   | `José O’Connor`                     |
+| `PHONE`   | Display text; must not be blank or contain control characters. Spaces, punctuation and labels are allowed. | `+65 9123 4567 (HP)`                |
+| `ADDRESS` | Must not be blank. Spaces and punctuation are allowed.                                                     | `Block 123, Clementi Ave 2, #01-01` |
+| `TAG`     | Contains one or more English letters or digits, without spaces or punctuation.                             | `projectTeam`                       |
 
 **Email rules:**
 
@@ -528,22 +527,22 @@ The terminal and log report `UniTeam is already running in this folder.`
 
 ## Command Summary
 
-| Action                       | Format and examples                                                                                                                        |
-|------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------|
-| **Add contact**              | `add n/NAME p/PHONE_NUMBER e/EMAIL a/ADDRESS [t/TAG]...`<br>Example: `add n/James Ho p/22224444 e/jamesho@example.com a/Clementi t/friend` |
-| **Add project**              | `addproject n/PROJECT_NAME d/YYYY-MM-DD [desc/DESCRIPTION]`<br>Example: `addproject n/Orbital d/2027-08-01`                                |
-| **Associate**                | `associate c/CONTACT_INDEX pr/PROJECT_INDEX`<br>Example: `associate c/2 pr/1`                                                              |
-| **Clear all entries**        | `clear`                                                                                                                                    |
-| **Delete contact**           | `delete INDEX`<br>Example: `delete 3`                                                                                                      |
-| **Delete project**           | `deleteproject INDEX`<br>Example: `deleteproject 2`                                                                                        |
-| **Dissociate**               | `dissociate c/CONTACT_INDEX pr/PROJECT_INDEX`<br>Example: `dissociate c/2 pr/1`                                                            |
-| **Edit contact**             | `edit INDEX [n/NAME] [p/PHONE_NUMBER] [e/EMAIL] [a/ADDRESS] [t/TAG]...`<br>Example: `edit 2 n/James Lee`                                   |
-| **Edit project**             | `editproject INDEX [n/PROJECT_NAME] [d/YYYY-MM-DD] [desc/DESCRIPTION]`<br>Example: `editproject 1 d/2026-12-01`                            |
-| **Exit**                     | `exit`                                                                                                                                     |
-| **Find contacts**            | `find KEYWORD [MORE_KEYWORDS]...`<br>Example: `find James Jake`                                                                            |
-| **Find projects**            | `findproject KEYWORD [MORE_KEYWORDS]...`<br>Example: `findproject CS2103T Orbital`                                                         |
-| **Help**                     | `help`                                                                                                                                     |
-| **List contacts**            | `list`                                                                                                                                     |
-| **List projects**            | `listprojects [c/CONTACT_INDEX]`<br>Example: `listprojects c/2`                                                                            |
-| **List members**             | `listmembers pr/PROJECT_NAME`<br>Example: `listmembers pr/CS2103T Team Project`                                                            |
-| **Set or clear member role** | `setrole c/CONTACT_INDEX pr/PROJECT_INDEX r/[ROLE]`<br>Set: `setrole c/2 pr/1 r/Implement the parser`<br>Clear: `setrole c/2 pr/1 r/`      |
+| Action                       | Format and examples                                                                                                                   |
+|------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| **Add contact**              | `add n/NAME p/PHONE e/EMAIL a/ADDRESS [t/TAG]...`<br>Example: `add n/James Ho p/22224444 e/jamesho@example.com a/Clementi t/friend`   |
+| **Add project**              | `addproject n/PROJECT_NAME d/YYYY-MM-DD [desc/DESCRIPTION]`<br>Example: `addproject n/Orbital d/2027-08-01`                           |
+| **Associate**                | `associate c/CONTACT_INDEX pr/PROJECT_INDEX`<br>Example: `associate c/2 pr/1`                                                         |
+| **Clear all entries**        | `clear`                                                                                                                               |
+| **Delete contact**           | `delete INDEX`<br>Example: `delete 3`                                                                                                 |
+| **Delete project**           | `deleteproject INDEX`<br>Example: `deleteproject 2`                                                                                   |
+| **Dissociate**               | `dissociate c/CONTACT_INDEX pr/PROJECT_INDEX`<br>Example: `dissociate c/2 pr/1`                                                       |
+| **Edit contact**             | `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...`<br>Example: `edit 2 n/James Lee`                                     |
+| **Edit project**             | `editproject INDEX [n/PROJECT_NAME] [d/YYYY-MM-DD] [desc/DESCRIPTION]`<br>Example: `editproject 1 d/2026-12-01`                       |
+| **Exit**                     | `exit`                                                                                                                                |
+| **Find contacts**            | `find KEYWORD [MORE_KEYWORDS]...`<br>Example: `find James Jake`                                                                       |
+| **Find projects**            | `findproject KEYWORD [MORE_KEYWORDS]...`<br>Example: `findproject CS2103T Orbital`                                                    |
+| **Help**                     | `help`                                                                                                                                |
+| **List contacts**            | `list`                                                                                                                                |
+| **List projects**            | `listprojects [c/CONTACT_INDEX]`<br>Example: `listprojects c/2`                                                                       |
+| **List members**             | `listmembers pr/PROJECT_NAME`<br>Example: `listmembers pr/CS2103T Team Project`                                                       |
+| **Set or clear member role** | `setrole c/CONTACT_INDEX pr/PROJECT_INDEX r/[ROLE]`<br>Set: `setrole c/2 pr/1 r/Implement the parser`<br>Clear: `setrole c/2 pr/1 r/` |

@@ -25,7 +25,7 @@ import seedu.address.model.tag.Tag;
 
 public class ParserUtilTest {
     private static final String INVALID_NAME = "R@chel";
-    private static final String INVALID_PHONE = "+651234";
+    private static final String INVALID_PHONE = " \t ";
     private static final String INVALID_ADDRESS = " ";
     private static final String INVALID_EMAIL = "example.com";
     private static final String INVALID_TAG = "#friend";
@@ -96,6 +96,12 @@ public class ParserUtilTest {
     public void parsePhone_validValueWithoutWhitespace_returnsPhone() throws Exception {
         Phone expectedPhone = new Phone(VALID_PHONE);
         assertEquals(expectedPhone, ParserUtil.parsePhone(VALID_PHONE));
+    }
+
+    @Test
+    public void parsePhone_validFormattedValue_preservesDisplayText() throws Exception {
+        String phoneDisplayText = "+65 9123 4567 / 9123-4567 (Office)";
+        assertEquals(new Phone(phoneDisplayText), ParserUtil.parsePhone(phoneDisplayText));
     }
 
     @Test

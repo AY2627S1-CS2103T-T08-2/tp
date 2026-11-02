@@ -22,7 +22,7 @@ import seedu.address.model.project.exceptions.ProjectNotFoundException;
 
 /**
  * Stores UniTeam's contacts, projects and project memberships.
- * * Contacts have unique identifiers; different contacts may share a name.
+ * Contacts have unique identifiers; different contacts may share a name.
  * Projects have unique identifiers and normalised names.
  * Memberships are unique contact-project pairs that reference existing entities.
  */

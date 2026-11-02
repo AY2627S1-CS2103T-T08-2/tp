@@ -258,4 +258,17 @@ public class AddProjectCommandParserTest {
         assertEquals(expectedProject.getDeadline(), actualProject.getDeadline());
         assertEquals(expectedProject.getDescription(), actualProject.getDescription());
     }
+
+    @Test
+    public void parse_unicodeWhitespaceOnlyDescription_failure() {
+        String[] blankValues = {"\u2003", "\u00A0", "\u2007", "\u202F", "\u3000", " \u2003\u00A0 "};
+        for (String value : blankValues) {
+            assertParseFailure(parser,
+                    " n/Project d/2027-01-01 desc/" + value,
+                    ParserUtil.MESSAGE_EMPTY_DESCRIPTION);
+            assertParseFailure(parser,
+                    " n/Project d/2027-01-01 desc/\"" + value + "\"",
+                    ParserUtil.MESSAGE_EMPTY_DESCRIPTION);
+        }
+    }
 }

@@ -74,9 +74,11 @@ public class EditProjectCommandParser implements Parser<EditProjectCommand> {
             String description = argMultimap
                 .getValue(PREFIX_DESCRIPTION)
                 .get();
-            editProjectDescriptor.setDescription(description.isBlank()
-                ? Description.EMPTY
-                : ParserUtil.parseDescription(description));
+            boolean hasContent = description.codePoints().anyMatch(codePoint ->
+                    !Character.isWhitespace(codePoint) && !Character.isSpaceChar(codePoint));
+            editProjectDescriptor.setDescription(hasContent
+                    ? ParserUtil.parseDescription(description)
+                    : Description.EMPTY);
         }
 
         if (!editProjectDescriptor.isAnyFieldEdited()) {

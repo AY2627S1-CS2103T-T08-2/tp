@@ -82,4 +82,18 @@ public class PhoneTest {
         assertTimeoutPreemptively(Duration.ofSeconds(5), () ->
                 assertFalse(Phone.isValidPhone(invalidPhone)));
     }
+
+    @Test
+    public void isValidAddress_unicodeWhitespaceOnly_returnsFalse() {
+        String[] blankValues = {"\u2002", "\u2003", "\u00A0", "\u2007", "\u202F", "\u3000", " \u2003\u00A0\u3000 "};
+        for (String value : blankValues) {
+            assertFalse(Address.isValidAddress(value));
+            assertThrows(IllegalArgumentException.class, () -> new Address(value));
+        }
+    }
+
+    @Test
+    public void isValidAddress_unicodeSpaceWithinText_returnsTrue() {
+        assertTrue(Address.isValidAddress("Block\u00A01, Clementi Avenue"));
+    }
 }

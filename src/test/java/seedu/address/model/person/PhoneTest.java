@@ -58,4 +58,17 @@ public class PhoneTest {
         // different values -> returns false
         assertFalse(phone.equals(new Phone("995")));
     }
+
+    @Test
+    public void isValidPhone_unicodeWhitespaceOnly_returnsFalse() {
+        assertFalse(Phone.isValidPhone("\u2002")); // EN SPACE
+        assertFalse(Phone.isValidPhone("\u2003")); // EM SPACE
+        assertFalse(Phone.isValidPhone("\u3000")); // IDEOGRAPHIC SPACE
+        assertFalse(Phone.isValidPhone(" \u2003\u3000 "));
+    }
+
+    @Test
+    public void constructor_unicodeWhitespaceOnly_throwsIllegalArgumentException() {
+        assertThrows(IllegalArgumentException.class, () -> new Phone("\u2003"));
+    }
 }

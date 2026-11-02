@@ -193,7 +193,9 @@ public class ParserUtil {
 
         String trimmedDescription = description.strip();
 
-        if (trimmedDescription.isEmpty()) {
+        boolean hasContent = trimmedDescription.codePoints().anyMatch(codePoint ->
+                !Character.isWhitespace(codePoint) && !Character.isSpaceChar(codePoint));
+        if (!hasContent) {
             throw new ParseException(MESSAGE_EMPTY_DESCRIPTION);
         }
 

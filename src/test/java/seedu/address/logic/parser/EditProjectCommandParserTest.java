@@ -239,4 +239,16 @@ public class EditProjectCommandParserTest {
         assertParseSuccess(parser, input,
             new EditProjectCommand(Index.fromOneBased(1), descriptor));
     }
+
+    @Test
+    public void parse_unicodeWhitespaceOnlyDescription_clearsDescription() {
+        EditProjectDescriptor descriptor = new EditProjectDescriptor();
+        descriptor.setDescription(Description.EMPTY);
+
+        String[] blankValues = {"\u2003", "\u00A0", "\u2007", "\u202F", "\u3000", " \u2003\u00A0 "};
+        for (String value : blankValues) {
+            assertParsedCommand(" 1 desc/" + value, descriptor);
+            assertParsedCommand(" 1 desc/\"" + value + "\"", descriptor);
+        }
+    }
 }

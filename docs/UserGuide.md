@@ -66,6 +66,19 @@ contacts faster than traditional GUI applications.
 * Enter each command on a single line. Separate prefixed arguments with spaces
   or tabs.
 
+* To include text that resembles an argument prefix inside a field value,
+  enclose the entire value in double quotes.
+  For example, use `edit 1 n/"Arjun a/l Kumar"` so that `a/` remains part
+  of the name. Without quotes, `a/` starts an address argument.
+  This also applies to other prefixes recognized by the command.
+
+* A quoted value must have a closing double quote and must be followed
+  by the end of the command or another argument prefix separated by
+  spaces or tabs. Inside quoted values, use `\"` for a literal double
+  quote and `\\` for a literal backslash.
+  Leading and trailing whitespace is still removed, and normal field
+  restrictions still apply.
+
 * Contacts and Projects have separate displayed lists and filters.
   An index refers to the number currently shown in the relevant list, not a
   permanent identifier. Check the displayed numbers after changing a filter
@@ -75,7 +88,8 @@ contacts faster than traditional GUI applications.
   For example, `help 123` reports an invalid command format and shows the usage for `help`.
   Leading and trailing whitespace is allowed.
 
-* If you are using a PDF version of this document, be careful when copying and pasting commands that span multiple lines as space characters surrounding line-breaks may be omitted when copied over to the application.
+* If you are using a PDF version of this document, be careful when copying and pasting commands that span multiple 
+  lines as space characters surrounding line-breaks may be omitted when copied over to the application.
 
 ### Viewing help: `help`
 

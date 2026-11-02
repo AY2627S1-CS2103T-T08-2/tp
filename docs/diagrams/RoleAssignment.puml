@@ -28,8 +28,8 @@ class Role {
 
 AssociateCommand ..> Model : creates membership
 SetRoleCommand ..> Model : updates existing role
-Model ..> ProjectMembership : stores
-ProjectMembership *-- Role
+Model ..> ProjectMembership : uses
+ProjectMembership --> "1" Role : Role
 
 note right of AssociateCommand
   Resolves contact and project indices,

@@ -65,6 +65,16 @@ public class EditCommandParserTest {
     }
 
     @Test
+    public void parse_nameWithUnicodeAndPunctuation_success() {
+        Index targetIndex = INDEX_FIRST_PERSON;
+        String name = "José Anne-Marie O’Connor";
+        String userInput = targetIndex.getOneBased() + " n/" + name;
+        EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder().withName(name).build();
+
+        assertParseSuccess(parser, userInput, new EditCommand(targetIndex, descriptor));
+    }
+
+    @Test
     public void parse_missingParts_failure() {
         // no index specified
         assertParseFailure(parser, VALID_NAME_AMY, MESSAGE_INVALID_FORMAT);

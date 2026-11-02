@@ -364,4 +364,13 @@ public class ParserUtilTest {
     public void parseRole_null_throwsNullPointerException() {
         assertThrows(NullPointerException.class, () -> ParserUtil.parseRole(null));
     }
+
+    @Test
+    public void parseContactFields_unicodeWhitespaceOnly_throwsParseException() {
+        String[] blankValues = {"\u2002", "\u2003", "\u00A0", "\u2007", "\u202F", "\u3000", " \u2003\u00A0\u3000 "};
+        for (String value : blankValues) {
+            assertThrows(ParseException.class, Address.MESSAGE_CONSTRAINTS, () -> ParserUtil.parseAddress(value));
+            assertThrows(ParseException.class, Phone.MESSAGE_CONSTRAINTS, () -> ParserUtil.parsePhone(value));
+        }
+    }
 }

@@ -146,6 +146,12 @@ How the parsing works:
   or form feed, causes a `ParseException`. This check runs before `trim()` so that
   invalid line breaks cannot disappear during whitespace processing. Spaces and
   tabs remain supported.
+* Parsers for prefixed commands use `ArgumentTokenizer` to separate field
+  values. When a value starts with a double quote, prefixes inside that
+  quoted value are treated as literal text. `readQuotedValue` removes the
+  surrounding quotes and decodes escaped double quotes (`\"`) and
+  backslashes (`\\`). Missing closing quotes or unexpected text after a
+  closing quote cause a `ParseException` before command execution.
 * When called upon to parse a user command, the `AddressBookParser` class creates an `XYZCommandParser` (`XYZ` is a placeholder for the specific command name, e.g., `AddCommandParser`). The parser uses the other classes shown above to parse the user command and create an `XYZCommand` object (e.g., `AddCommand`). The `AddressBookParser` returns that object as a `Command` object.
 * All `XYZCommandParser` classes, such as `AddCommandParser` and `DeleteCommandParser`, implement the `Parser` interface so they can be treated similarly where appropriate, for example during testing.
 
@@ -762,6 +768,42 @@ testers are expected to do more *exploratory* testing.
 1. Add a contact with `p/+65 9123 4567` and confirm the displayed phone retains the formatting.
 2. Add or edit a contact with `p/1234 5678 (HP) 1111-3333 (Office)` and confirm the complete display string is retained.
 3. Try a blank or whitespace-only phone value and confirm the command reports a validation error.
+
+### Quoted field values
+
+1. Use a disposable copy of UniTeam in a separate folder. The following
+   setup clears that copy's existing data:
+
+   ```text
+   clear
+   add n/"Priya a/p Kumar" p/91234567 e/priya@example.com a/Block 1
+   ```
+
+   Expected: One contact is added with the complete name `Priya a/p Kumar`
+   and address `Block 1`. The `a/` inside the name is not interpreted as
+   an address prefix.
+
+2. Execute `edit 1 n/"Priya a/p Raman"`.<br>
+   Expected: Only the name changes. The address remains `Block 1`, and
+   the phone number and email remain unchanged.
+
+3. Try these commands separately:
+
+   ```text
+   edit 1 n/"Unfinished name
+   edit 1 n/"Another Name" extra
+   ```
+
+   Expected: Both commands report a quoting error. The contact retains
+   the name `Priya a/p Raman` and all previously saved details.
+
+4. Execute `edit 1 a/"Block 1 \"North\""`.<br>
+   Expected: The address becomes `Block 1 "North"`, without the outer
+   delimiter quotes or escape backslashes. The name remains unchanged.
+
+5. Close and restart UniTeam.<br>
+   Expected: The complete name `Priya a/p Raman` and address
+   `Block 1 "North"` are retained.
 
 ### Contacts with the same name
 

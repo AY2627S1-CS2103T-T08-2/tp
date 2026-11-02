@@ -24,7 +24,7 @@ Refer to the guide [_Setting up and getting started_](SettingUp.md).
 
 ### Architecture
 
-<puml src="diagrams/ArchitectureDiagram.puml" width="280" />
+<puml src="diagrams/ArchitectureDiagram.puml" width="280"></puml>
 
 The ***Architecture Diagram*** given above explains the high-level design of the App.
 
@@ -61,7 +61,7 @@ The bulk of the app's work is done by the following four components:
 
 The *Sequence Diagram* below shows how the components interact with each other for the scenario where the user issues the command `delete 1`.
 
-<puml src="diagrams/ArchitectureSequenceDiagram.puml" width="574" />
+<puml src="diagrams/ArchitectureSequenceDiagram.puml" width="574"></puml>
 
 Each of the four main components (also shown in the diagram above),
 
@@ -70,7 +70,7 @@ Each of the four main components (also shown in the diagram above),
 
 For example, the `Logic` component defines its API in `Logic.java` and implements it in `LogicManager.java`. Other components interact with a component through its interface rather than its concrete class, preventing them from coupling to that component's implementation, as illustrated in the following partial class diagram.
 
-<puml src="diagrams/ComponentManagers.puml" width="300" />
+<puml src="diagrams/ComponentManagers.puml" width="300"></puml>
 
 The sections below give more details of each component.
 
@@ -79,7 +79,7 @@ The sections below give more details of each component.
 The **API** of this component is specified 
 in [`Ui.java`](https://github.com/AY2627S1-CS2103T-T08-2/tp/tree/master/src/main/java/seedu/address/ui/Ui.java)
 
-<puml src="diagrams/UiClassDiagram.puml" alt="Structure of the UI Component"/>
+<puml src="diagrams/UiClassDiagram.puml" alt="Structure of the UI Component"></puml>
 
 The UI consists of `MainWindow` and its parts, including `CommandBox`,
 `ResultDisplay`, `PersonListPanel`, `ProjectListPanel`, `HelpWindow` and
@@ -115,22 +115,18 @@ The `UI` component,
 
 Here's a (partial) class diagram of the `Logic` component:
 
-<puml src="diagrams/LogicClassDiagram.puml" width="550"/>
+<puml src="diagrams/LogicClassDiagram.puml" width="550"></puml>
 
 The sequence diagram below illustrates the interactions within the `Logic` component, taking `execute("delete 1")` API call as an example.
 
-<puml src="diagrams/DeleteSequenceDiagram.puml" alt="Interactions Inside the Logic Component for the `delete 1` Command" />
+<puml src="diagrams/DeleteSequenceDiagram.puml" alt="Interactions Inside the Logic Component for the `delete 1` Command"></puml>
 
 The diagram illustrates parsing and command execution for a successful
 `delete 1`. Snapshot creation, saving and save-failure handling are omitted
 for clarity. These are described under
 [Handling save failures](#handling-save-failures).
 
-<box type="info" seamless>
-
 **Note:** The lifeline for `DeleteCommandParser` should end at the destroy marker (X), but due to a limitation of PlantUML, the lifeline continues till the end of diagram.
-</box>
-
 
 How the `Logic` component works:
 
@@ -142,7 +138,7 @@ How the `Logic` component works:
 
 Here are the other classes in `Logic` (omitted from the class diagram above) that are used for parsing a user command:
 
-<puml src="diagrams/ParserClasses.puml" width="600"/>
+<puml src="diagrams/ParserClasses.puml" width="600"></puml>
 
 How the parsing works:
 * Before dispatching a command, `AddressBookParser` checks the raw input for line
@@ -156,7 +152,7 @@ How the parsing works:
 ### Model component
 **API** : [`Model.java`](https://github.com/AY2627S1-CS2103T-T08-2/tp/tree/master/src/main/java/seedu/address/model/Model.java)
 
-<puml src="diagrams/ModelClassDiagram.puml" width="650" />
+<puml src="diagrams/ModelClassDiagram.puml" width="650"></puml>
 
 
 The `Model` component,
@@ -222,19 +218,14 @@ lookup consider the complete data, including entities hidden by filters.
 
 Switching tabs changes neither filter.
 
-<box type="info" seamless>
-
 **Note:** The alternative, arguably more object-oriented, design below keeps a unique list of tags in `AddressBook`, and each `Person` references tags from that list. This lets `AddressBook` maintain one `Tag` object per unique tag instead of each `Person` holding its own `Tag` objects.<br>
-
-<puml src="diagrams/BetterModelClassDiagram.puml" width="450" />
-</box>
-
+<puml src="diagrams/BetterModelClassDiagram.puml" width="450"></puml>
 
 ### Storage component
 
 **API** : [`Storage.java`](https://github.com/AY2627S1-CS2103T-T08-2/tp/tree/master/src/main/java/seedu/address/storage/Storage.java)
 
-<puml src="diagrams/StorageClassDiagram.puml" width="550" />
+<puml src="diagrams/StorageClassDiagram.puml" width="550"></puml>
 
 The `Storage` component,
 * can save both address book data and user preference data in JSON format, and read them back into corresponding objects.
@@ -738,12 +729,6 @@ future requirements and are not implemented in v1.6.
 
 ## **Appendix: Instructions for manual testing**
 
-### Contact phone display text
-
-1. Add a contact with `p/+65 9123 4567` and confirm the displayed phone retains the formatting.
-2. Add or edit a contact with `p/1234 5678 (HP) 1111-3333 (Office)` and confirm the complete display string is retained.
-3. Try a blank or whitespace-only phone value and confirm the command reports a validation error.
-
 Given below are instructions to test the app manually.
 
 **Note:** These instructions only provide a starting point for testers to work on;
@@ -764,6 +749,12 @@ testers are expected to do more *exploratory* testing.
 
     2. Open a terminal in the same folder and run `java -jar uniteam.jar` again.<br>
        Expected: The most recent window size and location are retained.
+
+### Contact phone display text
+
+1. Add a contact with `p/+65 9123 4567` and confirm the displayed phone retains the formatting.
+2. Add or edit a contact with `p/1234 5678 (HP) 1111-3333 (Office)` and confirm the complete display string is retained.
+3. Try a blank or whitespace-only phone value and confirm the command reports a validation error.
 
 ### Contacts with the same name
 

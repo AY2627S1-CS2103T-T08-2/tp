@@ -2,8 +2,10 @@ package seedu.address.logic.parser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import seedu.address.logic.parser.exceptions.ParseException;
 
 /**
  * Tokenizes arguments string of the form: {@code preamble <prefix>value <prefix>value ...}<br>
@@ -15,15 +17,19 @@ import java.util.stream.Collectors;
  */
 public class ArgumentTokenizer {
 
+    public static final String MESSAGE_UNCLOSED_QUOTE = "Quoted field values must have a closing double quote.";
+    public static final String MESSAGE_INVALID_QUOTED_VALUE =
+            "A quoted field value must be followed by another argument prefix or the end of the command.";
+
     /**
-     * Tokenizes an arguments string and returns an {@code ArgumentMultimap} object that maps prefixes to their
-     * respective argument values. Only the given prefixes will be recognized in the arguments string.
+     * Tokenizes arguments and maps the recognized prefixes to their values.
      *
-     * @param argsString Arguments string of the form: {@code preamble <prefix>value <prefix>value ...}
-     * @param prefixes   Prefixes to tokenize the arguments string with
-     * @return ArgumentMultimap object that maps prefixes to their arguments
+     * @param argsString arguments containing optional quoted field values
+     * @param prefixes   prefixes recognized by this command
+     * @return the prefixes and their argument values
+     * @throws ParseException if a quoted field value is not correctly delimited
      */
-    public static ArgumentMultimap tokenize(String argsString, Prefix... prefixes) {
+    public static ArgumentMultimap tokenize(String argsString, Prefix... prefixes) throws ParseException {
         List<PrefixPosition> positions = findAllPrefixPositions(argsString, prefixes);
         return extractArguments(argsString, positions);
     }
@@ -35,11 +41,29 @@ public class ArgumentTokenizer {
      * @param prefixes   Prefixes to find in the arguments string
      * @return List of zero-based prefix positions in the given arguments string
      */
-    private static List<PrefixPosition> findAllPrefixPositions(String argsString, Prefix... prefixes) {
-        return Arrays
-            .stream(prefixes)
-            .flatMap(prefix -> findPrefixPositions(argsString, prefix).stream())
-            .collect(Collectors.toList());
+    private static List<PrefixPosition> findAllPrefixPositions(String argsString, Prefix... prefixes)
+            throws ParseException {
+        List<PrefixPosition> positions = Arrays
+                .stream(prefixes)
+                .flatMap(prefix -> findPrefixPositions(argsString, prefix).stream())
+                .sorted(Comparator.comparingInt(PrefixPosition::getStartPosition))
+                .toList();
+        List<PrefixPosition> result = new ArrayList<>();
+        int quotedEnd = -1;
+        for (PrefixPosition position : positions) {
+            if (position.getStartPosition() < quotedEnd) {
+                continue;
+            }
+            result.add(position);
+            int valueStart = position.getStartPosition() + position.getPrefix().getPrefix().length();
+            while (valueStart < argsString.length() && argsString.charAt(valueStart) <= ' ') {
+                valueStart++;
+            }
+            if (valueStart < argsString.length() && argsString.charAt(valueStart) == '"') {
+                quotedEnd = readQuotedValue(argsString, valueStart).endIndex();
+            }
+        }
+        return result;
     }
 
     /**
@@ -97,7 +121,8 @@ public class ArgumentTokenizer {
      * @param prefixPositions Zero-based positions of all prefixes in {@code argsString}
      * @return ArgumentMultimap object that maps prefixes to their arguments
      */
-    private static ArgumentMultimap extractArguments(String argsString, List<PrefixPosition> prefixPositions) {
+    private static ArgumentMultimap extractArguments(String argsString, List<PrefixPosition> prefixPositions)
+            throws ParseException {
 
         // Sort by start position
         prefixPositions.sort((prefix1, prefix2) -> prefix1.getStartPosition() - prefix2.getStartPosition());
@@ -130,15 +155,48 @@ public class ArgumentTokenizer {
      */
     private static String extractArgumentValue(String argsString,
                                                PrefixPosition currentPrefixPosition,
-                                               PrefixPosition nextPrefixPosition) {
+                                               PrefixPosition nextPrefixPosition) throws ParseException {
         Prefix prefix = currentPrefixPosition.getPrefix();
 
         int valueStartPos = currentPrefixPosition.getStartPosition() + prefix
             .getPrefix()
             .length();
-        String value = argsString.substring(valueStartPos, nextPrefixPosition.getStartPosition());
+        String value = argsString.substring(valueStartPos, nextPrefixPosition.getStartPosition()).trim();
 
-        return value.trim();
+        if (prefix.getPrefix().isEmpty() || !value.startsWith("\"")) {
+            return value;
+        }
+        QuotedValue quotedValue = readQuotedValue(value, 0);
+        if (quotedValue.endIndex() != value.length()) {
+            throw new ParseException(MESSAGE_INVALID_QUOTED_VALUE);
+        }
+        return quotedValue.value().trim();
+    }
+
+    /**
+     * Reads a double-quoted value, decoding escaped double quotes and backslashes.
+     */
+    private static QuotedValue readQuotedValue(String text, int openingQuote) throws ParseException {
+        StringBuilder value = new StringBuilder();
+        for (int index = openingQuote + 1; index < text.length(); index++) {
+            char character = text.charAt(index);
+            if (character == '"') {
+                return new QuotedValue(value.toString(), index + 1);
+            }
+            if (character == '\\' && index + 1 < text.length()
+                    && (text.charAt(index + 1) == '"' || text.charAt(index + 1) == '\\')) {
+                value.append(text.charAt(++index));
+            } else {
+                value.append(character);
+            }
+        }
+        throw new ParseException(MESSAGE_UNCLOSED_QUOTE);
+    }
+
+    /**
+     * A decoded value and the index immediately after its closing quote.
+     */
+    private record QuotedValue(String value, int endIndex) {
     }
 
     /**

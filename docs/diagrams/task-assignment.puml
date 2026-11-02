@@ -1,124 +1,45 @@
 @startuml
-' Task Assignment System UML Diagram
+title Task Assignment
 
-package "Model Layer" {
-  class Person {
-    - PersonId personId
-    - Name name
-    - Phone phone
-    - Email email
-    - Address address
-    + getPersonId()
-    + getName()
-  }
-
-  class Project {
-    - ProjectId projectId
-    - ProjectName name
-    - Deadline deadline
-    - Description description
-    + getProjectId()
-    + getName()
-  }
-
-  class ProjectMembership {
-    - PersonId personId
-    - ProjectId projectId
-    - Role role
-    + getPersonId()
-    + getProjectId()
-    + getRole()
-    + withRole(Role)
-  }
-
-  class Role {
-    - String description
-    + isValidRole()
-    + getDescription()
-  }
-
-  class AddressBook {
-    - UniquePersonList persons
-    - UniqueProjectList projects
-    - UniqueProjectMembershipList memberships
-    + getProjectMembers(Project)
-    + getPersonProjects(Person)
-    + hasProjectMembership(ProjectMembership)
-    + addProjectMembership(ProjectMembership)
-    + setProjectMembership(ProjectMembership)
-    + removeProjectMembership(ProjectMembership)
-  }
-
-  class Model {
-    <<Interface>>
-    + getProjectMembers(Project)
-    + getPersonProjects(Person)
-    + hasProjectMembership(ProjectMembership)
-    + addProjectMembership(ProjectMembership)
-    + setProjectMembership(ProjectMembership)
-    + removeProjectMembership(ProjectMembership)
-  }
-
-  class ModelManager {
-    - AddressBook addressBook
-    - FilteredList<Person> filteredPersons
-    + getProjectMembers(Project)
-    + getPersonProjects(Person)
-    + hasProjectMembership(ProjectMembership)
-    + addProjectMembership(ProjectMembership)
-    + setProjectMembership(ProjectMembership)
-    + removeProjectMembership(ProjectMembership)
-  }
+class AssociateCommand {
+  +execute(Model)
 }
 
-package "Logic Layer" {
-  class Command {
-    <<Interface>>
-  }
-
-  class SetRoleCommand {
-    - Index contactIndex
-    - Index projectIndex
-    - Role role
-    + execute(Model)
-  }
-
-  class CommandResult {
-    + String feedbackToUser
-  }
+class SetRoleCommand {
+  +execute(Model)
 }
 
-package "UI Layer" {
-  class SetRoleCommandParser {
-    + parse(String)
-  }
+interface Model {
+  +hasProjectMembership(ProjectMembership)
+  +addProjectMembership(ProjectMembership)
+  +setProjectMembership(ProjectMembership)
 }
 
-' Associations
-Person "1" --> "0..*" ProjectMembership : has >
-Project "1" --> "0..*" ProjectMembership : has >
-ProjectMembership "1" --> "1" Role : uses >
-AddressBook --> Person : contains >
-AddressBook --> Project : contains >
-AddressBook --> ProjectMembership : contains >
-Model <|-- ModelManager : implements >
-ModelManager --> AddressBook : uses >
-SetRoleCommand --> Model : uses >
-SetRoleCommandParser --> SetRoleCommand : creates >
+class ProjectMembership {
+  -personId: PersonId
+  -projectId: ProjectId
+  -role: Role
+  +withRole(Role): ProjectMembership
+}
 
-' Stereotypes
-note right of Model
-  The Model interface defines
-  all operations for managing
-  projects, persons, and their
-  task assignments via memberships
+class Role {
+  -description: String
+}
+
+AssociateCommand ..> Model : creates membership
+SetRoleCommand ..> Model : updates existing role
+Model ..> ProjectMembership : stores
+ProjectMembership *-- Role
+
+note right of AssociateCommand
+  Resolves contact and project indices,
+  rejects duplicate associations, then adds
+  a membership with an empty role.
 end note
 
-note right of ProjectMembership
-  ProjectMembership links a Person
-  to a Project. The Role field
-  describes the task allotment
-  for that membership.
+note right of SetRoleCommand
+  Requires an existing membership;
+  replaces it with a copy containing the new
+  role, or an empty role when clearing it.
 end note
-
 @enduml

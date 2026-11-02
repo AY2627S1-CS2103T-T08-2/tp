@@ -353,6 +353,13 @@ identity.
 `ParserUtil#parseRole` returns `Role.EMPTY` for an empty trimmed value. Clearing
 a role therefore preserves the membership instead of dissociating the contact.
 
+The following partial class diagram summarises how `AssociateCommand` and
+`SetRoleCommand` use the `Model` interface to create memberships and update
+member roles. Other classes, fields, operations and relationships are omitted
+for clarity.
+
+<puml src="diagrams/RoleAssignment.puml" width="900"></puml>
+
 `ListProjectsCommand` optionally accepts `c/CONTACT_INDEX`. With no contact
 index, it resets the project predicate to `PREDICATE_SHOW_ALL_PROJECTS`,
 lists all projects and requests the Projects tab.

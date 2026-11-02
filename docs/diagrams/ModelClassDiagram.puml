@@ -35,6 +35,7 @@ Class Role
 Class I #FFFFFF
 }
 
+Class GuiSettings
 Class HiddenOutside #FFFFFF
 HiddenOutside ..> Model
 
@@ -46,6 +47,7 @@ Model .left.> ReadOnlyAddressBook
 ModelManager -left-> "1" AddressBook
 ModelManager -right-> "1" UserPrefs
 UserPrefs .up.|> ReadOnlyUserPrefs
+UserPrefs --> "1" GuiSettings
 
 AddressBook *--> "1" UniquePersonList
 UniquePersonList --> "~* all" Person

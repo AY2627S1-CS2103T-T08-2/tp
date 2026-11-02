@@ -246,7 +246,7 @@ public class EditCommandParserTest {
 
     @Test
     public void parse_quotedNameContainingAddressPrefix_editsOnlyName() {
-        String[] names = {"Arjun a/l Kumar", "Priya a/p Kumar"};
+        String[] names = {"John s/o Smith", "Priya a/p Kumar"};
         for (String name : names) {
             EditPersonDescriptor descriptor = new EditPersonDescriptorBuilder().withName(name).build();
             String userInput = "1 n/\"" + name + "\"";

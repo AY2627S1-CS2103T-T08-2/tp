@@ -219,7 +219,7 @@ public class AddCommandParserTest {
 
     @Test
     public void parse_quotedNameContainingAddressPrefix_success() {
-        String[] names = {"Arjun a/l Kumar", "Priya a/p Kumar"};
+        String[] names = {"John s/o Smith", "Priya a/p Kumar"};
         for (String name : names) {
             Person expectedPerson = new PersonBuilder(BOB).withName(name).withTags().build();
             String userInput = " n/\"" + name + "\"" + PHONE_DESC_BOB + EMAIL_DESC_BOB + ADDRESS_DESC_BOB;

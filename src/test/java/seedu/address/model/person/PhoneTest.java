@@ -64,10 +64,11 @@ public class PhoneTest {
 
     @Test
     public void isValidPhone_unicodeWhitespaceOnly_returnsFalse() {
-        assertFalse(Phone.isValidPhone("\u2002")); // EN SPACE
-        assertFalse(Phone.isValidPhone("\u2003")); // EM SPACE
-        assertFalse(Phone.isValidPhone("\u3000")); // IDEOGRAPHIC SPACE
-        assertFalse(Phone.isValidPhone(" \u2003\u3000 "));
+        String[] blankValues = {"\u2002", "\u2003", "\u00A0", "\u2007", "\u202F", "\u3000", " \u2003\u00A0\u3000 "};
+        for (String value : blankValues) {
+            assertFalse(Phone.isValidPhone(value));
+            assertThrows(IllegalArgumentException.class, () -> new Phone(value));
+        }
     }
 
     @Test
@@ -84,16 +85,7 @@ public class PhoneTest {
     }
 
     @Test
-    public void isValidAddress_unicodeWhitespaceOnly_returnsFalse() {
-        String[] blankValues = {"\u2002", "\u2003", "\u00A0", "\u2007", "\u202F", "\u3000", " \u2003\u00A0\u3000 "};
-        for (String value : blankValues) {
-            assertFalse(Address.isValidAddress(value));
-            assertThrows(IllegalArgumentException.class, () -> new Address(value));
-        }
-    }
-
-    @Test
-    public void isValidAddress_unicodeSpaceWithinText_returnsTrue() {
-        assertTrue(Address.isValidAddress("Block\u00A01, Clementi Avenue"));
+    public void isValidPhone_unicodeSpaceWithinText_returnsTrue() {
+        assertTrue(Phone.isValidPhone("+65\u00A09123\u202F4567 (HP)"));
     }
 }

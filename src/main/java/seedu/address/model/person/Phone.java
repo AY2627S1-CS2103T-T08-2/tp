@@ -32,7 +32,7 @@ public class Phone {
      * Returns true if a given string is non-blank printable phone display text.
      */
     public static boolean isValidPhone(String test) {
-        return test.matches(VALIDATION_REGEX);
+        return !test.isBlank() && test.matches(VALIDATION_REGEX);
     }
 
     @Override

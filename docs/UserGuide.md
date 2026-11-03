@@ -55,7 +55,7 @@ contacts faster than traditional GUI applications.
   For example, `n/NAME [t/TAG]` can be used as `n/John Doe t/friend` or as `n/John Doe`.
 
 * Items followed by `...` can appear zero or more times.<br>
-  For example, `[t/TAG]... ` may be omitted, or written as `t/friend` or `t/friend t/family`.
+  For example, `[t/TAG]...` may be omitted, or written as `t/friend` or `t/friend t/family`.
 
 * Prefixed parameters can appear in any order.<br>
   For example, `add n/NAME p/PHONE e/EMAIL a/ADDRESS` also accepts
@@ -104,7 +104,7 @@ Format: `help`
 
 Adds a contact to UniTeam.
 
-Format: `add n/NAME p/PHONE e/EMAIL a/ADDRESS [t/TAG]... `
+Format: `add n/NAME p/PHONE e/EMAIL a/ADDRESS [t/TAG]...`
 
 **Field restrictions**
 
@@ -181,7 +181,7 @@ Examples:
 
 Edits an existing contact in UniTeam.
 
-Format: `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]... `
+Format: `edit INDEX [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS] [t/TAG]...`
 
 * Edits the contact at the specified `INDEX`. The index refers to the index number shown in the displayed contact list.
   The index **must be a positive integer** 1, 2, 3, ...
@@ -218,7 +218,7 @@ Format: `delete INDEX`
   and member roles. The projects themselves remain in UniTeam.
 
 Examples:
-* `list` followed by `delete 2` deletes the 2nd contact in UniTeam .
+* `list` followed by `delete 2` deletes the 2nd contact in UniTeam.
 * `find Betsy` followed by `delete 1` deletes the 1st contact in the results of the `find` command.
 
 ### Adding a project: `addproject`
